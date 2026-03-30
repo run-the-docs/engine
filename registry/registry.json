@@ -12,7 +12,7 @@
       },
       {
         "name": "Manifest",
-        "llmsTxt": null,
+        "llmsTxt": "https://manifest.build/docs/llms.txt",
         "readme": "https://raw.githubusercontent.com/mnfst/manifest/main/README.md"
       }
     ]
@@ -4106,10 +4106,10 @@
       "episodeStatus": "published",
       "notes": "v4 \u2014 fixed canvas.toDataURL() render bug"
     },
-    "https://raw.githubusercontent.com/mnfst/manifest/main/README.md": {
-      "url": "https://raw.githubusercontent.com/mnfst/manifest/main/README.md",
+    "https://manifest.build/docs/introduction.md": {
+      "url": "https://manifest.build/docs/introduction.md",
       "source": "manifest",
-      "slug": "manifest/intro",
+      "slug": "manifest/introduction",
       "contentHash": null,
       "lastChecked": null,
       "lastChanged": null,
@@ -4117,11 +4117,98 @@
         "series": "manifest",
         "number": 1,
         "title": "Smart LLM Routing with Manifest",
-        "videoFile": "/tmp/manifest_ep1.mp4",
         "discordMessageId": "1488297774423212165",
         "publishedAt": "2026-03-31T22:04:00Z"
       },
       "episodeStatus": "published",
+      "notes": null
+    },
+    "https://manifest.build/docs/get-started.md": {
+      "url": "https://manifest.build/docs/get-started.md",
+      "source": "manifest",
+      "slug": "manifest/get-started",
+      "contentHash": null,
+      "lastChecked": null,
+      "lastChanged": null,
+      "episode": null,
+      "episodeStatus": "unplanned",
+      "notes": null
+    },
+    "https://manifest.build/docs/routing.md": {
+      "url": "https://manifest.build/docs/routing.md",
+      "source": "manifest",
+      "slug": "manifest/routing",
+      "contentHash": null,
+      "lastChecked": null,
+      "lastChanged": null,
+      "episode": null,
+      "episodeStatus": "unplanned",
+      "notes": null
+    },
+    "https://manifest.build/docs/fallback.md": {
+      "url": "https://manifest.build/docs/fallback.md",
+      "source": "manifest",
+      "slug": "manifest/fallback",
+      "contentHash": null,
+      "lastChecked": null,
+      "lastChanged": null,
+      "episode": null,
+      "episodeStatus": "unplanned",
+      "notes": null
+    },
+    "https://manifest.build/docs/cloud-vs-local.md": {
+      "url": "https://manifest.build/docs/cloud-vs-local.md",
+      "source": "manifest",
+      "slug": "manifest/cloud-vs-local",
+      "contentHash": null,
+      "lastChecked": null,
+      "lastChanged": null,
+      "episode": null,
+      "episodeStatus": "unplanned",
+      "notes": null
+    },
+    "https://manifest.build/docs/track-usage.md": {
+      "url": "https://manifest.build/docs/track-usage.md",
+      "source": "manifest",
+      "slug": "manifest/track-usage",
+      "contentHash": null,
+      "lastChecked": null,
+      "lastChanged": null,
+      "episode": null,
+      "episodeStatus": "unplanned",
+      "notes": null
+    },
+    "https://manifest.build/docs/set-limits.md": {
+      "url": "https://manifest.build/docs/set-limits.md",
+      "source": "manifest",
+      "slug": "manifest/set-limits",
+      "contentHash": null,
+      "lastChecked": null,
+      "lastChanged": null,
+      "episode": null,
+      "episodeStatus": "unplanned",
+      "notes": null
+    },
+    "https://manifest.build/docs/configuration.md": {
+      "url": "https://manifest.build/docs/configuration.md",
+      "source": "manifest",
+      "slug": "manifest/configuration",
+      "contentHash": null,
+      "lastChecked": null,
+      "lastChanged": null,
+      "episode": null,
+      "episodeStatus": "unplanned",
+      "notes": null
+    },
+    "https://manifest.build/docs/contributing.md": {
+      "url": "https://manifest.build/docs/contributing.md",
+      "source": "manifest",
+      "slug": "manifest/contributing",
+      "contentHash": null,
+      "lastChecked": null,
+      "lastChanged": null,
+      "episode": null,
+      "episodeStatus": "unplanned",
       "notes": null
     }
   }

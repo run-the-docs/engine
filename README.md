@@ -36,7 +36,7 @@ Fetches all tracked URLs, compares content hashes, reports:
 |--------|------|---------|
 | OpenClaw | 370 | https://docs.openclaw.ai/llms.txt |
 | Hono.js | — | https://hono.dev/llms.txt |
-| Manifest | 1 README | GitHub raw |
+| Manifest | 9 | https://manifest.build/docs/llms.txt |
 
 ## Schedule
 
