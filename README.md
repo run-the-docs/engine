@@ -37,6 +37,7 @@ Fetches all tracked URLs, compares content hashes, reports:
 | OpenClaw | 370 | https://docs.openclaw.ai/llms.txt |
 | Hono.js | — | https://hono.dev/llms.txt |
 | Manifest | 9 | https://manifest.build/docs/llms.txt |
+| Kubernetes | 14 (curated) | kubernetes.io/docs — no llms.txt |
 
 ## Schedule
 

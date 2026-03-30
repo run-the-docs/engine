@@ -14,6 +14,12 @@
         "name": "Manifest",
         "llmsTxt": "https://manifest.build/docs/llms.txt",
         "readme": "https://raw.githubusercontent.com/mnfst/manifest/main/README.md"
+      },
+      {
+        "name": "Kubernetes",
+        "baseUrl": "https://kubernetes.io/docs/",
+        "llmsTxt": null,
+        "notes": "No llms.txt \u2014 episodes curated manually"
       }
     ]
   },
@@ -4209,6 +4215,230 @@
       "lastChanged": null,
       "episode": null,
       "episodeStatus": "unplanned",
+      "notes": null
+    },
+    "https://kubernetes.io/docs/concepts/overview/what-is-kubernetes/": {
+      "url": "https://kubernetes.io/docs/concepts/overview/what-is-kubernetes/",
+      "source": "kubernetes",
+      "slug": "kubernetes/what-is-kubernetes",
+      "contentHash": null,
+      "lastChecked": null,
+      "lastChanged": null,
+      "episode": {
+        "series": "kubernetes",
+        "number": 1,
+        "title": "What is Kubernetes?",
+        "plannedAt": "2026-03-31"
+      },
+      "episodeStatus": "planned",
+      "notes": null
+    },
+    "https://kubernetes.io/docs/concepts/overview/components/": {
+      "url": "https://kubernetes.io/docs/concepts/overview/components/",
+      "source": "kubernetes",
+      "slug": "kubernetes/components",
+      "contentHash": null,
+      "lastChecked": null,
+      "lastChanged": null,
+      "episode": {
+        "series": "kubernetes",
+        "number": 2,
+        "title": "Cluster Components",
+        "plannedAt": "2026-03-31"
+      },
+      "episodeStatus": "planned",
+      "notes": null
+    },
+    "https://kubernetes.io/docs/concepts/workloads/pods/": {
+      "url": "https://kubernetes.io/docs/concepts/workloads/pods/",
+      "source": "kubernetes",
+      "slug": "kubernetes/pods",
+      "contentHash": null,
+      "lastChecked": null,
+      "lastChanged": null,
+      "episode": {
+        "series": "kubernetes",
+        "number": 3,
+        "title": "Pods \u2014 The Smallest Unit",
+        "plannedAt": "2026-03-31"
+      },
+      "episodeStatus": "planned",
+      "notes": null
+    },
+    "https://kubernetes.io/docs/concepts/workloads/controllers/deployment/": {
+      "url": "https://kubernetes.io/docs/concepts/workloads/controllers/deployment/",
+      "source": "kubernetes",
+      "slug": "kubernetes/deployments",
+      "contentHash": null,
+      "lastChecked": null,
+      "lastChanged": null,
+      "episode": {
+        "series": "kubernetes",
+        "number": 4,
+        "title": "Deployments",
+        "plannedAt": "2026-03-31"
+      },
+      "episodeStatus": "planned",
+      "notes": null
+    },
+    "https://kubernetes.io/docs/concepts/services-networking/service/": {
+      "url": "https://kubernetes.io/docs/concepts/services-networking/service/",
+      "source": "kubernetes",
+      "slug": "kubernetes/services",
+      "contentHash": null,
+      "lastChecked": null,
+      "lastChanged": null,
+      "episode": {
+        "series": "kubernetes",
+        "number": 5,
+        "title": "Services & Networking",
+        "plannedAt": "2026-03-31"
+      },
+      "episodeStatus": "planned",
+      "notes": null
+    },
+    "https://kubernetes.io/docs/concepts/services-networking/ingress/": {
+      "url": "https://kubernetes.io/docs/concepts/services-networking/ingress/",
+      "source": "kubernetes",
+      "slug": "kubernetes/ingress",
+      "contentHash": null,
+      "lastChecked": null,
+      "lastChanged": null,
+      "episode": {
+        "series": "kubernetes",
+        "number": 6,
+        "title": "Ingress",
+        "plannedAt": "2026-03-31"
+      },
+      "episodeStatus": "planned",
+      "notes": null
+    },
+    "https://kubernetes.io/docs/concepts/storage/persistent-volumes/": {
+      "url": "https://kubernetes.io/docs/concepts/storage/persistent-volumes/",
+      "source": "kubernetes",
+      "slug": "kubernetes/persistent-volumes",
+      "contentHash": null,
+      "lastChecked": null,
+      "lastChanged": null,
+      "episode": {
+        "series": "kubernetes",
+        "number": 7,
+        "title": "Persistent Volumes",
+        "plannedAt": "2026-03-31"
+      },
+      "episodeStatus": "planned",
+      "notes": null
+    },
+    "https://kubernetes.io/docs/concepts/configuration/configmap/": {
+      "url": "https://kubernetes.io/docs/concepts/configuration/configmap/",
+      "source": "kubernetes",
+      "slug": "kubernetes/configmaps",
+      "contentHash": null,
+      "lastChecked": null,
+      "lastChanged": null,
+      "episode": {
+        "series": "kubernetes",
+        "number": 8,
+        "title": "ConfigMaps & Secrets",
+        "plannedAt": "2026-03-31"
+      },
+      "episodeStatus": "planned",
+      "notes": null
+    },
+    "https://kubernetes.io/docs/concepts/security/rbac-good-practices/": {
+      "url": "https://kubernetes.io/docs/concepts/security/rbac-good-practices/",
+      "source": "kubernetes",
+      "slug": "kubernetes/rbac",
+      "contentHash": null,
+      "lastChecked": null,
+      "lastChanged": null,
+      "episode": {
+        "series": "kubernetes",
+        "number": 9,
+        "title": "RBAC Security",
+        "plannedAt": "2026-03-31"
+      },
+      "episodeStatus": "planned",
+      "notes": null
+    },
+    "https://kubernetes.io/docs/concepts/cluster-administration/": {
+      "url": "https://kubernetes.io/docs/concepts/cluster-administration/",
+      "source": "kubernetes",
+      "slug": "kubernetes/cluster-administration",
+      "contentHash": null,
+      "lastChecked": null,
+      "lastChanged": null,
+      "episode": {
+        "series": "kubernetes",
+        "number": 10,
+        "title": "Cluster Administration",
+        "plannedAt": "2026-03-31"
+      },
+      "episodeStatus": "planned",
+      "notes": null
+    },
+    "https://kubernetes.io/docs/tasks/tools/": {
+      "url": "https://kubernetes.io/docs/tasks/tools/",
+      "source": "kubernetes",
+      "slug": "kubernetes/kubectl",
+      "contentHash": null,
+      "lastChecked": null,
+      "lastChanged": null,
+      "episode": {
+        "series": "kubernetes",
+        "number": 11,
+        "title": "kubectl \u2014 The CLI",
+        "plannedAt": "2026-03-31"
+      },
+      "episodeStatus": "planned",
+      "notes": null
+    },
+    "https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/": {
+      "url": "https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/",
+      "source": "kubernetes",
+      "slug": "kubernetes/statefulsets",
+      "contentHash": null,
+      "lastChecked": null,
+      "lastChanged": null,
+      "episode": {
+        "series": "kubernetes",
+        "number": 12,
+        "title": "StatefulSets",
+        "plannedAt": "2026-03-31"
+      },
+      "episodeStatus": "planned",
+      "notes": null
+    },
+    "https://kubernetes.io/docs/concepts/workloads/controllers/job/": {
+      "url": "https://kubernetes.io/docs/concepts/workloads/controllers/job/",
+      "source": "kubernetes",
+      "slug": "kubernetes/jobs",
+      "contentHash": null,
+      "lastChecked": null,
+      "lastChanged": null,
+      "episode": {
+        "series": "kubernetes",
+        "number": 13,
+        "title": "Jobs & CronJobs",
+        "plannedAt": "2026-03-31"
+      },
+      "episodeStatus": "planned",
+      "notes": null
+    },
+    "https://kubernetes.io/docs/concepts/extend-kubernetes/": {
+      "url": "https://kubernetes.io/docs/concepts/extend-kubernetes/",
+      "source": "kubernetes",
+      "slug": "kubernetes/extending",
+      "contentHash": null,
+      "lastChecked": null,
+      "lastChanged": null,
+      "episode": {
+        "series": "kubernetes",
+        "number": 14,
+        "title": "Extending Kubernetes",
+        "plannedAt": "2026-03-31"
+      },
+      "episodeStatus": "planned",
       "notes": null
     }
   }
