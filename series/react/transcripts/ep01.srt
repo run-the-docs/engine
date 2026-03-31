@@ -1,0 +1,59 @@
+1
+00:00:00,000 --> 00:00:03,000
+React is built on components.
+Let's learn what they are.
+
+2
+00:00:03,500 --> 00:00:08,000
+A component is a reusable piece of
+the user interface.
+
+3
+00:00:08,500 --> 00:00:11,000
+It can be as small as a button,
+or as large as an entire page.
+
+4
+00:00:11,500 --> 00:00:15,000
+In React, components are just
+JavaScript functions that return markup.
+
+5
+00:00:15,500 --> 00:00:20,000
+Here's a button component.
+It's a function called MyButton.
+
+6
+00:00:20,500 --> 00:00:25,000
+To use your component, reference it
+like any other JSX element.
+
+7
+00:00:25,500 --> 00:00:29,000
+Make sure to capitalize the first letter.
+That tells React it's a component.
+
+8
+00:00:29,500 --> 00:00:33,000
+You can use the same component
+multiple times.
+
+9
+00:00:33,500 --> 00:00:37,000
+Nest components inside other components
+to build complex user interfaces.
+
+10
+00:00:37,500 --> 00:00:42,000
+Components are the building blocks
+of every React app.
+
+11
+00:00:42,500 --> 00:00:46,000
+Start with functions, and you
+can build anything.
+
+12
+00:00:46,500 --> 00:00:50,000
+Next episode: learn about Props
+to pass data to your components.
