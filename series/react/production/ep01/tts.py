@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate TTS for React ep01: Your First Component"""
+"""Generate TTS for React ep01: Your First Component (EXPANDED to cover all concepts)"""
 import soundfile as sf
 import json
 import numpy as np
@@ -27,20 +27,57 @@ def patched_create_audio(self, phonemes, voice, speed):
 kokoro._create_audio = types.MethodType(patched_create_audio, kokoro)
 
 INTRO_SILENCE = 2.0
-GAP = 0.4
+GAP = 0.38
 
 sentences = [
-    "React is built on components. Let's learn what they are.",
-    "A component is a reusable piece of the user interface.",
+    # INTRO (0-4s)
+    "React is built on components. They're the foundation of every user interface you build.",
+    "A component is a reusable piece of UI — like a button, a card, or a sidebar.",
     "It can be as small as a button, or as large as an entire page.",
-    "In React, components are just JavaScript functions that return markup.",
-    "Here's a button component. It's a function called MyButton that returns a button element.",
-    "To use your component, you reference it like any other JSX element.",
-    "Just make sure to capitalize the first letter. That tells React it's a component, not an HTML tag.",
-    "You can use the same component multiple times, and you can nest components inside other components to build complex user interfaces.",
-    "Components are the building blocks of every React app.",
-    "Start with functions, and you can build anything.",
-    "Next episode: learn about Props to pass data to your components.",
+    "Just like HTML has tags like div and button, React lets you create your own custom components.",
+    
+    # FUNCTIONS (4-12s)
+    "Here's the key idea: a React component is just a JavaScript function.",
+    "It's a function that returns markup — HTML-like code called JSX.",
+    "Let's call our function MyButton. It returns a button element.",
+    "That's it. Function. Return markup. That's a component.",
+    
+    # EXPORT (12-23s)
+    "To use your component in other files, you need to export it.",
+    "First: add the export default prefix before your function.",
+    "This tells JavaScript that MyButton is the main thing this file exports.",
+    "You can learn more about imports and exports in the next episode.",
+    "For now, just remember: export default makes your component reusable.",
+    
+    # USING (23-32s)
+    "Now that you've defined MyButton, you can use it anywhere in your app.",
+    "Reference it like you would any JSX element. That's capital M, capital B: MyButton.",
+    "The capital letter matters. React uses capitalization to tell components apart from HTML tags.",
+    "So div is lowercase — that's an HTML tag. MyButton is capitalized — that's your component.",
+    
+    # NESTING (32-45s)
+    "Components can contain other components. That's called nesting.",
+    "You can use MyButton inside a Gallery component, multiple times.",
+    "Each MyButton is independent. Each one can have its own state later.",
+    "You can build entire pages this way — one component inside another, all the way down.",
+    
+    # BEST PRACTICES (45-60s)
+    "Important rule: never define a component inside another component.",
+    "If you define MyButton inside Gallery, your app will be slow and buggy.",
+    "Always define components at the top level, outside of other functions.",
+    "If a child component needs data from a parent, pass it with props instead.",
+    
+    # ALL THE WAY DOWN (60-72s)
+    "Your React app starts with a root component.",
+    "Most React apps use components all the way down.",
+    "Not just for small things like buttons, but for large sections like sidebars and pages.",
+    "Components are how you organize and structure your entire UI.",
+    
+    # RECAP (72-83s)
+    "Here's what you learned: React components are JavaScript functions that return markup.",
+    "They let you build reusable UI pieces.",
+    "Capitalize their names. Export them to reuse them. Nest them to build complex interfaces.",
+    "You're ready for the next concept: Props.",
 ]
 
 print(f"Generating {len(sentences)} sentences...")
@@ -78,12 +115,18 @@ sf.write(output_path, final_audio, SAMPLE_RATE)
 print(f"\nSaved: {output_path}")
 print(f"Total voice duration: {current_time:.2f}s")
 
+total_frames = int(np.ceil((current_time + 4.0) * 30))  # +4s outro, 30fps
+
 timing_path = 'timing.json'
 with open(timing_path, 'w') as f:
     json.dump({
         "segments": segments,
         "total_voice_duration": round(current_time, 4),
         "total_duration": round(current_time + 4.0, 4),
-        "total_frames_30fps": int(np.ceil((current_time + 4.0) * 30)),
+        "total_frames_30fps": total_frames,
     }, f, indent=2)
 print(f"Saved timing: {timing_path}")
+print(f"Total frames at 30fps: {total_frames}")
+print(f"\nTiming summary:")
+for seg in segments:
+    print(f"  [{seg['start']:.2f}s - {seg['end']:.2f}s] {seg['text'][:60]}")
