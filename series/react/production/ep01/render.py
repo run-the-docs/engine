@@ -5,7 +5,8 @@ from playwright.sync_api import sync_playwright
 import base64
 
 script_dir = Path(sys.argv[1]).resolve()
-html_file = script_dir / "animation.html"
+html_name = sys.argv[2] if len(sys.argv) > 2 else "animation.html"
+html_file = script_dir / html_name
 frames_dir = script_dir / "frames"
 frames_dir.mkdir(exist_ok=True)
 

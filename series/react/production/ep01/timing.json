@@ -1,0 +1,84 @@
+{
+  "segments": [
+    {
+      "index": 0,
+      "text": "React is built on components. Let's learn what they are.",
+      "start": 2.0,
+      "end": 5.6693,
+      "duration": 3.6693
+    },
+    {
+      "index": 1,
+      "text": "A component is a reusable piece of the user interface.",
+      "start": 6.0693,
+      "end": 10.144,
+      "duration": 4.0747
+    },
+    {
+      "index": 2,
+      "text": "It can be as small as a button, or as large as an entire page.",
+      "start": 10.544,
+      "end": 14.896,
+      "duration": 4.352
+    },
+    {
+      "index": 3,
+      "text": "In React, components are just JavaScript functions that return markup.",
+      "start": 15.296,
+      "end": 20.3307,
+      "duration": 5.0347
+    },
+    {
+      "index": 4,
+      "text": "Here's a button component. It's a function called MyButton that returns a button element.",
+      "start": 20.7307,
+      "end": 26.384,
+      "duration": 5.6533
+    },
+    {
+      "index": 5,
+      "text": "To use your component, you reference it like any other JSX element.",
+      "start": 26.784,
+      "end": 31.84,
+      "duration": 5.056
+    },
+    {
+      "index": 6,
+      "text": "Just make sure to capitalize the first letter. That tells React it's a component, not an HTML tag.",
+      "start": 32.24,
+      "end": 39.152,
+      "duration": 6.912
+    },
+    {
+      "index": 7,
+      "text": "You can use the same component multiple times, and you can nest components inside other components to build complex user interfaces.",
+      "start": 39.552,
+      "end": 48.5547,
+      "duration": 9.0027
+    },
+    {
+      "index": 8,
+      "text": "Components are the building blocks of every React app.",
+      "start": 48.9547,
+      "end": 52.752,
+      "duration": 3.7973
+    },
+    {
+      "index": 9,
+      "text": "Start with functions, and you can build anything.",
+      "start": 53.152,
+      "end": 56.3307,
+      "duration": 3.1787
+    },
+    {
+      "index": 10,
+      "text": "Next episode: learn about Props to pass data to your components.",
+      "start": 56.7307,
+      "end": 60.976,
+      "duration": 4.2453
+    }
+  ],
+  "total_voice_duration": 60.976,
+  "total_duration": 64.976,
+  "total_frames_30fps": 1950
+}
