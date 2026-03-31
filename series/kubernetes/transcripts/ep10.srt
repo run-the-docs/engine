@@ -1,0 +1,56 @@
+1
+00:00:00,000 --> 00:00:07,760
+My SQL Kafka riddies, they can't just be any PAD, they need to be the same PAD, that's
+
+2
+00:00:07,760 --> 00:00:09,760
+stateful sets.
+
+3
+00:00:09,760 --> 00:00:14,800
+Deployment PADs are interchangeable, random names, replaceable.
+
+4
+00:00:14,800 --> 00:00:20,280
+Stateful set PADs are sticky, mydb0 is always mydb0.
+
+5
+00:00:20,280 --> 00:00:25,520
+Same name, same storage, same identity, even across rescheduling.
+
+6
+00:00:25,520 --> 00:00:29,760
+PADs are created in order, 0, then 1, then 2.
+
+7
+00:00:29,760 --> 00:00:34,120
+Reveal down in reverse, rolling updates 1 at a time.
+
+8
+00:00:34,120 --> 00:00:37,880
+This prevents split brain in clustered databases.
+
+9
+00:00:37,880 --> 00:00:41,960
+Each PAD gets its own persistent volume claim.
+
+10
+00:00:41,960 --> 00:00:47,760
+Deleting the stateful set does not delete the volumes, your data stays safe.
+
+11
+00:00:47,760 --> 00:00:50,720
+Stateless workload, use a deployment.
+
+12
+00:00:50,720 --> 00:00:56,080
+Need stable identity and persistent storage, stateful set.
+
+13
+00:00:56,080 --> 00:00:57,880
+Databases live here.
+
+14
+00:00:57,880 --> 00:01:01,000
+Run the docs, Kubernetes, stateful sets.
+

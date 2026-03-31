@@ -1,0 +1,124 @@
+1
+00:00:00,000 --> 00:00:05,280
+A Kubernetes cluster has two sides.
+
+2
+00:00:05,280 --> 00:00:08,940
+The control plane that thinks, and the nodes that do.
+
+3
+00:00:08,940 --> 00:00:11,300
+The control plane manages.
+
+4
+00:00:11,300 --> 00:00:13,780
+Worker nodes run your workloads.
+
+5
+00:00:13,780 --> 00:00:14,780
+Five components.
+
+6
+00:00:14,780 --> 00:00:16,860
+First, KubeAPER server.
+
+7
+00:00:16,860 --> 00:00:17,980
+The front door.
+
+8
+00:00:17,980 --> 00:00:20,140
+All API traffic goes here.
+
+9
+00:00:20,140 --> 00:00:22,540
+It scales horizontally.
+
+10
+00:00:22,540 --> 00:00:23,540
+Second, ECT.
+
+11
+00:00:23,540 --> 00:00:24,540
+The database.
+
+12
+00:00:24,540 --> 00:00:26,220
+All cluster state lives here.
+
+13
+00:00:26,220 --> 00:00:27,220
+Back it up.
+
+14
+00:00:27,220 --> 00:00:29,280
+Third, Kube scheduler.
+
+15
+00:00:29,280 --> 00:00:32,160
+Watches for new pods with no assigned node.
+
+16
+00:00:32,160 --> 00:00:37,000
+Picks the right one based on resources, constraints, affinity, deadlines.
+
+17
+00:00:37,000 --> 00:00:39,440
+Fourth, Kube controller manager.
+
+18
+00:00:39,440 --> 00:00:44,960
+Runs controller processes, node, job, and point slice service account compiled into
+
+19
+00:00:44,960 --> 00:00:46,600
+one binary.
+
+20
+00:00:46,600 --> 00:00:48,000
+Watches for drift.
+
+21
+00:00:48,000 --> 00:00:49,000
+Fixes it.
+
+22
+00:00:49,000 --> 00:00:51,400
+Fifth, Cloud controller manager.
+
+23
+00:00:51,400 --> 00:00:53,280
+Cloud integrations only.
+
+24
+00:00:53,280 --> 00:00:56,320
+Not present on-prem or local clusters.
+
+25
+00:00:56,320 --> 00:00:58,880
+On every node, three things.
+
+26
+00:00:58,880 --> 00:01:04,240
+KubeLit, the agent, ensures containers in a pod are running and healthy.
+
+27
+00:01:04,240 --> 00:01:10,960
+Kube Proxy, optional, implements service networking, can be replaced by network plugins.
+
+28
+00:01:10,960 --> 00:01:16,760
+Container runtime, containered, or CRIO, actually runs your containers.
+
+29
+00:01:16,760 --> 00:01:19,560
+Every cluster runs these pieces.
+
+30
+00:01:19,560 --> 00:01:21,880
+Now you know what they do.
+
+31
+00:01:21,880 --> 00:01:25,240
+Run the docs, Kubernetes cluster components.
+

@@ -1,0 +1,68 @@
+1
+00:00:00,000 --> 00:00:07,000
+Three replicas, new image, zero downtime, that's a deployment.
+
+2
+00:00:07,000 --> 00:00:10,400
+A deployment manages a set of paths.
+
+3
+00:00:10,400 --> 00:00:12,760
+You describe the desired state.
+
+4
+00:00:12,760 --> 00:00:17,080
+The controller continuously reconciles actual to desired.
+
+5
+00:00:17,080 --> 00:00:19,720
+Under the hood, it wraps a replica set.
+
+6
+00:00:19,720 --> 00:00:22,560
+You don't touch replica sets directly.
+
+7
+00:00:22,560 --> 00:00:26,480
+Change the image tag, and a new replica set spins up.
+
+8
+00:00:26,480 --> 00:00:30,640
+The old one scales down gradually, never all at once.
+
+9
+00:00:30,640 --> 00:00:34,960
+The old replica set is kept, that's your rollback target.
+
+10
+00:00:34,960 --> 00:00:38,000
+Four operations you need to know.
+
+11
+00:00:38,000 --> 00:00:41,240
+Scale replicas up or down instantly.
+
+12
+00:00:41,240 --> 00:00:46,000
+Roll back to a previous revision with Cubectl Rollout Undo.
+
+13
+00:00:46,000 --> 00:00:50,240
+Pause a rollout to batch multiple changes, then resume.
+
+14
+00:00:50,240 --> 00:00:54,000
+Check progress with Cubectl Rollout status.
+
+15
+00:00:54,280 --> 00:00:57,480
+A how you run stateless apps in production.
+
+16
+00:00:57,480 --> 00:01:02,560
+Set the replica count, set the image, let Kubernetes handle the rest.
+
+17
+00:01:02,560 --> 00:01:05,640
+Run the docs, Kubernetes deployments.
+

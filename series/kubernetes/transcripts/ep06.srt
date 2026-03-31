@@ -1,0 +1,52 @@
+1
+00:00:00,000 --> 00:00:10,320
+Same code. Different config per environment. Config maps make that work. Picture this database
+
+2
+00:00:10,320 --> 00:00:17,240
+host equals local host hardcoded in your app. Works in dev breaks in production. The fix
+
+3
+00:00:17,240 --> 00:00:23,760
+seems obvious, bake config into the image. But then every environment change means a
+
+4
+00:00:23,760 --> 00:00:30,840
+build. Config map breaks that cycle. It stores configuration outside your container image
+
+5
+00:00:30,840 --> 00:00:38,440
+as key value pairs. Once you have a config map, pods consume it three ways. First, environment
+
+6
+00:00:38,440 --> 00:00:45,120
+variables inject values directly into the container. Second, command line arguments pass
+
+7
+00:00:45,120 --> 00:00:51,680
+config values as flags at startup. Third, files mounted in a volume. Drop a whole settings
+
+8
+00:00:51,680 --> 00:00:59,520
+file at a path like slash etc slash config slash settings dot yaml. Four rules before you use
+
+9
+00:00:59,520 --> 00:01:07,040
+them. Not for secrets, there is no encryption, never store passwords here. Size cap one megabyte,
+
+10
+00:01:07,040 --> 00:01:14,080
+bigger than that use a volume or external storage. Namespace scoped. The config map must
+
+11
+00:01:14,080 --> 00:01:21,400
+live in the same namespace as the pod. Since version one, 19, you can mark a config map immutable.
+
+12
+00:01:21,400 --> 00:01:29,720
+No accidental overwrites. Lighter on the API server. One image. Three environments. Three
+
+13
+00:01:29,720 --> 00:01:35,200
+config maps. Zero rebuilds. Kubernetes dot config maps.
+

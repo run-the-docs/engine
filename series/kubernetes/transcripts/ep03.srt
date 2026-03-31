@@ -1,0 +1,36 @@
+1
+00:00:00,000 --> 00:00:07,000
+Your app doesn't run in a container. It runs in a pod. Here's why that matters.
+
+2
+00:00:07,000 --> 00:00:12,560
+A pod is the smallest deployable unit in Kubernetes. It holds one or more containers, sharing the
+
+3
+00:00:12,560 --> 00:00:18,840
+same network, same IP address, and the same storage volumes. Think of it as a logical
+
+4
+00:00:18,840 --> 00:00:25,560
+host for your app. There are two usage patterns. The most common, one container per pod. Simple.
+
+5
+00:00:25,560 --> 00:00:30,880
+The pod is just a wrapper. The second, the sidecar pattern. Two tightly coupled containers
+
+6
+00:00:30,880 --> 00:00:36,760
+sharing resources. An app plus a log shipper, a proxy, or a config reloader. Here's the
+
+7
+00:00:36,760 --> 00:00:42,960
+critical thing. Pods are temporary. They crash. They are replaced. Never rely on a specific
+
+8
+00:00:42,960 --> 00:00:49,040
+pod surviving. Use a deployment to manage them. Don't create pods directly. Let a deployment
+
+9
+00:00:49,040 --> 00:00:53,360
+do it. Pods are the unit of work. Deployments are the unit of ownership.
+

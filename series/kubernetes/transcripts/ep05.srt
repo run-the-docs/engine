@@ -1,0 +1,40 @@
+1
+00:00:00,000 --> 00:00:09,680
+PADs die and get replaced. Their IPs change. Services don't. Here's the problem. Your
+
+2
+00:00:09,680 --> 00:00:16,200
+front-end hardcodes a back-end PAD IP. That PAD dies, a new one starts with a different
+
+3
+00:00:16,200 --> 00:00:24,280
+IP, your front-end breaks. Services fix this with a stable virtual IP and DNS name. Add
+
+4
+00:00:24,280 --> 00:00:31,600
+a selector to match PADs by label. Kubernetes creates a cluster IP, a stable virtual address.
+
+5
+00:00:31,600 --> 00:00:38,920
+CubeProxy writes network rules on every node. Traffic hits the service IP. It routes to a
+
+6
+00:00:38,920 --> 00:00:45,320
+healthy PAD. Endpoint slices track which PADs back the service, updated automatically.
+
+7
+00:00:45,320 --> 00:00:53,800
+Vore service types. Cluster IP internal only. The default. Node port exposes on each node.
+
+8
+00:00:53,800 --> 00:01:03,560
+Port 30,000 to 32,767. Load balancer. Cloud provider creates an external load balancer.
+
+9
+00:01:03,560 --> 00:01:11,640
+External name maps to an external DNS name. One service, many PADs, zero hardcoded IPs.
+
+10
+00:01:11,640 --> 00:01:19,680
+That's how Kubernetes decouples your front-end from your back-end. Run the dark's Kubernetes services.
+

@@ -1,0 +1,56 @@
+1
+00:00:00,000 --> 00:00:07,280
+Two controllers, one runs on every node, one runs once and stops.
+
+2
+00:00:07,280 --> 00:00:12,800
+The demon set ensures every node in your cluster runs a copy of a pod.
+
+3
+00:00:12,800 --> 00:00:16,960
+Add a node, a pod appears, remove a node, it's gone.
+
+4
+00:00:16,960 --> 00:00:23,800
+Log shippers, monitoring agents, network plugins, cube proxy, infrastructure that has to live
+
+5
+00:00:23,800 --> 00:00:24,800
+everywhere.
+
+6
+00:00:24,800 --> 00:00:26,880
+That's a demon set.
+
+7
+00:00:26,880 --> 00:00:32,800
+A job creates pods and runs until a specified number completes successfully.
+
+8
+00:00:32,800 --> 00:00:36,160
+Not a service, a task with a finished line.
+
+9
+00:00:36,160 --> 00:00:41,040
+Batch processing, data migration, machine learning training runs.
+
+10
+00:00:41,040 --> 00:00:45,720
+Retries on failure, delete the job, pods are cleaned up.
+
+11
+00:00:45,720 --> 00:00:49,160
+Need it on a schedule, that's a cran job.
+
+12
+00:00:49,160 --> 00:00:53,120
+Demon set runs everywhere, job runs once.
+
+13
+00:00:53,120 --> 00:00:56,080
+Different tools for different shapes of work.
+
+14
+00:00:56,080 --> 00:00:59,680
+On the docks, Kubernetes, demon sets and jobs.
+

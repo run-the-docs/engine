@@ -1,0 +1,64 @@
+1
+00:00:00,000 --> 00:00:08,280
+Containers are ephemeral, your database isn't, that's what persistent volumes solve.
+
+2
+00:00:08,280 --> 00:00:12,280
+When a pod dies, its container file system is gone.
+
+3
+00:00:12,280 --> 00:00:18,360
+For databases, caches and stateful apps, you need storage that outlives any pod.
+
+4
+00:00:18,360 --> 00:00:21,320
+Kubernetes gives you two objects.
+
+5
+00:00:21,320 --> 00:00:27,440
+A persistent volume is the actual storage, provisioned by an admin or dynamically by
+
+6
+00:00:27,440 --> 00:00:28,640
+the cluster.
+
+7
+00:00:28,640 --> 00:00:32,840
+A persistent volume claim is your request for storage.
+
+8
+00:00:32,840 --> 00:00:35,600
+Kubernetes binds them one to one.
+
+9
+00:00:35,600 --> 00:00:39,440
+Your pod mounts the claim, it doesn't care what's behind it.
+
+10
+00:00:39,440 --> 00:00:41,600
+Two provisioning modes.
+
+11
+00:00:41,600 --> 00:00:44,600
+Static and admin pre-creates the PV.
+
+12
+00:00:44,600 --> 00:00:50,960
+Dynamic, a storage class auto provisions one when the PVC is created, that's the modern
+
+13
+00:00:50,960 --> 00:00:51,960
+way.
+
+14
+00:00:51,960 --> 00:00:56,040
+Pod dies, data stays, that's the contract.
+
+15
+00:00:56,040 --> 00:01:00,560
+PV claims it, PV holds it, storage class provides it.
+
+16
+00:01:00,560 --> 00:01:04,000
+Run the docs, Kubernetes, persistent volumes.
+

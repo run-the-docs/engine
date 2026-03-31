@@ -1,0 +1,64 @@
+1
+00:00:00,000 --> 00:00:08,000
+One IP, multiple services, different domains, that's what Ingress does.
+
+2
+00:00:08,000 --> 00:00:14,240
+Every service as a load balancer means a separate IP and a separate cloud bill.
+
+3
+00:00:14,240 --> 00:00:17,680
+Node port works, but port numbers are ugly.
+
+4
+00:00:17,680 --> 00:00:22,240
+Ingress is one entry point that routes by hostname and path.
+
+5
+00:00:22,240 --> 00:00:26,040
+You define an Ingress resource with routing rules.
+
+6
+00:00:26,040 --> 00:00:33,200
+An Ingress controller, EngineX, Trific, HAProxy, reads those rules and acts on them.
+
+7
+00:00:33,200 --> 00:00:37,640
+Traffic flows, internet to controller to service to pods.
+
+8
+00:00:37,640 --> 00:00:43,800
+Route by hostname, api.example.com goes to the API service.
+
+9
+00:00:43,800 --> 00:00:47,600
+App.example.com goes to the front end.
+
+10
+00:00:47,600 --> 00:00:52,960
+Route by path, slash api slash routes differently than slash app slash.
+
+11
+00:00:52,960 --> 00:00:56,520
+TLS termination happens at the controller.
+
+12
+00:00:56,520 --> 00:01:00,440
+Your services stay plain HTTP internally.
+
+13
+00:01:00,440 --> 00:01:03,640
+One catch, the Ingress API is frozen.
+
+14
+00:01:03,640 --> 00:01:05,040
+No new features.
+
+15
+00:01:05,040 --> 00:01:08,640
+For new projects, look at Gateway API instead.
+
+16
+00:01:08,640 --> 00:01:11,520
+Run the docs, Kubernetes, Ingress.
+

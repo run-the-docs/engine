@@ -1,0 +1,80 @@
+1
+00:00:00,000 --> 00:00:06,520
+API keys, database passwords, TLS certs.
+
+2
+00:00:06,520 --> 00:00:09,640
+Don't put them in your image, use a secret.
+
+3
+00:00:09,640 --> 00:00:14,360
+A secret is like a config map, but for sensitive data.
+
+4
+00:00:14,360 --> 00:00:17,640
+Created independently of paths.
+
+5
+00:00:17,640 --> 00:00:20,640
+Injected at runtime, not baked into the image.
+
+6
+00:00:20,640 --> 00:00:23,000
+Here's the catch.
+
+7
+00:00:23,000 --> 00:00:25,960
+Secrets are not encrypted by default.
+
+8
+00:00:25,960 --> 00:00:28,200
+They're base 64 encoded.
+
+9
+00:00:28,200 --> 00:00:30,600
+That's encoding, not encryption.
+
+10
+00:00:30,600 --> 00:00:33,720
+Anyone with ECT access can read them.
+
+11
+00:00:33,720 --> 00:00:38,040
+To make secrets actually secret, enable encryption at rest
+
+12
+00:00:38,040 --> 00:00:39,960
+and lock down RBAC.
+
+13
+00:00:39,960 --> 00:00:42,440
+Three ways to use a secret.
+
+14
+00:00:42,440 --> 00:00:45,840
+One, inject as environment variables.
+
+15
+00:00:45,840 --> 00:00:48,560
+Two, mount as files in a volume.
+
+16
+00:00:48,560 --> 00:00:52,840
+Three, image pull secret for private container registries.
+
+17
+00:00:52,840 --> 00:00:56,920
+Use secrets, encrypt ed, restrict RBAC.
+
+18
+00:00:56,920 --> 00:00:59,440
+Or use an external vault.
+
+19
+00:00:59,440 --> 00:01:02,560
+Don't commit credentials to your image.
+
+20
+00:01:02,560 --> 00:01:06,360
+Run the docs, Kubernetes secrets.
+

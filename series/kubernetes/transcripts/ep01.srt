@@ -1,0 +1,48 @@
+1
+00:00:00,000 --> 00:00:09,520
+Your container just crashed. Again, at 3am, you woke up to fix it. There's a better way.
+
+2
+00:00:09,520 --> 00:00:16,400
+Three eras, physical servers, resource conflicts, expensive, virtual machines, better isolation,
+
+3
+00:00:16,400 --> 00:00:22,040
+but heavyweight, containers, lightweight, portable, but at scale. At scale, you need
+
+4
+00:00:22,040 --> 00:00:28,280
+something to manage them. That something is Kubernetes. Open source container orchestration
+
+5
+00:00:28,280 --> 00:00:35,720
+from Google released in 2014. Named from the Greek word for helmsman, abbreviated K-8S,
+
+6
+00:00:35,720 --> 00:00:43,520
+8 letters between K and S. Five things that matter. Self-healing restarts crashed containers
+
+7
+00:00:43,520 --> 00:00:52,120
+automatically. Scaling up or down on demand. Rollouts, zero downtime deployments. Load balancing,
+
+8
+00:00:52,440 --> 00:00:58,840
+traffic distribution built in. Secrets, passwords and config managed safely. What
+
+9
+00:00:58,840 --> 00:01:05,160
+Kubernetes is not. It's not a platform as a service. It doesn't build your code. It doesn't
+
+10
+00:01:05,160 --> 00:01:12,040
+include databases or message buses. It's building blocks. You choose the rest. You describe the
+
+11
+00:01:12,040 --> 00:01:18,520
+desired state. Three pods running. Kubernetes figures out how to get there and keeps it there.
+
+12
+00:01:18,520 --> 00:01:27,960
+A container crashes. K-8s restarts it. No 3 a.m. wake up. Run the darks. Kubernetes. Episode one of 13.
+
