@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React: Writing Markup with JSX</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #0a0a0a;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        #canvas {
+            display: block;
+            width: 100%;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="c"></canvas>
+    <script>
+        const canvas = document.getElementById('c');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 1920;
+        canvas.height = 1080;
+
+        const colors = {
+            bg: '#0a0a0a',
+            grad1: '#1a1a2e',
+            grad2: '#16213e',
+            accent: '#0f3460',
+            highlight: '#e94560',
+            text: '#eee',
+            code: '#90ee90',
+            border: '#444',
+            error: '#ff6b6b',
+        };
+
+        function clearCanvas() {
+            ctx.fillStyle = colors.bg;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            grad.addColorStop(0, colors.grad1);
+            grad.addColorStop(1, colors.grad2);
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function drawText(text, x, y, size, color, weight = '400') {
+            ctx.fillStyle = color;
+            ctx.font = `${weight} ${size}px -apple-system, BlinkMacSystemFont, sans-serif`;
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            ctx.fillText(text, x, y);
+        }
+
+        function drawCodeBox(lines, x, y, w, h, title = null, bgColor = null) {
+            const titleH = title ? 40 : 0;
+            
+            if (title) {
+                ctx.fillStyle = 'rgba(15, 52, 96, 0.8)';
+                ctx.fillRect(x, y, w, titleH);
+                drawText(title, x + 16, y + 8, 20, colors.code, '600');
+            }
+            
+            ctx.fillStyle = bgColor || 'rgba(20, 20, 35, 0.9)';
+            ctx.fillRect(x, y + titleH, w, h - titleH);
+            
+            ctx.strokeStyle = colors.border;
+            ctx.lineWidth = 2;
+            ctx.strokeRect(x, y, w, h);
+            
+            ctx.fillStyle = colors.code;
+            ctx.font = '20px Menlo, Monaco, monospace';
+            
+            lines.forEach((line, i) => {
+                ctx.fillText(line, x + 16, y + titleH + 12 + i * 26);
+            });
+        }
+
+        function renderFrame(frameIndex) {
+            const t = frameIndex / 30;
+            clearCanvas();
+
+            if (t < 2) {
+                const alpha = Math.min(1, t / 0.5);
+                drawText('JSX Rules', 960, 380, 120, `rgba(239, 68, 96, ${alpha})`, '700');
+                drawText('Writing React Markup', 960, 520, 64, `rgba(238, 238, 238, ${alpha})`, '400');
+            }
+            else if (t < 15) {
+                drawText('What is JSX?', 100, 100, 56, colors.text, '600');
+                drawText('A syntax extension that lets you write HTML-like markup in JavaScript', 150, 200, 44, colors.text);
+                drawText('React components use JSX to describe what to render', 150, 280, 44, colors.text);
+                drawText('JSX looks like HTML, but has stricter rules', 150, 360, 44, colors.text);
+            }
+            else if (t < 30) {
+                drawText('Rule 1: Single Root Element', 100, 100, 56, colors.text, '600');
+                
+                drawText('❌ Wrong: Multiple elements without parent', 150, 200, 36, colors.error);
+                drawCodeBox(
+                    ['<h1>Title</h1>', '<p>Content</p>'],
+                    150, 250, 700, 140
+                );
+                
+                drawText('✓ Correct: Wrapped in parent or fragment', 1000, 200, 36, colors.code);
+                drawCodeBox(
+                    ['<>', '  <h1>Title</h1>', '  <p>Content</p>', '</>'],
+                    1000, 250, 700, 180
+                );
+            }
+            else if (t < 45) {
+                drawText('Rule 2: Close All Tags', 100, 100, 56, colors.text, '600');
+                
+                drawText('❌ Wrong: Unclosed tags', 150, 200, 36, colors.error);
+                drawCodeBox(
+                    ['<img src="photo.jpg">', '<li>Item</li>'],
+                    150, 250, 700, 140
+                );
+                
+                drawText('✓ Correct: All tags closed', 1000, 200, 36, colors.code);
+                drawCodeBox(
+                    ['<img src="photo.jpg" />', '<li>Item</li>'],
+                    1000, 250, 700, 140
+                );
+            }
+            else if (t < 60) {
+                drawText('Rule 3: camelCase Attributes', 100, 100, 56, colors.text, '600');
+                
+                drawText('❌ Wrong: HTML attribute names', 150, 200, 36, colors.error);
+                drawCodeBox(
+                    ['<div class="container">', '<img stroke-width="2" />'],
+                    150, 250, 700, 160
+                );
+                
+                drawText('✓ Correct: camelCase in JSX', 1000, 200, 36, colors.code);
+                drawCodeBox(
+                    ['<div className="container">', '<img strokeWidth="2" />'],
+                    1000, 250, 700, 160
+                );
+            }
+            else if (t < 75) {
+                drawText('Common Conversions', 100, 100, 56, colors.text, '600');
+                
+                drawText('HTML → JSX', 150, 200, 36, colors.code, '600');
+                drawText('class → className', 150, 260, 32, colors.code);
+                drawText('for → htmlFor', 150, 310, 32, colors.code);
+                drawText('stroke-width → strokeWidth', 150, 360, 32, colors.code);
+                drawText('<img> → <img />', 150, 410, 32, colors.code);
+                
+                drawText('HTML', 950, 200, 36, colors.text, '600');
+                drawText('JSX', 1350, 200, 36, colors.code, '600');
+            }
+            else {
+                drawText('JSX rules prevent errors in your code', 150, 300, 48, colors.text);
+                drawText('HTML and logic stay together in components', 150, 380, 48, colors.text);
+                drawText('Next: JavaScript expressions in JSX', 150, 500, 48, colors.highlight, '600');
+            }
+        }
+
+        window.renderFrame = renderFrame;
+        window.canvas = canvas;
+    </script>
+</body>
+</html>

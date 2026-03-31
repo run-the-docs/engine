@@ -1,0 +1,26 @@
+{
+  "name": "React ep03: Writing Markup with JSX",
+  "colors": {
+    "background": "#0a0a0a",
+    "gradient1": "#1a1a2e",
+    "gradient2": "#16213e",
+    "accent": "#0f3460",
+    "highlight": "#e94560",
+    "text": "#eee",
+    "code": "#90ee90",
+    "border": "#444",
+    "error": "#ff6b6b"
+  },
+  "video": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "duration_seconds": 90,
+    "codec": "h264",
+    "crf": 20
+  },
+  "audio": {
+    "voice": "Samantha",
+    "rate": 150
+  }
+}
