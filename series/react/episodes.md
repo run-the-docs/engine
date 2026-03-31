@@ -5,7 +5,7 @@ Episode plan based on [react.dev/learn](https://react.dev/learn). Videos uploade
 | Ep | Title | Topic | Doc Link | Duration | Status | YouTube | Transcript |
 |----|-------|-------|----------|----------|--------|---------|-----------|
 | 01 | Your First Component | Components | [learn/your-first-component](https://react.dev/learn/your-first-component) | 90s | Video Ready | TBD | [ep01.srt](./transcripts/ep01.srt) |
-| 02 | Importing and Exporting Components | Modules | [learn/importing-and-exporting-components](https://react.dev/learn/importing-and-exporting-components) | ~90s | Planning | TBD | [ep02.srt](./transcripts/ep02.srt) |
+| 02 | Importing and Exporting Components | Modules | [learn/importing-and-exporting-components](https://react.dev/learn/importing-and-exporting-components) | 90s | Production Assets Ready | TBD | [ep02.srt](./transcripts/ep02.srt) |
 | 03 | Writing Markup with JSX | JSX | [learn/writing-markup-with-jsx](https://react.dev/learn/writing-markup-with-jsx) | ~90s | Planning | TBD | [ep03.srt](./transcripts/ep03.srt) |
 | 04 | JavaScript in JSX with Curly Braces | JSX | [learn/javascript-in-jsx-with-curly-braces](https://react.dev/learn/javascript-in-jsx-with-curly-braces) | ~90s | Planning | TBD | [ep04.srt](./transcripts/ep04.srt) |
 | 05 | Passing Props to a Component | Props | [learn/passing-props-to-a-component](https://react.dev/learn/passing-props-to-a-component) | ~90s | Planning | TBD | [ep05.srt](./transcripts/ep05.srt) |

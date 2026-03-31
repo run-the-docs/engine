@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React: Importing and Exporting Components</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #0a0a0a;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        #canvas {
+            display: block;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="c"></canvas>
+    <script>
+        const canvas = document.getElementById('c');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 1920;
+        canvas.height = 1080;
+
+        // Color scheme
+        const colors = {
+            bg: '#0a0a0a',
+            grad1: '#1a1a2e',
+            grad2: '#16213e',
+            accent: '#0f3460',
+            highlight: '#e94560',
+            text: '#eee',
+            code: '#90ee90',
+            border: '#444',
+            file1: '#4a90e2',  // Blue for app.js
+            file2: '#7ed321',  // Green for component files
+        };
+
+        function clearCanvas() {
+            ctx.fillStyle = colors.bg;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            grad.addColorStop(0, colors.grad1);
+            grad.addColorStop(1, colors.grad2);
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function drawText(text, x, y, size, color, weight = '400', maxWidth = null) {
+            ctx.fillStyle = color;
+            ctx.font = `${weight} ${size}px -apple-system, BlinkMacSystemFont, sans-serif`;
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            if (maxWidth) {
+                ctx.fillText(text, x, y, maxWidth);
+            } else {
+                ctx.fillText(text, x, y);
+            }
+        }
+
+        function drawCodeBox(code, x, y, w, h, title = null) {
+            // Title bar
+            if (title) {
+                ctx.fillStyle = 'rgba(15, 52, 96, 0.8)';
+                ctx.fillRect(x, y, w, 40);
+                drawText(title, x + 16, y + 8, 20, colors.code, '600');
+            }
+            
+            const startY = title ? y + 40 : y;
+            const startH = title ? h - 40 : h;
+            
+            // Box background
+            ctx.fillStyle = 'rgba(20, 20, 35, 0.9)';
+            ctx.fillRect(x, startY, w, startH);
+            
+            // Border
+            ctx.strokeStyle = colors.border;
+            ctx.lineWidth = 2;
+            ctx.strokeRect(x, y, w, h);
+            
+            // Code text
+            ctx.fillStyle = colors.code;
+            ctx.font = '22px Menlo, Monaco, monospace';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            
+            const lines = code.split('\n');
+            lines.forEach((line, i) => {
+                ctx.fillText(line, x + 20, startY + 16 + i * 28);
+            });
+        }
+
+        function drawFileBox(name, color, x, y, w, h) {
+            ctx.fillStyle = `rgba(${hexToRgb(color).r}, ${hexToRgb(color).g}, ${hexToRgb(color).b}, 0.15)`;
+            ctx.fillRect(x, y, w, h);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.strokeRect(x, y, w, h);
+            drawText(name, x + 16, y + 12, 24, color, '600');
+        }
+
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : { r: 0, g: 0, b: 0 };
+        }
+
+        function renderFrame(frameIndex) {
+            const t = frameIndex / 30; // 30 fps
+            
+            clearCanvas();
+
+            // Timeline:
+            // 0-2s: Intro
+            // 2-15s: What is import/export
+            // 15-30s: File structure visualization
+            // 30-45s: Default export example
+            // 45-60s: Named exports example
+            // 60-75s: Multiple exports
+            // 75-90s: Recap + CTA
+
+            if (t < 2) {
+                const alpha = Math.min(1, t / 0.5);
+                ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.1})`;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                drawText('Imports & Exports', 960, 380, 120, `rgba(239, 68, 96, ${alpha})`, '700');
+                drawText('Organizing Your Components', 960, 520, 64, `rgba(238, 238, 238, ${alpha})`, '400');
+            }
+            else if (t < 15) {
+                drawText('Growing Your App', 100, 100, 56, colors.text, '600');
+                drawText('As your React app grows, split components into separate files', 150, 250, 44, colors.text);
+                drawText('Importing and exporting lets you organize your code logically', 150, 320, 44, colors.text);
+                drawText('Two patterns: default export (one per file) and named exports (multiple)', 150, 390, 44, colors.text);
+            }
+            else if (t < 30) {
+                drawText('File Structure', 100, 100, 56, colors.text, '600');
+                
+                // Visualize file layout
+                drawFileBox('App.js', colors.file1, 200, 250, 400, 500);
+                drawFileBox('Gallery.js', colors.file2, 750, 250, 400, 500);
+                drawFileBox('Profile.js', colors.file2, 1300, 250, 400, 500);
+                
+                // Draw arrows
+                ctx.strokeStyle = colors.highlight;
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(600, 480);
+                ctx.lineTo(750, 480);
+                ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.moveTo(1150, 480);
+                ctx.lineTo(1300, 480);
+                ctx.stroke();
+                
+                drawText('imports', 660, 460, 24, colors.highlight);
+                drawText('imports', 1210, 460, 24, colors.highlight);
+            }
+            else if (t < 45) {
+                drawText('Default Export', 100, 100, 56, colors.text, '600');
+                drawText('One main component per file', 150, 180, 40, colors.code);
+                
+                drawCodeBox(
+                    'export default function Gallery() {\n  return <section>...</section>\n}',
+                    150, 280, 1620, 280, 'Gallery.js'
+                );
+                
+                drawCodeBox(
+                    'import Gallery from "./Gallery.js"',
+                    150, 620, 1620, 180, 'App.js'
+                );
+            }
+            else if (t < 60) {
+                drawText('Named Exports', 100, 100, 56, colors.text, '600');
+                drawText('Multiple components from one file', 150, 180, 40, colors.code);
+                
+                drawCodeBox(
+                    'export function Profile() { ... }\nexport default function Gallery() { ... }',
+                    150, 280, 1620, 320, 'Gallery.js'
+                );
+                
+                drawCodeBox(
+                    'import Gallery from "./Gallery.js"\nimport { Profile } from "./Gallery.js"',
+                    150, 660, 1620, 220, 'App.js'
+                );
+            }
+            else if (t < 75) {
+                drawText('Mixing Exports', 100, 100, 56, colors.text, '600');
+                
+                drawCodeBox(
+                    'export function Profile() { ... }\nexport default Gallery',
+                    200, 250, 700, 300, 'Gallery.js'
+                );
+                
+                drawCodeBox(
+                    'import { Profile } from "./Profile.js"',
+                    1000, 250, 700, 140, 'App.js'
+                );
+                
+                drawText('One default export', 200, 600, 40, colors.code);
+                drawText('Multiple named exports', 200, 680, 40, colors.code);
+                drawText('= maximum flexibility', 200, 760, 40, colors.code);
+            }
+            else {
+                drawText('Organize your components logically', 150, 300, 48, colors.text);
+                drawText('Split into files for reusability and clarity', 150, 380, 48, colors.text);
+                drawText('Use default or named exports as needed', 150, 460, 48, colors.text);
+                drawText('Next: learn about Props', 150, 580, 48, colors.highlight, '600');
+            }
+        }
+
+        window.renderFrame = renderFrame;
+        window.canvas = canvas;
+    </script>
+</body>
+</html>
