@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #080810; overflow: hidden; }
+canvas { display: block; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+// ── Configuration ──────────────────────────────────────────────────────────
+const W = 1920, H = 1080;
+const FPS = 30;
+const TOTAL_FRAMES = 72 * FPS; // 2160 frames
+
+// Colours
+const BG      = '#080810';
+const ACCENT  = '#326CE5';
+const ACCENT2 = '#60a5fa';
+const TEXT    = '#f8fafc';
+const GREEN   = '#22c55e';
+const YELLOW  = '#eab308';
+const RED     = '#ef4444';
+const FONT    = 'JetBrains Mono, Consolas, monospace';
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+function ease(t) { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
+function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+function easeIn(t) { return t * t * t; }
+function clamp(v,lo,hi) { return Math.min(hi, Math.max(lo, v)); }
+function lerp(a,b,t) { return a + (b-a)*t; }
+function progress(frame, start, end) { return clamp((frame-start)/(end-start),0,1); }
+
+function fitText(ctx, text, maxWidth, startSize, fontFamily) {
+  let size = startSize;
+  ctx.font = `${size}px ${fontFamily}`;
+  while (ctx.measureText(text).width > maxWidth && size > 10) {
+    size -= 1;
+    ctx.font = `${size}px ${fontFamily}`;
+  }
+  return size;
+}
+
+function hexToRgba(hex, alpha) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+// ── K8s Logo ────────────────────────────────────────────────────────────────
+let k8sLogo = null;
+const logoImg = new Image();
+logoImg.onload = () => { k8sLogo = logoImg; };
+logoImg.src = 'k8s-logo.png';
+
+// ── Scene boundaries (in frames at 30fps) ─────────────────────────────────
+// Scene 1: HOOK          0   - 150  (0-5s)
+// Scene 2: POD ANATOMY   150 - 600  (5-20s)
+// Scene 3: TWO PATTERNS  600 - 1050 (20-35s)
+// Scene 4: EPHEMERAL     1050- 1440 (35-48s)
+// Scene 5: YAML SNIPPET  1440- 1800 (48-60s)
+// Scene 6: OUTRO         1800- 2160 (60-72s)
+
+const S = {
+  HOOK_START:    0,   HOOK_END:    150,
+  ANAT_START:    150, ANAT_END:    600,
+  PAT_START:     600, PAT_END:     1050,
+  EPH_START:     1050,EPH_END:     1440,
+  YAML_START:    1440,YAML_END:    1800,
+  OUTRO_START:   1800,OUTRO_END:   2160,
+};
+
+// ── Background gradient ────────────────────────────────────────────────────
+function drawBg(ctx) {
+  ctx.fillStyle = BG;
+  ctx.fillRect(0, 0, W, H);
+  // subtle radial glow
+  const g = ctx.createRadialGradient(W/2, H/2, 100, W/2, H/2, 900);
+  g.addColorStop(0, 'rgba(50,108,229,0.06)');
+  g.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, H);
+}
+
+// ── Scene 1: HOOK ─────────────────────────────────────────────────────────
+function drawHook(ctx, frame) {
+  const f = frame - S.HOOK_START;
+  const dur = S.HOOK_END - S.HOOK_START;
+
+  drawBg(ctx);
+
+  // kubectl output background
+  const termX = W/2 - 480, termY = H/2 - 200;
+  const termW = 960, termH = 300;
+
+  ctx.fillStyle = 'rgba(8,8,24,0.9)';
+  ctx.strokeStyle = ACCENT;
+  ctx.lineWidth = 1.5;
+  roundRect(ctx, termX, termY, termW, termH, 8);
+  ctx.fill(); ctx.stroke();
+
+  // Terminal prompt
+  ctx.font = `22px ${FONT}`;
+  ctx.fillStyle = GREEN;
+  ctx.fillText('$ kubectl get pods', termX + 24, termY + 44);
+
+  // Header row
+  ctx.fillStyle = '#64748b';
+  ctx.font = `20px ${FONT}`;
+  ctx.fillText('NAME              READY   STATUS             RESTARTS   AGE', termX + 24, termY + 80);
+
+  // Pod rows — appear at f=10
+  const rowAlpha = clamp((f - 10) / 15, 0, 1);
+
+  const pods = [
+    { name: 'nginx-7d6-abc',   status: 'Running',              col: GREEN,  flash: false },
+    { name: 'nginx-7d6-def',   status: 'CrashLoopBackOff',     col: RED,    flash: true  },
+    { name: 'nginx-7d6-ghi',   status: 'Running',              col: GREEN,  flash: false },
+  ];
+
+  pods.forEach((pod, i) => {
+    const rowY = termY + 108 + i * 32;
+    ctx.globalAlpha = rowAlpha;
+
+    // Flash the crash pod
+    let col = pod.col;
+    if (pod.flash) {
+      const flashRate = Math.sin(f * 0.25) > 0;
+      col = flashRate ? RED : '#ff8080';
+    }
+
+    ctx.fillStyle = TEXT;
+    ctx.font = `20px ${FONT}`;
+    const nameSize = fitText(ctx, pod.name, 260, 20, FONT);
+    ctx.font = `${nameSize}px ${FONT}`;
+    ctx.fillText(pod.name, termX + 24, rowY);
+
+    ctx.font = `20px ${FONT}`;
+    ctx.fillStyle = '#94a3b8';
+    ctx.fillText('1/1     ', termX + 300, rowY);
+
+    ctx.fillStyle = col;
+    const statusSize = fitText(ctx, pod.status, 280, 20, FONT);
+    ctx.font = `${statusSize}px ${FONT}`;
+    ctx.fillText(pod.status, termX + 370, rowY);
+
+    ctx.font = `20px ${FONT}`;
+    ctx.fillStyle = '#64748b';
+    ctx.fillText('0          2m', termX + 680, rowY);
+
+    ctx.globalAlpha = 1;
+  });
+
+  // Hook text — fade in after f=20
+  const textAlpha = clamp((f - 20) / 20, 0, 1);
+  ctx.globalAlpha = textAlpha;
+
+  ctx.fillStyle = TEXT;
+  ctx.textAlign = 'center';
+  let sz1 = fitText(ctx, "Your app doesn't run in a container.", W - 200, 48, FONT);
+  ctx.font = `${sz1}px ${FONT}`;
+  ctx.fillText("Your app doesn't run in a container.", W/2, termY + termH + 80);
+
+  // Second line appears later — brighter, bigger
+  const line2Alpha = clamp((f - 60) / 20, 0, 1);
+  ctx.globalAlpha = line2Alpha;
+  ctx.fillStyle = ACCENT2;
+  let sz2 = fitText(ctx, "It runs in a Pod.", W - 200, 72, FONT);
+  ctx.font = `bold ${sz2}px ${FONT}`;
+  ctx.fillText("It runs in a Pod.", W/2, termY + termH + 170);
+
+  ctx.globalAlpha = 1;
+  ctx.textAlign = 'left';
+}
+
+// ── Scene 2: POD ANATOMY ──────────────────────────────────────────────────
+function drawAnatomy(ctx, frame) {
+  const f = frame - S.ANAT_START;
+  const dur = S.ANAT_END - S.ANAT_START;
+
+  drawBg(ctx);
+
+  // Scene title
+  const titleAlpha = clamp(f / 20, 0, 1);
+  ctx.globalAlpha = titleAlpha;
+  ctx.fillStyle = '#64748b';
+  ctx.font = `24px ${FONT}`;
+  ctx.textAlign = 'center';
+  ctx.fillText('// what is a pod?', W/2, 60);
+  ctx.textAlign = 'left';
+
+  // POD outer box springs in
+  const podP = clamp((f - 10) / 40, 0, 1);
+  const podEased = easeOut(podP);
+  const podW = 860 * podEased;
+  const podH = 440 * podEased;
+  const podX = W/2 - podW/2;
+  const podY = H/2 - podH/2 - 20;
+
+  ctx.globalAlpha = podEased;
+
+  // Outer POD container
+  ctx.strokeStyle = ACCENT;
+  ctx.lineWidth = 3;
+  ctx.fillStyle = 'rgba(50,108,229,0.08)';
+  roundRect(ctx, podX, podY, podW, podH, 16);
+  ctx.fill(); ctx.stroke();
+
+  // POD label
+  ctx.fillStyle = ACCENT;
+  ctx.font = `bold 28px ${FONT}`;
+  ctx.textAlign = 'center';
+  ctx.fillText('POD', W/2, podY + 36);
+
+  // IP badge
+  const ipAlpha = clamp((f - 50) / 25, 0, 1);
+  ctx.globalAlpha = ipAlpha * podEased;
+  ctx.fillStyle = 'rgba(96,165,250,0.15)';
+  ctx.strokeStyle = ACCENT2;
+  ctx.lineWidth = 1.5;
+  const ipW = 200, ipH = 34;
+  roundRect(ctx, W/2 - ipW/2, podY + 48, ipW, ipH, 6);
+  ctx.fill(); ctx.stroke();
+  ctx.fillStyle = ACCENT2;
+  ctx.font = `16px ${FONT}`;
+  ctx.textAlign = 'center';
+  ctx.fillText('10.0.0.42', W/2, podY + 71);
+
+  // Container boxes — side by side
+  const contAlpha = clamp((f - 60) / 30, 0, 1);
+  ctx.globalAlpha = contAlpha * podEased;
+
+  const cW = 280, cH = 180;
+  const c1X = W/2 - 310, cY = podY + 100;
+  const c2X = W/2 + 30;
+
+  // Container 1
+  ctx.fillStyle = 'rgba(34,197,94,0.1)';
+  ctx.strokeStyle = GREEN;
+  ctx.lineWidth = 2;
+  roundRect(ctx, c1X, cY, cW, cH, 10);
+  ctx.fill(); ctx.stroke();
+  ctx.fillStyle = GREEN;
+  ctx.font = `18px ${FONT}`;
+  ctx.textAlign = 'center';
+  ctx.fillText('container 1', c1X + cW/2, cY + 30);
+  ctx.fillStyle = '#64748b';
+  ctx.font = `14px ${FONT}`;
+  ctx.fillText('nginx:1.14.2', c1X + cW/2, cY + 56);
+
+  // Container 2
+  ctx.fillStyle = 'rgba(96,165,250,0.1)';
+  ctx.strokeStyle = ACCENT2;
+  ctx.lineWidth = 2;
+  roundRect(ctx, c2X, cY, cW, cH, 10);
+  ctx.fill(); ctx.stroke();
+  ctx.fillStyle = ACCENT2;
+  ctx.font = `18px ${FONT}`;
+  ctx.textAlign = 'center';
+  ctx.fillText('container 2', c2X + cW/2, cY + 30);
+  ctx.fillStyle = '#64748b';
+  ctx.font = `14px ${FONT}`;
+  ctx.fillText('log-shipper', c2X + cW/2, cY + 56);
+
+  // Shared volume bar at bottom
+  const volAlpha = clamp((f - 100) / 30, 0, 1);
+  ctx.globalAlpha = volAlpha * podEased;
+  const volY = cY + cH + 20;
+  ctx.fillStyle = 'rgba(234,179,8,0.12)';
+  ctx.strokeStyle = YELLOW;
+  ctx.lineWidth = 1.5;
+  roundRect(ctx, c1X, volY, c2X + cW - c1X, 44, 6);
+  ctx.fill(); ctx.stroke();
+  ctx.fillStyle = YELLOW;
+  ctx.font = `16px ${FONT}`;
+  ctx.textAlign = 'center';
+  ctx.fillText('/data  (shared volume)', W/2, volY + 28);
+
+  // Labels
+  const labelAlpha = clamp((f - 140) / 30, 0, 1);
+  ctx.globalAlpha = labelAlpha;
+
+  // shared network label
+  ctx.fillStyle = ACCENT2;
+  ctx.font = `22px ${FONT}`;
+  ctx.textAlign = 'center';
+  ctx.fillText('shared network  ·  same IP', W/2, podY + podH + 52);
+
+  ctx.fillStyle = YELLOW;
+  ctx.font = `22px ${FONT}`;
+  ctx.fillText('shared storage  ·  same volumes', W/2, podY + podH + 88);
+
+  ctx.globalAlpha = 1;
+  ctx.textAlign = 'left';
+}
+
+// ── Scene 3: TWO PATTERNS ─────────────────────────────────────────────────
+function drawPatterns(ctx, frame) {
+  const f = frame - S.PAT_START;
+
+  drawBg(ctx);
+
+  ctx.globalAlpha = clamp(f / 20, 0, 1);
+  ctx.fillStyle = '#64748b';
+  ctx.font = `24px ${FONT}`;
+  ctx.textAlign = 'center';
+  ctx.fillText('// two usage patterns', W/2, 60);
+  ctx.textAlign = 'left';
+  ctx.globalAlpha = 1;
+
+  // LEFT CARD: single container
+  const leftP = easeOut(clamp((f - 15) / 45, 0, 1));
+  const rightP = easeOut(clamp((f - 45) / 45, 0, 1));
+
+  const cardW = 680, cardH = 420;
+  const margin = 60;
+  const leftX = W/2 - cardW - margin/2;
+  const rightX = W/2 + margin/2;
+  const cardY = H/2 - cardH/2 + 20;
+
+  // Left card background
+  ctx.globalAlpha = leftP;
+  ctx.fillStyle = 'rgba(34,197,94,0.06)';
+  ctx.strokeStyle = GREEN;
+  ctx.lineWidth = 2;
+  roundRect(ctx, leftX, cardY, cardW, cardH, 14);
+  ctx.fill(); ctx.stroke();
+
+  // Left card title
+  ctx.fillStyle = GREEN;
+  ctx.font = `bold 26px ${FONT}`;
+  ctx.textAlign = 'center';
+  ctx.fillText('single container', leftX + cardW/2, cardY + 44);
+  ctx.fillStyle = '#64748b';
+  ctx.font = `18px ${FONT}`;
+  ctx.fillText('(most common)', leftX + cardW/2, cardY + 72);
+
+  // Container box inside
+  const innerW = 320, innerH = 140;
+  const innerX = leftX + cardW/2 - innerW/2;
+  const innerY = cardY + 110;
+  ctx.fillStyle = 'rgba(34,197,94,0.12)';
+  ctx.strokeStyle = GREEN;
+  ctx.lineWidth = 1.5;
+  roundRect(ctx, innerX, innerY, innerW, innerH, 8);
+  ctx.fill(); ctx.stroke();
+  ctx.fillStyle = GREEN;
+  ctx.font = `20px ${FONT}`;
+  ctx.textAlign = 'center';
+  ctx.fillText('nginx', innerX + innerW/2, innerY + 44);
+  ctx.fillStyle = '#64748b';
+  ctx.font = `15px ${FONT}`;
+  ctx.fillText('nginx:1.14.2', innerX + innerW/2, innerY + 68);
+
+  // POD border around it
+  const podPad = 40;
+  ctx.strokeStyle = ACCENT;
+  ctx.lineWidth = 2;
+  ctx.setLineDash([8, 4]);
+  roundRect(ctx, innerX - podPad, innerY - podPad, innerW + podPad*2, innerH + podPad*2 + 10, 12);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = ACCENT;
+  ctx.font = `14px ${FONT}`;
+  ctx.fillText('POD', innerX - podPad + 8, innerY - podPad + 20);
+
+  // Caption
+  ctx.fillStyle = TEXT;
+  ctx.font = `18px ${FONT}`;
+  ctx.textAlign = 'center';
+  ctx.fillText('Pod wraps one container', leftX + cardW/2, cardY + cardH - 28);
+
+  // RIGHT CARD: sidecar
+  ctx.globalAlpha = rightP;
+  ctx.fillStyle = 'rgba(50,108,229,0.06)';
+  ctx.strokeStyle = ACCENT;
+  ctx.lineWidth = 2;
+  roundRect(ctx, rightX, cardY, cardW, cardH, 14);
+  ctx.fill(); ctx.stroke();
+
+  ctx.fillStyle = ACCENT;
+  ctx.font = `bold 26px ${FONT}`;
+  ctx.textAlign = 'center';
+  ctx.fillText('sidecar pattern', rightX + cardW/2, cardY + 44);
+  ctx.fillStyle = '#64748b';
+  ctx.font = `18px ${FONT}`;
+  ctx.fillText('(tightly coupled containers)', rightX + cardW/2, cardY + 72);
+
+  // Two containers
+  const sc = 220, sh = 100;
+  const s1X = rightX + 60, s2X = rightX + cardW - 60 - sc;
+  const sY = cardY + 110;
+
+  ctx.fillStyle = 'rgba(34,197,94,0.1)';
+  ctx.strokeStyle = GREEN;
+  ctx.lineWidth = 1.5;
+  roundRect(ctx, s1X, sY, sc, sh, 8);
+  ctx.fill(); ctx.stroke();
+  ctx.fillStyle = GREEN;
+  ctx.font = `17px ${FONT}`;
+  ctx.textAlign = 'center';
+  ctx.fillText('app', s1X + sc/2, sY + 34);
+  ctx.fillStyle = '#64748b';
+  ctx.font = `13px ${FONT}`;
+  ctx.fillText('my-app:v2', s1X + sc/2, sY + 56);
+
+  ctx.fillStyle = 'rgba(96,165,250,0.1)';
+  ctx.strokeStyle = ACCENT2;
+  roundRect(ctx, s2X, sY, sc, sh, 8);
+  ctx.fill(); ctx.stroke();
+  ctx.fillStyle = ACCENT2;
+  ctx.font = `17px ${FONT}`;
+  ctx.textAlign = 'center';
+  ctx.fillText('log-shipper', s2X + sc/2, sY + 34);
+  ctx.fillStyle = '#64748b';
+  ctx.font = `13px ${FONT}`;
+  ctx.fillText('fluentd:v1', s2X + sc/2, sY + 56);
+
+  // Arrow between with "shared volume" label
+  const arrowMidX = rightX + cardW/2;
+  const arrowY = sY + sh/2;
+  ctx.strokeStyle = YELLOW;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(s1X + sc, arrowY);
+  ctx.lineTo(s2X, arrowY);
+  ctx.stroke();
+  // Arrow heads
+  ctx.fillStyle = YELLOW;
+  ctx.beginPath();
+  ctx.moveTo(s2X, arrowY);
+  ctx.lineTo(s2X - 12, arrowY - 6);
+  ctx.lineTo(s2X - 12, arrowY + 6);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(s1X + sc, arrowY);
+  ctx.lineTo(s1X + sc + 12, arrowY - 6);
+  ctx.lineTo(s1X + sc + 12, arrowY + 6);
+  ctx.fill();
+
+  // shared volume label
+  ctx.fillStyle = YELLOW;
+  ctx.font = `14px ${FONT}`;
+  ctx.textAlign = 'center';
+  ctx.fillText('shared volume', arrowMidX, arrowY - 12);
+
+  // POD border around sidecar
+  const sp = 30;
+  ctx.strokeStyle = ACCENT;
+  ctx.lineWidth = 2;
+  ctx.setLineDash([8, 4]);
+  roundRect(ctx, s1X - sp, sY - sp, (s2X + sc) - (s1X - sp) + sp, sh + sp*2 + 10, 12);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = ACCENT;
+  ctx.font = `14px ${FONT}`;
+  ctx.textAlign = 'left';
+  ctx.fillText('POD', s1X - sp + 8, sY - sp + 18);
+
+  ctx.fillStyle = TEXT;
+  ctx.font = `18px ${FONT}`;
+  ctx.textAlign = 'center';
+  ctx.fillText('tightly coupled helpers', rightX + cardW/2, cardY + cardH - 28);
+
+  ctx.globalAlpha = 1;
+  ctx.textAlign = 'left';
+}
+
+// ── Scene 4: EPHEMERAL ────────────────────────────────────────────────────
+function drawEphemeral(ctx, frame) {
+  const f = frame - S.EPH_START;
+
+  drawBg(ctx);
+
+  ctx.globalAlpha = clamp(f / 20, 0, 1);
+  ctx.fillStyle = '#64748b';
+  ctx.font = `24px ${FONT}`;
+  ctx.textAlign = 'center';
+  ctx.fillText('// pods are ephemeral', W/2, 60);
+  ctx.textAlign = 'left';
+  ctx.globalAlpha = 1;
+
+  // Deployment label at top
+  const deplAlpha = clamp((f - 240) / 40, 0, 1);
+  ctx.globalAlpha = deplAlpha;
+  ctx.fillStyle = ACCENT;
+  ctx.font = `bold 28px ${FONT}`;
+  ctx.textAlign = 'center';
+  ctx.fillText('Deployment', W/2, 130);
+  // deployment bar
+  ctx.strokeStyle = ACCENT;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(W/2 - 300, 148); ctx.lineTo(W/2 + 300, 148);
+  ctx.stroke();
+  // down arrows
+  [-200, 0, 200].forEach(dx => {
+    ctx.beginPath();
+    ctx.moveTo(W/2 + dx, 148); ctx.lineTo(W/2 + dx, 180);
+    ctx.stroke();
+    // arrowhead
+    ctx.fillStyle = ACCENT;
+    ctx.beginPath();
+    ctx.moveTo(W/2 + dx, 185);
+    ctx.lineTo(W/2 + dx - 8, 172);
+    ctx.lineTo(W/2 + dx + 8, 172);
+    ctx.fill();
+  });
+  ctx.globalAlpha = 1;
+
+  // Three pod cards
+  const podDefs = [
+    { id: 'pod-abc', x: W/2 - 580 },
+    { id: 'pod-def', x: W/2 - 130 },
+    { id: 'pod-ghi', x: W/2 + 320 },
+  ];
+
+  const pw = 240, ph = 180;
+  const py = H/2 - ph/2 + 20;
+
+  podDefs.forEach((pod, i) => {
+    const appearP = easeOut(clamp((f - i*20 - 10) / 35, 0, 1));
+    if (appearP <= 0) return;
+
+    let col = GREEN;
+    let label = 'Running';
+    let alpha = appearP;
+
+    if (pod.id === 'pod-def') {
+      // Turn red at f=130, disappear at f=200
+      if (f > 130 && f < 200) {
+        col = RED; label = 'CrashLoopBackOff';
+        const flashVal = Math.sin((f - 130) * 0.4) > 0;
+        col = flashVal ? RED : '#ff8080';
+      } else if (f >= 200) {
+        // Disappear with scale-down
+        const disappearP = clamp((f - 200) / 20, 0, 1);
+        alpha = (1 - disappearP) * appearP;
+        const scale = 1 - disappearP;
+        // draw scaled pod
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.translate(pod.x + pw/2, py + ph/2);
+        ctx.scale(scale, scale);
+        ctx.translate(-(pw/2), -(ph/2));
+        ctx.fillStyle = 'rgba(239,68,68,0.1)';
+        ctx.strokeStyle = RED;
+        ctx.lineWidth = 2;
+        roundRect(ctx, 0, 0, pw, ph, 12);
+        ctx.fill(); ctx.stroke();
+        ctx.fillStyle = RED;
+        ctx.font = `18px ${FONT}`;
+        ctx.textAlign = 'center';
+        ctx.fillText(pod.id, pw/2, 36);
+        ctx.fillStyle = '#64748b';
+        ctx.font = `14px ${FONT}`;
+        ctx.fillText('CrashLoopBackOff', pw/2, 62);
+        ctx.restore();
+        ctx.globalAlpha = 1;
+        ctx.textAlign = 'left';
+        return;
+      }
+    }
+
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = col === GREEN ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)';
+    ctx.strokeStyle = col;
+    ctx.lineWidth = 2;
+    roundRect(ctx, pod.x, py, pw, ph, 12);
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = col;
+    ctx.font = `18px ${FONT}`;
+    ctx.textAlign = 'center';
+    ctx.fillText(pod.id, pod.x + pw/2, py + 36);
+    ctx.fillStyle = '#64748b';
+    ctx.font = `14px ${FONT}`;
+    ctx.fillText(label, pod.x + pw/2, py + 62);
+    ctx.fillStyle = '#475569';
+    ctx.font = `12px ${FONT}`;
+    ctx.fillText('1/1', pod.x + pw/2, py + 86);
+    ctx.globalAlpha = 1;
+    ctx.textAlign = 'left';
+  });
+
+  // New pod-xyz appears at f=220
+  const newPodP = easeOut(clamp((f - 220) / 30, 0, 1));
+  if (newPodP > 0) {
+    ctx.globalAlpha = newPodP;
+    ctx.fillStyle = 'rgba(34,197,94,0.1)';
+    ctx.strokeStyle = GREEN;
+    ctx.lineWidth = 2;
+    roundRect(ctx, W/2 - 130, py, pw, ph, 12);
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = GREEN;
+    ctx.font = `18px ${FONT}`;
+    ctx.textAlign = 'center';
+    ctx.fillText('pod-xyz', W/2 - 130 + pw/2, py + 36);
+    ctx.fillStyle = '#64748b';
+    ctx.font = `14px ${FONT}`;
+    ctx.fillText('Running', W/2 - 130 + pw/2, py + 62);
+    ctx.fillStyle = '#475569';
+    ctx.font = `12px ${FONT}`;
+    ctx.fillText('1/1', W/2 - 130 + pw/2, py + 86);
+    ctx.globalAlpha = 1;
+    ctx.textAlign = 'left';
+  }
+
+  // Bottom text
+  const textAlpha = clamp((f - 160) / 30, 0, 1);
+  ctx.globalAlpha = textAlpha;
+  ctx.fillStyle = TEXT;
+  ctx.font = `28px ${FONT}`;
+  ctx.textAlign = 'center';
+  ctx.fillText('Pods are replaced, not repaired', W/2, py + ph + 80);
+  ctx.globalAlpha = 1;
+  ctx.textAlign = 'left';
+}
+
+// ── Scene 5: YAML SNIPPET ──────────────────────────────────────────────────
+function drawYaml(ctx, frame) {
+  const f = frame - S.YAML_START;
+
+  drawBg(ctx);
+
+  ctx.globalAlpha = clamp(f / 20, 0, 1);
+  ctx.fillStyle = '#64748b';
+  ctx.font = `24px ${FONT}`;
+  ctx.textAlign = 'center';
+  ctx.fillText("// don't create pods directly", W/2, 60);
+  ctx.textAlign = 'left';
+  ctx.globalAlpha = 1;
+
+  // Code block box
+  const bx = W/2 - 440, by = H/2 - 260, bw = 880, bh = 420;
+  const blockP = easeOut(clamp((f - 10) / 35, 0, 1));
+  ctx.globalAlpha = blockP;
+  ctx.fillStyle = 'rgba(15,23,42,0.95)';
+  ctx.strokeStyle = ACCENT;
+  ctx.lineWidth = 2;
+  roundRect(ctx, bx, by, bw, bh, 12);
+  ctx.fill(); ctx.stroke();
+
+  // Window chrome dots
+  [[RED, bx+20], [YELLOW, bx+44], [GREEN, bx+68]].forEach(([c,x]) => {
+    ctx.fillStyle = c;
+    ctx.beginPath();
+    ctx.arc(x, by + 20, 7, 0, Math.PI*2);
+    ctx.fill();
+  });
+  ctx.fillStyle = '#64748b';
+  ctx.font = `16px ${FONT}`;
+  ctx.textAlign = 'center';
+  ctx.fillText('nginx-pod.yaml', W/2, by + 24);
+  ctx.textAlign = 'left';
+
+  // YAML lines animate in one by one
+  const yamlLines = [
+    { text: 'apiVersion: v1',          color: TEXT,     indent: 0,  highlight: false },
+    { text: 'kind: Pod',               color: ACCENT2,  indent: 0,  highlight: true  },
+    { text: 'metadata:',               color: TEXT,     indent: 0,  highlight: false },
+    { text: '  name: nginx',           color: TEXT,     indent: 1,  highlight: false },
+    { text: 'spec:',                   color: TEXT,     indent: 0,  highlight: false },
+    { text: '  containers:',           color: TEXT,     indent: 1,  highlight: false },
+    { text: '  - name: nginx',         color: GREEN,    indent: 1,  highlight: false },
+    { text: '    image: nginx:1.14.2', color: YELLOW,   indent: 2,  highlight: true  },
+    { text: '    ports:',              color: TEXT,     indent: 2,  highlight: false },
+    { text: '    - containerPort: 80', color: '#94a3b8', indent: 2, highlight: false },
+  ];
+
+  const lineH = 34;
+  const startY = by + 52;
+  const textX = bx + 36;
+
+  yamlLines.forEach((line, i) => {
+    const lineP = clamp((f - 30 - i * 12) / 15, 0, 1);
+    if (lineP <= 0) return;
+
+    ctx.globalAlpha = lineP * blockP;
+
+    // Highlight background
+    if (line.highlight && lineP > 0.5) {
+      ctx.fillStyle = 'rgba(50,108,229,0.15)';
+      ctx.fillRect(bx + 4, startY + i * lineH - 22, bw - 8, lineH);
+    }
+
+    ctx.fillStyle = line.color;
+    ctx.font = `22px ${FONT}`;
+    let sz = fitText(ctx, line.text, bw - 80, 22, FONT);
+    ctx.font = `${sz}px ${FONT}`;
+    ctx.fillText(line.text, textX, startY + i * lineH);
+  });
+
+  ctx.globalAlpha = 1;
+  ctx.textAlign = 'left';
+
+  // Bottom note
+  const noteAlpha = clamp((f - 280) / 30, 0, 1);
+  ctx.globalAlpha = noteAlpha;
+  ctx.fillStyle = '#64748b';
+  ctx.font = `20px ${FONT}`;
+  ctx.textAlign = 'center';
+  ctx.fillText('Use a Deployment — not a raw Pod', W/2, by + bh + 56);
+  ctx.globalAlpha = 1;
+  ctx.textAlign = 'left';
+}
+
+// ── Scene 6: OUTRO ─────────────────────────────────────────────────────────
+function drawOutro(ctx, frame) {
+  const f = frame - S.OUTRO_START;
+
+  drawBg(ctx);
+
+  // Background glow ring
+  const glowP = clamp(f / 40, 0, 1);
+  ctx.globalAlpha = glowP * 0.3;
+  const glow = ctx.createRadialGradient(W/2, H/2 - 60, 20, W/2, H/2 - 60, 300);
+  glow.addColorStop(0, ACCENT);
+  glow.addColorStop(1, 'transparent');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, W, H);
+  ctx.globalAlpha = 1;
+
+  // K8s logo
+  const logoP = easeOut(clamp((f - 10) / 40, 0, 1));
+  if (k8sLogo && logoP > 0) {
+    ctx.globalAlpha = logoP;
+    const logoSize = 120;
+    ctx.drawImage(k8sLogo, W/2 - logoSize/2, H/2 - 220, logoSize, logoSize);
+    ctx.globalAlpha = 1;
+  } else if (logoP > 0) {
+    // Fallback: K8s hex shape
+    ctx.globalAlpha = logoP;
+    ctx.fillStyle = ACCENT;
+    ctx.font = `bold 100px ${FONT}`;
+    ctx.textAlign = 'center';
+    ctx.fillText('k8s', W/2, H/2 - 130);
+    ctx.globalAlpha = 1;
+  }
+
+  // "Run the Docs"
+  const titleP = easeOut(clamp((f - 30) / 35, 0, 1));
+  ctx.globalAlpha = titleP;
+  ctx.fillStyle = TEXT;
+  ctx.font = `bold 64px ${FONT}`;
+  ctx.textAlign = 'center';
+  let rtdSz = fitText(ctx, 'Run the Docs', W - 200, 64, FONT);
+  ctx.font = `bold ${rtdSz}px ${FONT}`;
+  ctx.fillText('Run the Docs', W/2, H/2 - 30);
+
+  // kubernetes · pods label
+  const labelP = easeOut(clamp((f - 60) / 30, 0, 1));
+  ctx.globalAlpha = labelP;
+  ctx.fillStyle = ACCENT2;
+  ctx.font = `32px ${FONT}`;
+  let lblSz = fitText(ctx, 'kubernetes · pods', W - 200, 32, FONT);
+  ctx.font = `${lblSz}px ${FONT}`;
+  ctx.fillText('kubernetes · pods', W/2, H/2 + 30);
+
+  // URL pills
+  const pillP = easeOut(clamp((f - 100) / 35, 0, 1));
+  ctx.globalAlpha = pillP;
+
+  const pill1 = 'kubernetes.io/docs/concepts/workloads/pods/';
+  const pill2 = 'github.com/run-the-docs/kubernetes';
+
+  function drawPill(text, color, cy) {
+    ctx.font = `18px ${FONT}`;
+    const sz = fitText(ctx, text, 900, 18, FONT);
+    ctx.font = `${sz}px ${FONT}`;
+    const tw = ctx.measureText(text).width;
+    const ph = 36, pad = 20;
+    const px = W/2 - tw/2 - pad;
+    const pw = tw + pad*2;
+    ctx.fillStyle = hexToRgba(color, 0.15);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.5;
+    roundRect(ctx, px, cy - 24, pw, ph, 18);
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = color;
+    ctx.fillText(text, W/2 - tw/2, cy);
+  }
+
+  drawPill(pill1, ACCENT,  H/2 + 100);
+  drawPill(pill2, GREEN,   H/2 + 150);
+
+  ctx.globalAlpha = 1;
+  ctx.textAlign = 'left';
+}
+
+// ── Rounded rect helper ────────────────────────────────────────────────────
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+// ── Render loop ────────────────────────────────────────────────────────────
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+
+let currentFrame = 0;
+window._frames = [];
+window._done = false;
+window._frameCount = 0;
+
+function renderFrame(frame) {
+  ctx.clearRect(0, 0, W, H);
+
+  if (frame < S.ANAT_START) {
+    drawHook(ctx, frame);
+  } else if (frame < S.PAT_START) {
+    // Crossfade HOOK → ANATOMY
+    const xf = clamp((frame - (S.ANAT_START - 15)) / 15, 0, 1);
+    if (xf < 1) { drawHook(ctx, frame); }
+    if (xf > 0) {
+      ctx.globalAlpha = xf;
+      const tmp = document.createElement('canvas');
+      tmp.width = W; tmp.height = H;
+      const tc = tmp.getContext('2d');
+      drawAnatomy(tc, frame);
+      ctx.drawImage(tmp, 0, 0);
+      ctx.globalAlpha = 1;
+    }
+    if (xf === 0) drawHook(ctx, frame);
+    else if (xf === 1) drawAnatomy(ctx, frame);
+  } else if (frame < S.EPH_START) {
+    const xf = clamp((frame - (S.PAT_START - 15)) / 15, 0, 1);
+    if (xf < 1) drawAnatomy(ctx, frame);
+    if (xf >= 1) drawPatterns(ctx, frame);
+    else if (xf > 0) {
+      ctx.globalAlpha = xf;
+      const tmp = document.createElement('canvas');
+      tmp.width = W; tmp.height = H;
+      drawPatterns(tmp.getContext('2d'), frame);
+      ctx.drawImage(tmp, 0, 0);
+      ctx.globalAlpha = 1;
+    }
+  } else if (frame < S.YAML_START) {
+    const xf = clamp((frame - (S.EPH_START - 15)) / 15, 0, 1);
+    if (xf < 1) drawPatterns(ctx, frame);
+    if (xf >= 1) drawEphemeral(ctx, frame);
+    else if (xf > 0) {
+      ctx.globalAlpha = xf;
+      const tmp = document.createElement('canvas');
+      tmp.width = W; tmp.height = H;
+      drawEphemeral(tmp.getContext('2d'), frame);
+      ctx.drawImage(tmp, 0, 0);
+      ctx.globalAlpha = 1;
+    }
+  } else if (frame < S.OUTRO_START) {
+    const xf = clamp((frame - (S.YAML_START - 15)) / 15, 0, 1);
+    if (xf < 1) drawEphemeral(ctx, frame);
+    if (xf >= 1) drawYaml(ctx, frame);
+    else if (xf > 0) {
+      ctx.globalAlpha = xf;
+      const tmp = document.createElement('canvas');
+      tmp.width = W; tmp.height = H;
+      drawYaml(tmp.getContext('2d'), frame);
+      ctx.drawImage(tmp, 0, 0);
+      ctx.globalAlpha = 1;
+    }
+  } else {
+    const xf = clamp((frame - (S.OUTRO_START - 15)) / 15, 0, 1);
+    if (xf < 1) drawYaml(ctx, frame);
+    if (xf >= 1) drawOutro(ctx, frame);
+    else if (xf > 0) {
+      ctx.globalAlpha = xf;
+      const tmp = document.createElement('canvas');
+      tmp.width = W; tmp.height = H;
+      drawOutro(tmp.getContext('2d'), frame);
+      ctx.drawImage(tmp, 0, 0);
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  return canvas.toDataURL('image/png');
+}
+
+// Export API
+window.renderFrame = renderFrame;
+window.TOTAL_FRAMES = TOTAL_FRAMES;
+
+// Render first frame on load for verification
+window.addEventListener('load', () => {
+  renderFrame(0);
+});
+</script>
+</body>
+</html>

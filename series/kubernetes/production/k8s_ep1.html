@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #080810; width: 1920px; height: 1080px; overflow: hidden; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+const W = 1920, H = 1080, CX = 960, CY = 540;
+
+// Design system
+const BG       = '#080810';
+const ACCENT   = '#326CE5';  // Kubernetes blue
+const ACCENT2  = '#60a5fa';  // lighter blue
+const TEXT     = '#f8fafc';
+const CODE_BG  = '#0d1117';
+const GREEN    = '#22c55e';
+const YELLOW   = '#eab308';
+const RED      = '#ef4444';
+const SUBTLE   = '#334155';
+
+// Timing (will be populated from timing JSON or defaults)
+let TIMING = [];
+let TOTAL_DURATION = 92;
+
+// Easing functions
+const ease = {
+  out:    t => 1 - Math.pow(1-t, 3),
+  inOut:  t => t < 0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2,
+  spring: t => {
+    const c4 = (2*Math.PI)/2.5;
+    return t===0 ? 0 : t===1 ? 1 : Math.pow(2,-10*t)*Math.sin((t*10-0.75)*c4)+1;
+  },
+  back: t => { const c1=1.70158, c3=c1+1; return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2); },
+};
+
+function seg(t, start, end) {
+  return Math.max(0, Math.min(1, (t - start) / (end - start)));
+}
+
+// --- K8s Logo ---
+function drawK8sLogo(ctx, cx, cy, r, alpha=1, strokeProgress=1) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  // Outer circle
+  ctx.strokeStyle = ACCENT;
+  ctx.lineWidth = r * 0.08;
+  if (strokeProgress >= 1) {
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI*2);
+    ctx.stroke();
+  } else if (strokeProgress > 0) {
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, -Math.PI/2, -Math.PI/2 + strokeProgress * Math.PI * 2);
+    ctx.stroke();
+  }
+  // 7 spokes
+  for (let i = 0; i < 7; i++) {
+    const angle = (i / 7) * Math.PI * 2 - Math.PI/2;
+    const spokeP = Math.max(0, Math.min(1, (strokeProgress - 0.4) / 0.6));
+    if (spokeP <= 0) continue;
+    ctx.beginPath();
+    const startR = r * 0.25;
+    const endR = r * 0.25 + spokeP * (r * 0.6);
+    ctx.moveTo(cx + Math.cos(angle)*startR, cy + Math.sin(angle)*startR);
+    ctx.lineTo(cx + Math.cos(angle)*endR,   cy + Math.sin(angle)*endR);
+    ctx.stroke();
+  }
+  // Center circle
+  const centerP = Math.max(0, Math.min(1, (strokeProgress - 0.6) / 0.4));
+  if (centerP > 0) {
+    ctx.fillStyle = ACCENT;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r * 0.2 * centerP, 0, Math.PI*2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+// --- Helpers ---
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.lineTo(x+w-r, y);
+  ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+  ctx.lineTo(x+w, y+h-r);
+  ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+  ctx.lineTo(x+r, y+h);
+  ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+  ctx.lineTo(x, y+r);
+  ctx.quadraticCurveTo(x, y, x+r, y);
+  ctx.closePath();
+}
+
+function drawGrid(ctx, color='rgba(50,108,229,0.04)') {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1;
+  for (let x = 0; x < W; x += 80) {
+    ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke();
+  }
+  for (let y = 0; y < H; y += 80) {
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+  }
+}
+
+function drawCaption(ctx, t) {
+  if (!TIMING.length) return;
+  let activeText = '';
+  for (const s of TIMING) {
+    if (t >= s.start - 0.1 && t <= s.end + 0.3) {
+      activeText = s.text;
+      break;
+    }
+  }
+  if (!activeText) return;
+  ctx.save();
+  const PILL_H = 44, PAD = 24;
+  ctx.font = '500 20px "JetBrains Mono", monospace';
+  const tw = ctx.measureText(activeText).width;
+  const pw = Math.min(tw + PAD*2, W - 100);
+  const px = CX, py = 990;
+  ctx.globalAlpha = 0.9;
+  ctx.fillStyle = 'rgba(0,0,0,0.8)';
+  roundRect(ctx, px-pw/2, py-PILL_H/2, pw, PILL_H, 22);
+  ctx.fill();
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = TEXT;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  let display = activeText;
+  while (ctx.measureText(display + '...').width > pw - PAD*2 && display.length > 10) {
+    display = display.slice(0, -1);
+  }
+  if (display !== activeText) display += '...';
+  ctx.fillText(display, px, py);
+  ctx.restore();
+}
+
+// ============================================================
+// SCENE 1: HOOK (t=0 → ~12s)
+// ============================================================
+function drawScene1(ctx, t) {
+  ctx.fillStyle = BG;
+  ctx.fillRect(0, 0, W, H);
+  drawGrid(ctx);
+
+  // 3:47 AM text fades in at t=1.5
+  const timeAlpha = ease.out(seg(t, 1.5, 2.2));
+  if (timeAlpha > 0) {
+    ctx.save();
+    ctx.globalAlpha = timeAlpha;
+    ctx.font = '400 52px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#94a3b8';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('3:47 AM', CX, CY - 140);
+    ctx.restore();
+  }
+
+  // Alert icon + pulsing red glow
+  const alertEnter = ease.spring(seg(t, 1.8, 2.4));
+  const pulseSin = 0.5 + 0.5 * Math.sin(t * 6);
+
+  if (alertEnter > 0) {
+    ctx.save();
+    ctx.translate(CX, CY - 20);
+    ctx.scale(alertEnter, alertEnter);
+
+    // Red glow
+    const grad = ctx.createRadialGradient(0, 0, 20, 0, 0, 300);
+    grad.addColorStop(0, `rgba(239,68,68,${0.3 * pulseSin})`);
+    grad.addColorStop(1, 'transparent');
+    ctx.fillStyle = grad;
+    ctx.beginPath(); ctx.arc(0, 0, 300, 0, Math.PI*2); ctx.fill();
+
+    // Warning triangle
+    ctx.strokeStyle = RED;
+    ctx.fillStyle = `rgba(239,68,68,${0.15 + 0.1*pulseSin})`;
+    ctx.lineWidth = 6;
+    ctx.shadowColor = RED;
+    ctx.shadowBlur = 30 * alertEnter;
+    ctx.beginPath();
+    ctx.moveTo(0, -80);
+    ctx.lineTo(70, 60);
+    ctx.lineTo(-70, 60);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // Exclamation
+    ctx.fillStyle = RED;
+    ctx.font = 'bold 72px "JetBrains Mono", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('!', 0, 10);
+    ctx.restore();
+  }
+
+  // "container crashed" text
+  const crashAlpha = ease.out(seg(t, 2.4, 3.0));
+  if (crashAlpha > 0) {
+    ctx.save();
+    ctx.globalAlpha = crashAlpha;
+    ctx.font = '600 48px "JetBrains Mono", monospace';
+    ctx.fillStyle = RED;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('container crashed', CX, CY + 120);
+    ctx.restore();
+  }
+
+  // Terminal line: CrashLoopBackOff x47
+  const termAlpha = ease.out(seg(t, 2.8, 3.4));
+  if (termAlpha > 0) {
+    ctx.save();
+    ctx.globalAlpha = termAlpha;
+    // Terminal box
+    const bw = 860, bh = 56, bx = CX - 430, by = CY + 180;
+    ctx.fillStyle = CODE_BG;
+    roundRect(ctx, bx, by, bw, bh, 8);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(239,68,68,0.4)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.font = '500 28px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#94a3b8';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('$ kubectl get pods', bx + 20, by + 28);
+    ctx.restore();
+  }
+
+  const crashLineAlpha = ease.out(seg(t, 3.2, 3.8));
+  if (crashLineAlpha > 0) {
+    ctx.save();
+    ctx.globalAlpha = crashLineAlpha;
+    const bw = 860, bh = 48, bx = CX - 430, by = CY + 244;
+    ctx.fillStyle = 'rgba(239,68,68,0.08)';
+    roundRect(ctx, bx, by, bw, bh, 6);
+    ctx.fill();
+    ctx.font = '500 28px "JetBrains Mono", monospace';
+    ctx.fillStyle = RED;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('my-app   CrashLoopBackOff   x47', bx + 20, by + 24);
+    ctx.restore();
+  }
+
+  // "There's a better way." — fades in white, centered
+  const betterAlpha = ease.out(seg(t, 4.5, 5.5));
+  const betterFadeOut = 1 - ease.out(seg(t, 10.5, 11.5));
+  if (betterAlpha > 0) {
+    ctx.save();
+    ctx.globalAlpha = betterAlpha * betterFadeOut;
+    ctx.font = 'bold 72px "JetBrains Mono", monospace';
+    ctx.fillStyle = TEXT;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = ACCENT;
+    ctx.shadowBlur = 20 * betterAlpha;
+    ctx.fillText("There's a better way.", CX, CY + 330);
+    ctx.shadowBlur = 0;
+    ctx.restore();
+  }
+}
+
+// ============================================================
+// SCENE 2: THREE ERAS (t=9.1 → ~23.7s)
+// ============================================================
+function drawScene2(ctx, t) {
+  const s = 9.1;
+  ctx.fillStyle = BG;
+  ctx.fillRect(0, 0, W, H);
+  drawGrid(ctx);
+
+  // Title
+  const titleA = ease.out(seg(t, s, s+0.5));
+  ctx.save();
+  ctx.globalAlpha = titleA;
+  ctx.font = '600 42px "JetBrains Mono", monospace';
+  ctx.fillStyle = ACCENT2;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('Three Deployment Eras', CX, 140);
+  ctx.restore();
+
+  const eras = [
+    { icon: '🖥', label: 'Physical Servers', sub: 'resource conflicts', color: RED, x: CX - 560 },
+    { icon: '📦', label: 'Virtual Machines', sub: 'better but heavy', color: YELLOW, x: CX },
+    { icon: '🐳', label: 'Containers', sub: 'lightweight, portable', color: GREEN, x: CX + 560 },
+  ];
+
+  eras.forEach((era, i) => {
+    const delay = i * 0.4;
+    const eraP = ease.spring(seg(t, s + 0.3 + delay, s + 1.2 + delay));
+    if (eraP <= 0) return;
+
+    ctx.save();
+    ctx.globalAlpha = eraP;
+    ctx.translate(era.x, CY - 60);
+
+    // Card background
+    const cw = 300, ch = 280;
+    ctx.fillStyle = 'rgba(50,108,229,0.06)';
+    roundRect(ctx, -cw/2, -ch/2, cw, ch, 16);
+    ctx.fill();
+    ctx.strokeStyle = era.color + '66';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Icon
+    ctx.font = '72px serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(era.icon, 0, -70);
+
+    // Label
+    ctx.font = '600 28px "JetBrains Mono", monospace';
+    ctx.fillStyle = TEXT;
+    ctx.fillText(era.label, 0, 10);
+
+    // Sub
+    ctx.font = '400 22px "JetBrains Mono", monospace';
+    ctx.fillStyle = era.color;
+    ctx.fillText(era.sub, 0, 60);
+
+    ctx.restore();
+
+    // Arrow between eras
+    if (i < 2) {
+      const arrowP = ease.out(seg(t, s + 0.6 + delay, s + 1.0 + delay));
+      if (arrowP > 0) {
+        ctx.save();
+        ctx.globalAlpha = arrowP;
+        ctx.strokeStyle = SUBTLE;
+        ctx.lineWidth = 3;
+        const ax1 = era.x + 155, ax2 = eras[i+1].x - 155;
+        const ay = CY - 60;
+        ctx.beginPath();
+        ctx.moveTo(ax1, ay);
+        ctx.lineTo(ax1 + (ax2 - ax1) * arrowP, ay);
+        ctx.stroke();
+        if (arrowP > 0.8) {
+          ctx.fillStyle = SUBTLE;
+          ctx.beginPath();
+          ctx.moveTo(ax2, ay);
+          ctx.lineTo(ax2 - 12, ay - 8);
+          ctx.lineTo(ax2 - 12, ay + 8);
+          ctx.closePath();
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+    }
+  });
+
+  // "But at scale?" question → transforms into K8s logo hint
+  const scaleP = ease.out(seg(t, s + 1.8, s + 2.4));
+  if (scaleP > 0) {
+    const logoTransform = ease.out(seg(t, s + 5.5, s + 7.5));
+    ctx.save();
+    ctx.globalAlpha = scaleP * (1 - logoTransform * 0.8);
+    ctx.font = '600 52px "JetBrains Mono", monospace';
+    ctx.fillStyle = ACCENT;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('at scale → ?', CX, CY + 240);
+    ctx.restore();
+
+    if (logoTransform > 0) {
+      const logox = CX + 400, logoy = CY + 240;
+      drawK8sLogo(ctx, logox, logoy, 50, logoTransform, logoTransform);
+    }
+  }
+}
+
+// ============================================================
+// SCENE 3: WHAT IS KUBERNETES (t=23.7 → ~38.7s)
+// ============================================================
+function drawScene3(ctx, t) {
+  const s = 23.7;
+  ctx.fillStyle = BG;
+  ctx.fillRect(0, 0, W, H);
+  drawGrid(ctx);
+
+  // K8s logo drawing itself
+  const logoP = ease.out(seg(t, s, s + 1.5));
+  const logoR = 120;
+  const logoCX = CX, logoCY = CY - 200;
+  drawK8sLogo(ctx, logoCX, logoCY, logoR, logoP, logoP);
+
+  // "Kubernetes" letter-by-letter spring reveal
+  const word = 'Kubernetes';
+  const letterStart = s + 0.8;
+  const letterDur = 0.08;
+
+  ctx.save();
+  ctx.font = 'bold 110px "JetBrains Mono", monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  // Measure total width
+  const letterWidths = [];
+  let totalW2 = 0;
+  for (const ch of word) {
+    const w = ctx.measureText(ch).width;
+    letterWidths.push(w);
+    totalW2 += w;
+  }
+  let cx2 = CX - totalW2 / 2;
+  word.split('').forEach((ch, i) => {
+    const lp = ease.spring(seg(t, letterStart + i * letterDur, letterStart + i * letterDur + 0.4));
+    ctx.save();
+    ctx.globalAlpha = lp;
+    ctx.translate(cx2 + letterWidths[i]/2, CY - 30 - (1 - lp) * 40);
+    ctx.fillStyle = TEXT;
+    ctx.fillText(ch, 0, 0);
+    ctx.restore();
+    cx2 += letterWidths[i];
+  });
+  ctx.restore();
+
+  // K · 8 · s
+  const k8sA = ease.out(seg(t, s + 1.8, s + 2.4));
+  if (k8sA > 0) {
+    ctx.save();
+    ctx.globalAlpha = k8sA;
+    ctx.font = '500 40px "JetBrains Mono", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    // K
+    ctx.fillStyle = TEXT;
+    ctx.fillText('K', CX - 90, CY + 70);
+    // ·
+    ctx.fillStyle = SUBTLE;
+    ctx.fillText('·', CX - 50, CY + 70);
+    // 8 highlighted
+    ctx.fillStyle = ACCENT;
+    ctx.font = 'bold 40px "JetBrains Mono", monospace';
+    ctx.shadowColor = ACCENT;
+    ctx.shadowBlur = 12;
+    ctx.fillText('8', CX, CY + 70);
+    ctx.shadowBlur = 0;
+    // ·
+    ctx.fillStyle = SUBTLE;
+    ctx.font = '500 40px "JetBrains Mono", monospace';
+    ctx.fillText('·', CX + 50, CY + 70);
+    // s
+    ctx.fillStyle = TEXT;
+    ctx.fillText('s', CX + 90, CY + 70);
+    ctx.restore();
+  }
+
+  // Google · 2014 · Open Source
+  const metaA = ease.out(seg(t, s + 2.5, s + 3.2));
+  if (metaA > 0) {
+    ctx.save();
+    ctx.globalAlpha = metaA;
+    ctx.font = '400 30px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#64748b';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('Google  ·  2014  ·  Open Source', CX, CY + 130);
+    ctx.restore();
+  }
+
+  // Greek: helmsman
+  const greekA = ease.out(seg(t, s + 3.2, s + 4.0));
+  if (greekA > 0) {
+    ctx.save();
+    ctx.globalAlpha = greekA;
+    ctx.font = '400 26px "JetBrains Mono", monospace';
+    ctx.fillStyle = ACCENT2;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('Greek: "helmsman"  ·  15+ years Google production experience', CX, CY + 180);
+    ctx.restore();
+  }
+}
+
+// ============================================================
+// SCENE 4: WHAT IT DOES — 5 FEATURES (t=38.7 → ~58.6s)
+// ============================================================
+function drawScene4(ctx, t) {
+  const s = 38.7;
+  ctx.fillStyle = BG;
+  ctx.fillRect(0, 0, W, H);
+  drawGrid(ctx);
+
+  const titleA = ease.out(seg(t, s, s+0.4));
+  ctx.save();
+  ctx.globalAlpha = titleA;
+  ctx.font = '600 40px "JetBrains Mono", monospace';
+  ctx.fillStyle = ACCENT2;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('What Kubernetes Does', CX, 130);
+  ctx.restore();
+
+  const features = [
+    { icon: '💚', label: 'Self-healing',    desc: 'restarts crashed containers automatically', color: GREEN },
+    { icon: '📈', label: 'Scaling',         desc: 'up or down, on demand',                    color: ACCENT2 },
+    { icon: '🔄', label: 'Rollouts',        desc: 'zero-downtime deployments',                color: YELLOW },
+    { icon: '⚖️',  label: 'Load balancing', desc: 'traffic distribution built-in',             color: ACCENT },
+    { icon: '🔐', label: 'Secrets',         desc: 'passwords and config, managed safely',      color: '#a78bfa' },
+  ];
+
+  features.forEach((f, i) => {
+    const delay = i * 0.28;
+    const fp = ease.spring(seg(t, s + 0.3 + delay, s + 1.0 + delay));
+    if (fp <= 0) return;
+
+    const fy = 220 + i * 142;
+    ctx.save();
+    ctx.globalAlpha = fp;
+    ctx.translate(0, (1 - fp) * 30);
+
+    // Row background
+    ctx.fillStyle = 'rgba(50,108,229,0.06)';
+    roundRect(ctx, CX - 700, fy, 1400, 110, 12);
+    ctx.fill();
+    ctx.strokeStyle = f.color + '44';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Left accent bar
+    ctx.fillStyle = f.color;
+    roundRect(ctx, CX - 700, fy, 5, 110, 2);
+    ctx.fill();
+
+    // Icon
+    ctx.font = '48px serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(f.icon, CX - 670, fy + 55);
+
+    // Label
+    ctx.font = 'bold 36px "JetBrains Mono", monospace';
+    ctx.fillStyle = f.color;
+    ctx.fillText(f.label, CX - 590, fy + 35);
+
+    // Description
+    ctx.font = '400 26px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#94a3b8';
+    ctx.fillText(f.desc, CX - 590, fy + 76);
+
+    ctx.restore();
+  });
+}
+
+// ============================================================
+// SCENE 5: WHAT IT'S NOT (t=58.6 → ~71.1s)
+// ============================================================
+function drawScene5(ctx, t) {
+  const s = 58.6;
+  ctx.fillStyle = BG;
+  ctx.fillRect(0, 0, W, H);
+  drawGrid(ctx);
+
+  const titleA = ease.out(seg(t, s, s+0.4));
+  ctx.save();
+  ctx.globalAlpha = titleA;
+  ctx.font = '600 40px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#ef4444';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText("What Kubernetes Is NOT", CX, 140);
+  ctx.restore();
+
+  const nots = [
+    "Not a PaaS (Platform as a Service)",
+    "Doesn't build your code",
+    "Doesn't include databases or message buses",
+  ];
+
+  nots.forEach((text, i) => {
+    const delay = i * 0.45;
+    const np = ease.spring(seg(t, s + 0.4 + delay, s + 1.2 + delay));
+    const strikeProg = ease.inOut(seg(t, s + 1.0 + delay, s + 1.8 + delay));
+    if (np <= 0) return;
+
+    const fy = 240 + i * 140;
+    ctx.save();
+    ctx.globalAlpha = np;
+
+    // Row
+    ctx.fillStyle = 'rgba(239,68,68,0.06)';
+    roundRect(ctx, CX - 680, fy, 1360, 100, 12);
+    ctx.fill();
+
+    // ❌ icon
+    ctx.font = '44px serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('❌', CX - 650, fy + 50);
+
+    // Text
+    ctx.font = '500 34px "JetBrains Mono", monospace';
+    ctx.fillStyle = TEXT;
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, CX - 580, fy + 50);
+
+    // Strikethrough animation
+    if (strikeProg > 0) {
+      const tw = ctx.measureText(text).width;
+      const sx = CX - 580;
+      const sw = tw * strikeProg;
+      ctx.fillStyle = RED;
+      ctx.fillRect(sx, fy + 50, sw, 3);
+    }
+
+    ctx.restore();
+  });
+
+  // ✅ "Building blocks. You choose the rest."
+  const posP = ease.spring(seg(t, s + 2.2, s + 3.0));
+  if (posP > 0) {
+    ctx.save();
+    ctx.globalAlpha = posP;
+    const fy = 700;
+
+    ctx.fillStyle = 'rgba(34,197,94,0.08)';
+    roundRect(ctx, CX - 680, fy, 1360, 120, 16);
+    ctx.fill();
+    ctx.strokeStyle = GREEN + '66';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.font = '44px serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('✅', CX - 650, fy + 60);
+
+    ctx.font = 'bold 40px "JetBrains Mono", monospace';
+    ctx.fillStyle = GREEN;
+    ctx.textBaseline = 'middle';
+    ctx.fillText('Building blocks. You choose the rest.', CX - 580, fy + 60);
+
+    ctx.restore();
+  }
+}
+
+// ============================================================
+// SCENE 6: DESIRED STATE (t=71.1 → ~84s)
+// ============================================================
+function drawScene6(ctx, t) {
+  const s = 71.1;
+  ctx.fillStyle = BG;
+  ctx.fillRect(0, 0, W, H);
+  drawGrid(ctx);
+
+  const titleA = ease.out(seg(t, s, s+0.5));
+  ctx.save();
+  ctx.globalAlpha = titleA;
+  ctx.font = '600 38px "JetBrains Mono", monospace';
+  ctx.fillStyle = TEXT;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('You describe the desired state.', CX, 130);
+  ctx.restore();
+
+  // Two boxes
+  const boxesP = ease.spring(seg(t, s + 0.4, s + 1.2));
+  if (boxesP > 0) {
+    // Actual state (left, red border)
+    ctx.save();
+    ctx.globalAlpha = boxesP;
+    const bw = 540, bh = 380, by = 200;
+    const lx = CX - 580, rx = CX + 40;
+
+    // LEFT: ACTUAL STATE
+    ctx.fillStyle = 'rgba(239,68,68,0.08)';
+    roundRect(ctx, lx, by, bw, bh, 16);
+    ctx.fill();
+    ctx.strokeStyle = RED;
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    ctx.font = 'bold 28px "JetBrains Mono", monospace';
+    ctx.fillStyle = RED;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('ACTUAL STATE', lx + bw/2, by + 40);
+
+    // RIGHT: DESIRED STATE
+    ctx.fillStyle = 'rgba(34,197,94,0.08)';
+    roundRect(ctx, rx, by, bw, bh, 16);
+    ctx.fill();
+    ctx.strokeStyle = GREEN;
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    ctx.fillStyle = GREEN;
+    ctx.fillText('DESIRED STATE', rx + bw/2, by + 40);
+
+    ctx.restore();
+
+    // Arrow between boxes with "Kubernetes" label
+    const arrowP = ease.out(seg(t, s + 1.2, s + 2.0));
+    if (arrowP > 0) {
+      ctx.save();
+      ctx.globalAlpha = arrowP;
+      ctx.strokeStyle = ACCENT;
+      ctx.lineWidth = 4;
+      const ay = by + bh/2;
+      const ax1 = lx + bw + 10, ax2 = rx - 10;
+      const arrowEnd = ax1 + (ax2 - ax1) * arrowP;
+      ctx.beginPath();
+      ctx.moveTo(ax1, ay);
+      ctx.lineTo(arrowEnd, ay);
+      ctx.stroke();
+      if (arrowP > 0.9) {
+        ctx.fillStyle = ACCENT;
+        ctx.beginPath();
+        ctx.moveTo(ax2, ay);
+        ctx.lineTo(ax2 - 14, ay - 9);
+        ctx.lineTo(ax2 - 14, ay + 9);
+        ctx.closePath();
+        ctx.fill();
+      }
+      // Label
+      ctx.font = '600 26px "JetBrains Mono", monospace';
+      ctx.fillStyle = ACCENT2;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      ctx.fillText('Kubernetes', (ax1 + ax2) / 2, ay - 10);
+      ctx.restore();
+    }
+
+    // PODS
+    const podHealP = ease.out(seg(t, s + 2.5, s + 4.5));
+
+    // Left pods: 1 healthy (green), 2 crashed (red→green)
+    const leftPods = [
+      { label: 'pod-1', crashed: false },
+      { label: 'pod-2', crashed: true },
+      { label: 'pod-3', crashed: true },
+    ];
+    const bwBox = 540, byBox = 200;
+    leftPods.forEach((pod, i) => {
+      const px = lx + 60 + i * 140, py = byBox + 100;
+      const healing = pod.crashed ? podHealP : 1;
+      const color = pod.crashed
+        ? lerpColor(RED, GREEN, healing)
+        : GREEN;
+
+      ctx.save();
+      ctx.globalAlpha = boxesP;
+      ctx.fillStyle = color + '33';
+      roundRect(ctx, px, py, 100, 180, 10);
+      ctx.fill();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Icon
+      ctx.font = '36px serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(pod.crashed && healing < 0.5 ? '💀' : '🟢', px + 50, py + 70);
+
+      ctx.font = '400 18px "JetBrains Mono", monospace';
+      ctx.fillStyle = color;
+      ctx.fillText(pod.label, px + 50, py + 140);
+      ctx.restore();
+    });
+
+    // Right pods: 3 running
+    const rightPods = ['pod-1', 'pod-2', 'pod-3'];
+    rightPods.forEach((label, i) => {
+      const rp = ease.spring(seg(t, s + 0.6 + i * 0.2, s + 1.5 + i * 0.2));
+      const px = rx + 60 + i * 140, py = 300;
+      ctx.save();
+      ctx.globalAlpha = boxesP * rp;
+      ctx.fillStyle = GREEN + '33';
+      roundRect(ctx, px, py, 100, 180, 10);
+      ctx.fill();
+      ctx.strokeStyle = GREEN;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.font = '36px serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('🟢', px + 50, py + 70);
+      ctx.font = '400 18px "JetBrains Mono", monospace';
+      ctx.fillStyle = GREEN;
+      ctx.fillText(label, px + 50, py + 140);
+      ctx.restore();
+    });
+  }
+
+  // "You describe what you want. K8s figures out how."
+  const payoffA = ease.out(seg(t, s + 4.0, s + 5.0));
+  const noWakeupA = ease.out(seg(t, s + 5.5, s + 6.5));
+  if (payoffA > 0) {
+    ctx.save();
+    ctx.globalAlpha = payoffA;
+    ctx.font = '600 36px "JetBrains Mono", monospace';
+    ctx.fillStyle = TEXT;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('You describe what you want. K8s figures out how.', CX, 640);
+    ctx.restore();
+  }
+  if (noWakeupA > 0) {
+    ctx.save();
+    ctx.globalAlpha = noWakeupA;
+    ctx.font = '400 28px "JetBrains Mono", monospace';
+    ctx.fillStyle = GREEN;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('No 3am wake-up.', CX, 695);
+    ctx.restore();
+  }
+}
+
+function lerpColor(c1, c2, t) {
+  const r1 = parseInt(c1.slice(1,3),16), g1 = parseInt(c1.slice(3,5),16), b1 = parseInt(c1.slice(5,7),16);
+  const r2 = parseInt(c2.slice(1,3),16), g2 = parseInt(c2.slice(3,5),16), b2 = parseInt(c2.slice(5,7),16);
+  const r = Math.round(r1 + (r2-r1)*t).toString(16).padStart(2,'0');
+  const g = Math.round(g1 + (g2-g1)*t).toString(16).padStart(2,'0');
+  const b = Math.round(b1 + (b2-b1)*t).toString(16).padStart(2,'0');
+  return `#${r}${g}${b}`;
+}
+
+// ============================================================
+// SCENE 7: OUTRO (t=84 → ~92s)
+// ============================================================
+function drawScene7(ctx, t) {
+  const s = 84;
+  ctx.fillStyle = BG;
+  ctx.fillRect(0, 0, W, H);
+
+  // Blue glow background
+  const glow = ctx.createRadialGradient(CX, CY, 50, CX, CY, 600);
+  glow.addColorStop(0, 'rgba(50,108,229,0.18)');
+  glow.addColorStop(1, 'transparent');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, W, H);
+
+  const bgAlpha = ease.out(seg(t, s, s + 0.6));
+
+  // K8s logo
+  drawK8sLogo(ctx, CX, CY - 120, 90, bgAlpha, 1);
+
+  // "Run the Docs"
+  ctx.save();
+  ctx.globalAlpha = bgAlpha;
+  ctx.font = 'bold 100px "JetBrains Mono", monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.shadowColor = ACCENT;
+  ctx.shadowBlur = 30;
+  ctx.fillStyle = TEXT;
+  ctx.fillText('Run the Docs', CX, CY + 40);
+  ctx.shadowBlur = 0;
+
+  ctx.font = '400 34px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#64748b';
+  ctx.fillText('Technical docs. Made watchable.', CX, CY + 115);
+
+  const epA = ease.out(seg(t, s + 0.5, s + 1.0));
+  ctx.globalAlpha = bgAlpha * epA;
+  ctx.font = '500 24px "JetBrains Mono", monospace';
+  ctx.fillStyle = ACCENT2;
+  ctx.fillText('kubernetes  ·  ep 1 of 13', CX, CY + 175);
+  ctx.restore();
+}
+
+// ============================================================
+// Main render
+// ============================================================
+let lastT = -1;
+
+window.renderFrame = function(frameIndex) {
+  const t = frameIndex / 30;
+  lastT = t;
+
+  const ctx = document.getElementById('c').getContext('2d');
+  ctx.clearRect(0, 0, W, H);
+
+  // Scene routing with crossfades
+  const SCENE_TIMES = [0, 9.1, 23.7, 38.7, 58.6, 71.1, 84.0, 92];
+
+  if (t < SCENE_TIMES[1]) {
+    drawScene1(ctx, t);
+  } else if (t < SCENE_TIMES[2]) {
+    if (t < SCENE_TIMES[1] + 0.4) {
+      drawScene1(ctx, t);
+      const ov = seg(t, SCENE_TIMES[1], SCENE_TIMES[1]+0.4);
+      ctx.globalAlpha = ov;
+      ctx.fillStyle = BG;
+      ctx.fillRect(0,0,W,H);
+      ctx.globalAlpha = 1;
+    }
+    drawScene2(ctx, t);
+  } else if (t < SCENE_TIMES[3]) {
+    if (t < SCENE_TIMES[2] + 0.4) {
+      drawScene2(ctx, t);
+      const ov = seg(t, SCENE_TIMES[2], SCENE_TIMES[2]+0.4);
+      ctx.globalAlpha = ov;
+      ctx.fillStyle = BG;
+      ctx.fillRect(0,0,W,H);
+      ctx.globalAlpha = 1;
+    }
+    drawScene3(ctx, t);
+  } else if (t < SCENE_TIMES[4]) {
+    if (t < SCENE_TIMES[3] + 0.4) {
+      drawScene3(ctx, t);
+      const ov = seg(t, SCENE_TIMES[3], SCENE_TIMES[3]+0.4);
+      ctx.globalAlpha = ov;
+      ctx.fillStyle = BG;
+      ctx.fillRect(0,0,W,H);
+      ctx.globalAlpha = 1;
+    }
+    drawScene4(ctx, t);
+  } else if (t < SCENE_TIMES[5]) {
+    if (t < SCENE_TIMES[4] + 0.4) {
+      drawScene4(ctx, t);
+      const ov = seg(t, SCENE_TIMES[4], SCENE_TIMES[4]+0.4);
+      ctx.globalAlpha = ov;
+      ctx.fillStyle = BG;
+      ctx.fillRect(0,0,W,H);
+      ctx.globalAlpha = 1;
+    }
+    drawScene5(ctx, t);
+  } else if (t < SCENE_TIMES[6]) {
+    if (t < SCENE_TIMES[5] + 0.4) {
+      drawScene5(ctx, t);
+      const ov = seg(t, SCENE_TIMES[5], SCENE_TIMES[5]+0.4);
+      ctx.globalAlpha = ov;
+      ctx.fillStyle = BG;
+      ctx.fillRect(0,0,W,H);
+      ctx.globalAlpha = 1;
+    }
+    drawScene6(ctx, t);
+  } else {
+    if (t < SCENE_TIMES[6] + 0.4) {
+      drawScene6(ctx, t);
+      const ov = seg(t, SCENE_TIMES[6], SCENE_TIMES[6]+0.4);
+      ctx.globalAlpha = ov;
+      ctx.fillStyle = BG;
+      ctx.fillRect(0,0,W,H);
+      ctx.globalAlpha = 1;
+    }
+    drawScene7(ctx, t);
+  }
+
+  // Captions
+  if (t < SCENE_TIMES[5]) {
+    drawCaption(ctx, t);
+  }
+
+  // Fade to black at end
+  if (t > TOTAL_DURATION - 1.5) {
+    const finalFade = seg(t, TOTAL_DURATION - 1.0, TOTAL_DURATION);
+    ctx.globalAlpha = finalFade;
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, W, H);
+    ctx.globalAlpha = 1;
+  }
+};
+
+// Expose timing setter for render script
+window.setTiming = function(segments, totalDuration) {
+  TIMING = segments;
+  TOTAL_DURATION = totalDuration;
+};
+</script>
+</body>
+</html>
