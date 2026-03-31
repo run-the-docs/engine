@@ -90,6 +90,10 @@ for i, sentence in enumerate(sentences):
         all_audio.append(np.zeros(gap_samples, dtype=np.float32))
         current_time += GAP
 
+# Add outro silence (CRITICAL: must be in the WAV file for sync)
+outro_samples = int(OUTRO_BUFFER * SAMPLE_RATE)
+all_audio.append(np.zeros(outro_samples, dtype=np.float32))
+
 # Concatenate all audio
 final_audio = np.concatenate(all_audio)
 output_path = 'voice.wav'
