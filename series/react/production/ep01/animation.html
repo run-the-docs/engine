@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React: Your First Component</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #0a0a0a;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        #canvas {
+            display: block;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="c"></canvas>
+    <script>
+        const canvas = document.getElementById('c');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 1920;
+        canvas.height = 1080;
+
+        // Color scheme
+        const colors = {
+            bg: '#0a0a0a',
+            grad1: '#1a1a2e',
+            grad2: '#16213e',
+            accent: '#0f3460',
+            highlight: '#e94560',
+            text: '#eee',
+            code: '#90ee90',
+            border: '#444',
+        };
+
+        function clearCanvas() {
+            ctx.fillStyle = colors.bg;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Gradient background
+            const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            grad.addColorStop(0, colors.grad1);
+            grad.addColorStop(1, colors.grad2);
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function drawText(text, x, y, size, color, weight = '400', maxWidth = null) {
+            ctx.fillStyle = color;
+            ctx.font = `${weight} ${size}px -apple-system, BlinkMacSystemFont, sans-serif`;
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            if (maxWidth) {
+                ctx.fillText(text, x, y, maxWidth);
+            } else {
+                ctx.fillText(text, x, y);
+            }
+        }
+
+        function drawCodeBox(code, x, y, w, h) {
+            // Box background
+            ctx.fillStyle = 'rgba(20, 20, 35, 0.9)';
+            ctx.fillRect(x, y, w, h);
+            
+            // Border
+            ctx.strokeStyle = colors.border;
+            ctx.lineWidth = 2;
+            ctx.strokeRect(x, y, w, h);
+            
+            // Code text
+            ctx.fillStyle = colors.code;
+            ctx.font = '24px Menlo, Monaco, monospace';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            
+            const lines = code.split('\n');
+            lines.forEach((line, i) => {
+                ctx.fillText(line, x + 24, y + 20 + i * 32);
+            });
+        }
+
+        function renderFrame(frameIndex) {
+            const t = frameIndex / 30; // 30 fps
+            const duration = 90; // seconds
+            const totalFrames = duration * 30;
+            
+            clearCanvas();
+
+            // Timeline:
+            // 0-2s: Intro title
+            // 2-15s: What is a component
+            // 15-30s: Function component example
+            // 30-45s: Component naming rules
+            // 45-60s: Using components
+            // 60-75s: Nesting components
+            // 75-90s: Recap + CTA
+
+            if (t < 2) {
+                // Intro fade in
+                const alpha = Math.min(1, t / 0.5);
+                ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.1})`;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                drawText('React', 960, 380, 120, `rgba(239, 68, 96, ${alpha})`, '700', canvas.width);
+                drawText('Your First Component', 960, 520, 64, `rgba(238, 238, 238, ${alpha})`, '400', canvas.width);
+            }
+            else if (t < 15) {
+                // What is a component?
+                const phase = (t - 2) / 13;
+                drawText('What is a component?', 100, 100, 56, colors.text, '600');
+                
+                // Animated box showing component concept
+                const boxX = 200;
+                const boxY = 250;
+                const boxW = 1520;
+                const boxH = 600;
+                
+                ctx.fillStyle = `rgba(239, 68, 96, ${0.1 + phase * 0.1})`;
+                ctx.fillRect(boxX, boxY, boxW, boxH);
+                
+                ctx.strokeStyle = `rgba(239, 68, 96, ${0.3 + phase * 0.2})`;
+                ctx.lineWidth = 3;
+                ctx.strokeRect(boxX, boxY, boxW, boxH);
+                
+                drawText('A component is a reusable piece of the UI', 250, 350, 48, colors.text);
+                drawText('It can be as small as a button, or as large as a page', 250, 450, 48, colors.text);
+                drawText('Components are just JavaScript functions', 250, 550, 48, colors.text);
+            }
+            else if (t < 30) {
+                // Function component example
+                drawText('Building a Button Component', 100, 100, 56, colors.text, '600');
+                
+                const codeX = 150;
+                const codeY = 250;
+                const codeW = 1620;
+                const codeH = 400;
+                
+                drawCodeBox(
+                    'function MyButton() {\n  return <button>Click me</button>\n}',
+                    codeX, codeY, codeW, codeH
+                );
+                
+                // Label
+                drawText('← JavaScript function that returns JSX', 1900, 350, 32, colors.highlight, '400');
+            }
+            else if (t < 45) {
+                // Component naming
+                drawText('Component Naming Rules', 100, 100, 56, colors.text, '600');
+                
+                drawText('✓ Capitalize first letter', 150, 300, 44, '#90ee90', '400');
+                drawText('MyButton, Header, LoginForm', 250, 360, 40, colors.code, '400');
+                
+                drawText('✗ Lowercase (reserved for HTML)', 150, 500, 44, '#ff6b6b', '400');
+                drawText('myButton, button, div', 250, 560, 40, colors.code, '400');
+            }
+            else if (t < 60) {
+                // Using components
+                drawText('Using Your Component', 100, 100, 56, colors.text, '600');
+                
+                const codeX = 150;
+                const codeY = 250;
+                const codeW = 1620;
+                const codeH = 400;
+                
+                drawCodeBox(
+                    'export default function App() {\n  return <MyButton />\n}',
+                    codeX, codeY, codeW, codeH
+                );
+                
+                drawText('← Use your component with JSX', 1900, 350, 32, colors.highlight, '400');
+            }
+            else if (t < 75) {
+                // Nesting components
+                drawText('Nesting Components', 100, 100, 56, colors.text, '600');
+                
+                const codeX = 150;
+                const codeY = 250;
+                const codeW = 1620;
+                const codeH = 450;
+                
+                drawCodeBox(
+                    'export default function App() {\n  return (\n    <div>\n      <MyButton />\n      <MyButton />\n    </div>\n  )\n}',
+                    codeX, codeY, codeW, codeH
+                );
+            }
+            else {
+                // Recap
+                drawText('Components are the building blocks of React apps', 150, 300, 44, colors.text);
+                drawText('Start with functions, build complex UIs', 150, 380, 44, colors.text);
+                drawText('Next: Learn about Props', 150, 500, 44, colors.highlight, '600');
+            }
+        }
+
+        // For debugging / frame capture
+        window.renderFrame = renderFrame;
+        window.canvas = canvas;
+    </script>
+</body>
+</html>

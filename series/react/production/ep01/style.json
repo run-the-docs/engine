@@ -1,0 +1,48 @@
+{
+  "name": "React ep01: Your First Component",
+  "colors": {
+    "background": "#0a0a0a",
+    "gradient1": "#1a1a2e",
+    "gradient2": "#16213e",
+    "accent": "#0f3460",
+    "highlight": "#e94560",
+    "text": "#eee",
+    "code": "#90ee90",
+    "border": "#444"
+  },
+  "typography": {
+    "body": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    "code": "Menlo, Monaco, monospace",
+    "headline_size": 56,
+    "body_size": 44,
+    "code_size": 24,
+    "label_size": 32
+  },
+  "video": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "duration_seconds": 90,
+    "codec": "h264",
+    "crf": 20
+  },
+  "audio": {
+    "voice": "Samantha",
+    "rate": 150,
+    "sample_rate": 44100,
+    "channels": "mono"
+  },
+  "timeline": {
+    "intro_fade": { "start": 0, "end": 2 },
+    "body_start": 2,
+    "body_end": 75,
+    "recap_start": 75,
+    "recap_end": 90
+  },
+  "code_boxes": {
+    "background": "rgba(20, 20, 35, 0.9)",
+    "border_width": 2,
+    "padding": 24,
+    "line_height": 32
+  }
+}
