@@ -38,18 +38,31 @@ Visual and technical standards for all video series.
 
 ### TTS Settings
 
-- **Platform:** Microsoft Edge TTS (`edge-tts` CLI)
-- **Voice:** `en-US-ChristopherNeural` (News, authoritative, professional)
-- **Rate:** Default (1.0x speed)
-- **Pitch:** Default (0)
-- **Volume:** Default (100)
-- **Output:** MP3, converted to WAV (44100 Hz, mono, PCM s16) for video mixing
+- **Platform:** Kokoro TTS (ONNX inference)
+- **Voice:** `bm_george` (British male, authoritative, professional)
+- **Speed:** 1.0x (default)
+- **Sample Rate:** 44100 Hz
+- **Output:** WAV (mono, float32) — ready for video mixing
 
-**Command:**
-```bash
-edge-tts -t "Your narration here" --voice en-US-ChristopherNeural \
-  --write-media output.mp3
+**Files:**
+- Model: `/Users/claude/runthedocs/kokoro/onnx/model.onnx`
+- Voices: `/Users/claude/runthedocs/kokoro/voices.npz`
+- Voice data: `/Users/claude/runthedocs/kokoro/voices/bm_george.bin`
+
+**Python setup:**
+```python
+from kokoro_onnx import Kokoro
+import soundfile as sf
+
+kokoro = Kokoro(
+    '/Users/claude/runthedocs/kokoro/onnx/model.onnx',
+    '/Users/claude/runthedocs/kokoro/voices.npz'
+)
+audio, sr = kokoro.create("Your text here", voice='bm_george', speed=1.0, lang='en-us')
+sf.write('output.wav', audio, sr)
 ```
+
+**Pattern:** See `series/<name>/production/ep<NN>/tts.py` for per-episode TTS generation
 
 ### Background Music
 
