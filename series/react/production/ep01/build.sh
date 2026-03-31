@@ -29,7 +29,7 @@ ffmpeg -i voice.wav -i silence.wav \
 
 # 2. Render frames
 echo "Rendering animation frames..."
-python3 render.py "$SCRIPT_DIR" animation_pro.html
+python3 render.py "$SCRIPT_DIR" animation_synced.html
 
 # 3. Encode
 echo "Encoding video..."
