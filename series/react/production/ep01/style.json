@@ -27,8 +27,9 @@
     "crf": 20
   },
   "audio": {
-    "voice": "Samantha",
-    "rate": 150,
+    "voice": "en-US-ChristopherNeural",
+    "platform": "edge-tts",
+    "rate": 1.0,
     "sample_rate": 44100,
     "channels": "mono"
   },

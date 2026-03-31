@@ -15,13 +15,22 @@ echo "Building React ep${EP}..."
 # Ensure output directory exists
 mkdir -p "$VIDEOS_DIR"
 
-# 1. Generate TTS from script.md
+# 1. Generate TTS from script.md using edge-tts
 echo "Generating voice audio..."
-say -v "Samantha" -r 150 -f "$SCRIPT_DIR/script.md" -o "$SCRIPT_DIR/voice.aiff"
+cat "$SCRIPT_DIR/script.md" | tr '\n' ' ' | edge-tts --voice en-US-ChristopherNeural \
+  --write-media "$SCRIPT_DIR/voice.mp3" 2>&1 || {
+  echo "✗ edge-tts failed, falling back to macOS say"
+  say -v "Daniel" -r 150 -f "$SCRIPT_DIR/script.md" -o "$SCRIPT_DIR/voice.aiff"
+}
 
-# Convert AIFF to WAV
-ffmpeg -i "$SCRIPT_DIR/voice.aiff" -acodec pcm_s16le -ar 44100 \
-  "$SCRIPT_DIR/voice.wav" 2>&1 | grep -E "(Duration|error)" || true
+# Convert MP3 to WAV (or AIFF if fallback)
+if [ -f "$SCRIPT_DIR/voice.mp3" ]; then
+  ffmpeg -i "$SCRIPT_DIR/voice.mp3" -acodec pcm_s16le -ar 44100 \
+    "$SCRIPT_DIR/voice.wav" 2>&1 | grep -E "(Duration|error)" || true
+elif [ -f "$SCRIPT_DIR/voice.aiff" ]; then
+  ffmpeg -i "$SCRIPT_DIR/voice.aiff" -acodec pcm_s16le -ar 44100 \
+    "$SCRIPT_DIR/voice.wav" 2>&1 | grep -E "(Duration|error)" || true
+fi
 
 # Pad voice to 90 seconds
 VOICE_DURATION=$(ffprobe -v quiet -show_format "$SCRIPT_DIR/voice.wav" | \

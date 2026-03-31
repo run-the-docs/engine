@@ -38,11 +38,18 @@ Visual and technical standards for all video series.
 
 ### TTS Settings
 
-- **Platform:** macOS `say` command (fallback: OpenClaw TTS / Microsoft Edge TTS)
-- **Voice:** Samantha (macOS default, clear and neutral)
-- **Rate:** 150 words per minute (`-r 150`)
-- **Pitch:** Default
-- **Output:** WAV (44100 Hz, mono, PCM s16)
+- **Platform:** Microsoft Edge TTS (`edge-tts` CLI)
+- **Voice:** `en-US-ChristopherNeural` (News, authoritative, professional)
+- **Rate:** Default (1.0x speed)
+- **Pitch:** Default (0)
+- **Volume:** Default (100)
+- **Output:** MP3, converted to WAV (44100 Hz, mono, PCM s16) for video mixing
+
+**Command:**
+```bash
+edge-tts -t "Your narration here" --voice en-US-ChristopherNeural \
+  --write-media output.mp3
+```
 
 ### Background Music
 
