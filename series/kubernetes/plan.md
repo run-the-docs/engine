@@ -2,288 +2,174 @@
 
 Based on: https://kubernetes.io/docs/concepts/ (sitemap crawled 2026-04-01)
 
+**Length estimates** based on typical episode pace (~150 words/min narration, 30fps render):
+- Simple concept: ~90s
+- Medium concept: ~110s  
+- Complex concept: ~130s
+
+---
+
 ## Existing Episodes (11 published)
 
-| Ep | Title | Docs URL | Status |
-|----|-------|----------|--------|
-| 01 | What is Kubernetes | /docs/concepts/overview/ | ✅ Published |
-| 02 | Cluster Components | /docs/concepts/overview/components/ | ✅ Published |
-| 03 | Pods | /docs/concepts/workloads/pods/ | ✅ Published |
-| 04 | Deployments | /docs/concepts/workloads/controllers/deployment/ | ✅ Published |
-| 05 | Services | /docs/concepts/services-networking/service/ | ✅ Published |
-| 06 | ConfigMaps | /docs/concepts/configuration/configmap/ | ✅ Published |
-| 07 | Secrets | /docs/concepts/configuration/secret/ | ✅ Published |
-| 08 | Persistent Volumes | /docs/concepts/storage/persistent-volumes/ | ✅ Published |
-| 09 | Ingress | /docs/concepts/services-networking/ingress/ | ✅ Published |
-| 10 | StatefulSets | /docs/concepts/workloads/controllers/statefulset/ | ✅ Published |
-| 11 | DaemonSets & Jobs | /docs/concepts/workloads/controllers/daemonset/ + /job/ | ✅ Published |
+| Ep | Title | Docs Link | YouTube | Est. Length |
+|----|-------|-----------|---------|-------------|
+| 01 | What is Kubernetes | [overview](https://kubernetes.io/docs/concepts/overview/) | [youtu.be/oeZeViBO-34](https://youtu.be/oeZeViBO-34) | 72s |
+| 02 | Cluster Components | [components](https://kubernetes.io/docs/concepts/overview/components/) | [youtu.be/jzHthuaaJDE](https://youtu.be/jzHthuaaJDE) | 68s |
+| 03 | Pods | [pods](https://kubernetes.io/docs/concepts/workloads/pods/) | [youtu.be/3gP1jeLRG-s](https://youtu.be/3gP1jeLRG-s) | 74s |
+| 04 | Deployments | [deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) | [youtu.be/RF4ntSQ_pgA](https://youtu.be/RF4ntSQ_pgA) | 69s |
+| 05 | Services | [service](https://kubernetes.io/docs/concepts/services-networking/service/) | [youtu.be/wnU00LpKbfI](https://youtu.be/wnU00LpKbfI) | 70s |
+| 06 | ConfigMaps | [configmap](https://kubernetes.io/docs/concepts/configuration/configmap/) | [youtu.be/jxyX_3lViyU](https://youtu.be/jxyX_3lViyU) | 65s |
+| 07 | Secrets | [secret](https://kubernetes.io/docs/concepts/configuration/secret/) | [youtu.be/iKiU2DXgrRE](https://youtu.be/iKiU2DXgrRE) | 69s |
+| 08 | Persistent Volumes | [persistent-volumes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) | [youtu.be/NQ06EXGPxXg](https://youtu.be/NQ06EXGPxXg) | 71s |
+| 09 | Ingress | [ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) | [youtu.be/HRCcIP-IMHM](https://youtu.be/HRCcIP-IMHM) | 68s |
+| 10 | StatefulSets | [statefulset](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/) | [youtu.be/vO6UTF7e0y8](https://youtu.be/vO6UTF7e0y8) | 66s |
+| 11 | DaemonSets & Jobs | [daemonset](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/) + [job](https://kubernetes.io/docs/concepts/workloads/controllers/job/) | [youtu.be/c0fmmkcb0BU](https://youtu.be/c0fmmkcb0BU) | 70s |
 
 ---
 
-## Full Coverage Plan
+## Planned Episodes
 
-### Section 1: Overview (4 episodes — 1 existing)
+### Section 1: Overview
 
-| Ep | Title | Docs URL | Concepts Covered | Status |
-|----|-------|----------|-----------------|--------|
-| 01 | What is Kubernetes | /overview/ | What K8s is, what it does, what it's not. Containers → VMs → K8s history | ✅ Done |
-| NEW | The Kubernetes API | /overview/kubernetes-api/ | REST API, API groups, versioning (alpha/beta/stable), how kubectl talks to the API | 🔲 Planned |
-| 02 | Cluster Components | /overview/components/ | Control plane (API server, etcd, scheduler, controller-manager) + node components | ✅ Done |
-| NEW | Working with Objects | /overview/working-with-objects/ | Spec vs Status, names & UIDs, namespaces, labels, annotations, selectors | 🔲 Planned |
+| # | Title | Docs Link | Key Concepts | Est. Length |
+|---|-------|-----------|--------------|-------------|
+| 12 | The Kubernetes API | [kubernetes-api](https://kubernetes.io/docs/concepts/overview/kubernetes-api/) | REST API, API groups, versioning (alpha/beta/stable), `kubectl` under the hood | ~90s |
+| 13 | Labels & Selectors | [labels](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/) + [field-selectors](https://kubernetes.io/docs/concepts/overview/working-with-objects/field-selectors/) | Label syntax, equality vs set-based selectors, annotations vs labels | ~90s |
+| 14 | Namespaces | [namespaces](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/) + [names](https://kubernetes.io/docs/concepts/overview/working-with-objects/names/) | Namespace isolation, names, UIDs, resource scoping | ~85s |
+| 15 | Finalizers & Owners | [finalizers](https://kubernetes.io/docs/concepts/overview/working-with-objects/finalizers/) + [owners-dependents](https://kubernetes.io/docs/concepts/overview/working-with-objects/owners-dependents/) | Deletion protection, owner references, cascading delete | ~85s |
 
-Sub-pages of Working with Objects (can merge into one or split):
-- labels, annotations, field-selectors, names, namespaces, finalizers, owners-dependents, common-labels
+### Section 2: Architecture
 
-> **Decision:** Merge into 2 episodes: "Labels & Selectors" + "Namespaces & Object Metadata"
+| # | Title | Docs Link | Key Concepts | Est. Length |
+|---|-------|-----------|--------------|-------------|
+| 16 | Nodes | [nodes](https://kubernetes.io/docs/concepts/architecture/nodes/) | Node status, conditions, heartbeat, node controller, capacity | ~95s |
+| 17 | Controllers | [controller](https://kubernetes.io/docs/concepts/architecture/controller/) | Control loop, reconciliation, desired vs actual state, watch/list | ~85s |
+| 18 | Garbage Collection | [garbage-collection](https://kubernetes.io/docs/concepts/architecture/garbage-collection/) | Owner references, foreground vs background cascading deletion | ~85s |
+| 19 | Leases | [leases](https://kubernetes.io/docs/concepts/architecture/leases/) | Distributed lock, leader election, node heartbeat mechanism | ~80s |
+| 20 | Cloud Controller | [cloud-controller](https://kubernetes.io/docs/concepts/architecture/cloud-controller/) | Cloud-provider integration, node/route/service controllers | ~85s |
+| 21 | cgroups in Kubernetes | [cgroups](https://kubernetes.io/docs/concepts/architecture/cgroups/) | cgroup v1 vs v2, resource isolation, Linux fundamentals | ~80s |
 
-| NEW | Labels & Selectors | /working-with-objects/labels/ + /field-selectors/ | Label syntax, equality vs set-based selectors, annotation vs label | 🔲 Planned |
-| NEW | Namespaces | /working-with-objects/namespaces/ + /names/ | Namespace isolation, names/UIDs, object references | 🔲 Planned |
+### Section 3: Containers
 
----
+| # | Title | Docs Link | Key Concepts | Est. Length |
+|---|-------|-----------|--------------|-------------|
+| 22 | Container Images | [images](https://kubernetes.io/docs/concepts/containers/images/) | Image naming, pull policy (Always/IfNotPresent/Never), private registries, imagePullSecrets | ~90s |
+| 23 | Container Lifecycle | [container-lifecycle-hooks](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/) + [container-environment](https://kubernetes.io/docs/concepts/containers/container-environment/) | PostStart/PreStop hooks, env vars available, downward API intro | ~95s |
+| 24 | Runtime Classes | [runtime-class](https://kubernetes.io/docs/concepts/containers/runtime-class/) | CRI, containerd, gVisor, per-pod runtime selection | ~80s |
+| 25 | Container Runtime Interface | [cri](https://kubernetes.io/docs/concepts/containers/cri/) | CRI spec, how kubelet talks to container runtimes, pluggable runtimes | ~80s |
 
-### Section 2: Architecture (6 episodes — 0 existing)
+### Section 4: Workloads — Pods
 
-| Ep | Title | Docs URL | Concepts Covered | Status |
-|----|-------|----------|-----------------|--------|
-| NEW | Nodes | /architecture/nodes/ | Node status, heartbeat, node controller, taints | 🔲 Planned |
-| NEW | Controllers | /architecture/controller/ | Control loop, reconciliation, desired vs actual state | 🔲 Planned |
-| NEW | Garbage Collection | /architecture/garbage-collection/ | Owner references, cascading deletion, foreground vs background | 🔲 Planned |
-| NEW | Leases | /architecture/leases/ | Distributed coordination, leader election, node heartbeat mechanism | 🔲 Planned |
-| NEW | Cloud Controller | /architecture/cloud-controller/ | Cloud-provider integration, node/route/service controllers | 🔲 Planned |
-| NEW | cgroups | /architecture/cgroups/ | cgroup v1 vs v2, resource isolation, Linux fundamentals | 🔲 Planned |
+| # | Title | Docs Link | Key Concepts | Est. Length |
+|---|-------|-----------|--------------|-------------|
+| 26 | Pod Lifecycle | [pod-lifecycle](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/) | Phases (Pending/Running/Succeeded/Failed/Unknown), conditions, restart policy | ~100s |
+| 27 | Init Containers | [init-containers](https://kubernetes.io/docs/concepts/workloads/pods/init-containers/) | Sequential init, blocking main containers, use cases (DB wait, config) | ~90s |
+| 28 | Sidecar Containers | [sidecar-containers](https://kubernetes.io/docs/concepts/workloads/pods/sidecar-containers/) | Restartable init containers as sidecars, logging/proxy pattern | ~85s |
+| 29 | Pod Disruption Budgets | [disruptions](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/) | Voluntary vs involuntary disruption, PDB spec, `kubectl drain` safety | ~90s |
+| 30 | Ephemeral Containers | [ephemeral-containers](https://kubernetes.io/docs/concepts/workloads/pods/ephemeral-containers/) | Debug containers, `kubectl debug`, no restart policy | ~80s |
+| 31 | Downward API | [downward-api](https://kubernetes.io/docs/concepts/workloads/pods/downward-api/) | Exposing pod name/namespace/IP/labels to container via env or volume | ~85s |
 
----
+### Section 4: Workloads — Controllers
 
-### Section 3: Containers (4 episodes — 0 existing)
+| # | Title | Docs Link | Key Concepts | Est. Length |
+|---|-------|-----------|--------------|-------------|
+| 32 | ReplicaSets | [replicaset](https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/) | Selector + template, when to use directly vs via Deployment | ~80s |
+| 33 | CronJobs | [cron-jobs](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/) | Cron syntax, concurrencyPolicy, successfulJobsHistoryLimit | ~90s |
+| 34 | HPA (Autoscaling) | [horizontal-pod-autoscale](https://kubernetes.io/docs/concepts/workloads/autoscaling/horizontal-pod-autoscale/) | Scale on CPU/memory/custom metrics, targetUtilization | ~95s |
 
-| Ep | Title | Docs URL | Concepts Covered | Status |
-|----|-------|----------|-----------------|--------|
-| NEW | Container Images | /containers/images/ | Image naming, pull policy, private registries, imagePullSecrets | 🔲 Planned |
-| NEW | Container Lifecycle | /containers/container-lifecycle-hooks/ + /container-environment/ | PostStart/PreStop hooks, env vars, downward API | 🔲 Planned |
-| NEW | Runtime Classes | /containers/runtime-class/ | CRI, containerd, RuntimeClass, per-pod runtime selection | 🔲 Planned |
-| NEW | Container Runtime Interface | /containers/cri/ | CRI spec, how kubelet talks to container runtimes | 🔲 Planned |
+### Section 5: Services & Networking
 
----
+| # | Title | Docs Link | Key Concepts | Est. Length |
+|---|-------|-----------|--------------|-------------|
+| 35 | DNS for Pods & Services | [dns-pod-service](https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/) | CoreDNS, FQDN format, search domains, pod DNS policy | ~90s |
+| 36 | Network Policies | [network-policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/) | Ingress/egress rules, pod/namespace selectors, default deny | ~100s |
+| 37 | Ingress Controllers | [ingress-controllers](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/) | nginx/traefik/cloud options, IngressClass, choosing a controller | ~90s |
+| 38 | Gateway API | [gateway](https://kubernetes.io/docs/concepts/services-networking/gateway/) | HTTPRoute, GatewayClass, TCPRoute, successor to Ingress | ~95s |
+| 39 | EndpointSlices | [endpoint-slices](https://kubernetes.io/docs/concepts/services-networking/endpoint-slices/) | Scalable endpoint tracking, replacing Endpoints object, topology | ~80s |
 
-### Section 4: Workloads (10 episodes — 5 existing)
+### Section 6: Storage
 
-#### Pods sub-pages (need coverage)
+| # | Title | Docs Link | Key Concepts | Est. Length |
+|---|-------|-----------|--------------|-------------|
+| 40 | Volumes | [volumes](https://kubernetes.io/docs/concepts/storage/volumes/) | emptyDir, hostPath, configMap/secret as volumes, volume types overview | ~100s |
+| 41 | Storage Classes | [storage-classes](https://kubernetes.io/docs/concepts/storage/storage-classes/) | Provisioner, reclaim policy, volumeBindingMode, WaitForFirstConsumer | ~95s |
+| 42 | Dynamic Provisioning | [dynamic-provisioning](https://kubernetes.io/docs/concepts/storage/dynamic-provisioning/) | StorageClass + PVC → auto PV, cloud provisioners | ~85s |
+| 43 | Ephemeral Volumes | [ephemeral-volumes](https://kubernetes.io/docs/concepts/storage/ephemeral-volumes/) | Generic ephemeral, CSI ephemeral, emptyDir deep dive, lifecycle | ~90s |
+| 44 | Volume Snapshots | [volume-snapshots](https://kubernetes.io/docs/concepts/storage/volume-snapshots/) + [volume-snapshot-classes](https://kubernetes.io/docs/concepts/storage/volume-snapshot-classes/) | VolumeSnapshot, VolumeSnapshotContent, restore to PVC | ~90s |
 
-| Ep | Title | Docs URL | Concepts Covered | Status |
-|----|-------|----------|-----------------|--------|
-| 03 | Pods | /workloads/pods/ | Pod spec, containers, scheduling unit | ✅ Done |
-| NEW | Pod Lifecycle | /workloads/pods/pod-lifecycle/ | Phases (Pending/Running/Succeeded/Failed), conditions, container states | 🔲 Planned |
-| NEW | Init Containers | /workloads/pods/init-containers/ | Sequential init, use cases (DB wait, config setup) | 🔲 Planned |
-| NEW | Sidecar Containers | /workloads/pods/sidecar-containers/ | Restartable init containers, logging/proxy sidecars | 🔲 Planned |
-| NEW | Pod Disruption Budgets | /workloads/pods/disruptions/ | PDB, voluntary vs involuntary disruptions, drain operations | 🔲 Planned |
-| NEW | Ephemeral Containers | /workloads/pods/ephemeral-containers/ | Debug containers, kubectl debug | 🔲 Planned |
-| NEW | Downward API | /workloads/pods/downward-api/ | Exposing pod metadata to containers (env vars + volume files) | 🔲 Planned |
+### Section 7: Configuration
 
-#### Controllers (need coverage)
+| # | Title | Docs Link | Key Concepts | Est. Length |
+|---|-------|-----------|--------------|-------------|
+| 45 | Resource Requests & Limits | [manage-resources-containers](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) | CPU/memory requests vs limits, QoS classes (Guaranteed/Burstable/BestEffort) | ~105s |
+| 46 | Liveness & Readiness Probes | [liveness-readiness-startup-probes](https://kubernetes.io/docs/concepts/configuration/liveness-readiness-startup-probes/) | HTTP/exec/TCP probes, startup probe, failure threshold, initialDelaySeconds | ~105s |
 
-| Ep | Title | Docs URL | Concepts Covered | Status |
-|----|-------|----------|-----------------|--------|
-| 04 | Deployments | /controllers/deployment/ | ReplicaSet management, rolling updates, rollback | ✅ Done |
-| NEW | ReplicaSets | /controllers/replicaset/ | Direct ReplicaSet use (rare), relationship to Deployments | 🔲 Planned |
-| 10 | StatefulSets | /controllers/statefulset/ | Stable identity, ordered deploy/scale, persistent storage | ✅ Done |
-| 11 | DaemonSets | /controllers/daemonset/ | One pod per node, node selector, tolerations | ✅ Done |
-| 11 | Jobs | /controllers/job/ | Run-to-completion, parallelism, completions | ✅ Done (combined) |
-| NEW | CronJobs | /controllers/cron-jobs/ | Scheduled jobs, cron syntax, concurrency policy | 🔲 Planned |
-| NEW | Autoscaling | /workloads/autoscaling/ + /horizontal-pod-autoscale/ | HPA, VPA overview, metrics | 🔲 Planned |
+### Section 8: Scheduling & Eviction
 
----
+| # | Title | Docs Link | Key Concepts | Est. Length |
+|---|-------|-----------|--------------|-------------|
+| 47 | The Scheduler | [kube-scheduler](https://kubernetes.io/docs/concepts/scheduling-eviction/kube-scheduler/) | Filtering, scoring, binding phases, scheduler profiles | ~90s |
+| 48 | Assigning Pods to Nodes | [assign-pod-node](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) | nodeSelector, nodeAffinity (required/preferred), podAffinity/Anti | ~110s |
+| 49 | Taints & Tolerations | [taint-and-toleration](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) | Taint effects (NoSchedule/PreferNoSchedule/NoExecute), toleration syntax, use cases | ~95s |
+| 50 | Pod Priority & Preemption | [pod-priority-preemption](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/) | PriorityClass, preemption, impact on scheduler decisions | ~90s |
+| 51 | Node Pressure Eviction | [node-pressure-eviction](https://kubernetes.io/docs/concepts/scheduling-eviction/node-pressure-eviction/) | Memory/disk pressure signals, eviction thresholds, QoS order | ~95s |
 
-### Section 5: Services & Networking (7 episodes — 2 existing)
+### Section 9: Security
 
-| Ep | Title | Docs URL | Concepts Covered | Status |
-|----|-------|----------|-----------------|--------|
-| 05 | Services | /services-networking/service/ | ClusterIP, NodePort, LoadBalancer, ExternalName, kube-proxy | ✅ Done |
-| 09 | Ingress | /services-networking/ingress/ | Ingress resources, controllers, rules, TLS | ✅ Done |
-| NEW | DNS for Pods & Services | /services-networking/dns-pod-service/ | CoreDNS, FQDN, search domains, pod DNS | 🔲 Planned |
-| NEW | Network Policies | /services-networking/network-policies/ | Ingress/egress rules, pod selectors, namespace isolation | 🔲 Planned |
-| NEW | Ingress Controllers | /services-networking/ingress-controllers/ | nginx, traefik, cloud options, choosing a controller | 🔲 Planned |
-| NEW | Gateway API | /services-networking/gateway/ | HTTPRoute, GatewayClass, successor to Ingress | 🔲 Planned |
-| NEW | EndpointSlices | /services-networking/endpoint-slices/ | Scalable endpoint tracking, replacing Endpoints | 🔲 Planned |
+| # | Title | Docs Link | Key Concepts | Est. Length |
+|---|-------|-----------|--------------|-------------|
+| 52 | RBAC | [controlling-access](https://kubernetes.io/docs/concepts/security/controlling-access/) | AuthN vs AuthZ, Roles, ClusterRoles, RoleBindings, subjects | ~110s |
+| 53 | Service Accounts | [service-accounts](https://kubernetes.io/docs/concepts/security/service-accounts/) | Default SA, token automounting, IRSA pattern, projected tokens | ~95s |
+| 54 | Pod Security Standards | [pod-security-standards](https://kubernetes.io/docs/concepts/security/pod-security-standards/) + [pod-security-admission](https://kubernetes.io/docs/concepts/security/pod-security-admission/) | Privileged/Baseline/Restricted profiles, PSA labels, warn/audit/enforce | ~105s |
+| 55 | Network Security | [secrets-good-practices](https://kubernetes.io/docs/concepts/security/secrets-good-practices/) + [rbac-good-practices](https://kubernetes.io/docs/concepts/security/rbac-good-practices/) | Secrets hygiene, RBAC least privilege, defense in depth | ~95s |
+| 56 | Multi-tenancy | [multi-tenancy](https://kubernetes.io/docs/concepts/security/multi-tenancy/) | Namespace isolation, soft vs hard tenancy, cluster vs namespace admin | ~90s |
 
----
+### Section 10: Policies
 
-### Section 6: Storage (6 episodes — 1 existing)
+| # | Title | Docs Link | Key Concepts | Est. Length |
+|---|-------|-----------|--------------|-------------|
+| 57 | Resource Quotas | [resource-quotas](https://kubernetes.io/docs/concepts/policy/resource-quotas/) | Namespace-scoped limits, compute quotas, object count quotas | ~90s |
+| 58 | LimitRange | [limit-range](https://kubernetes.io/docs/concepts/policy/limit-range/) | Default requests/limits, min/max per container, ratio enforcement | ~85s |
 
-| Ep | Title | Docs URL | Concepts Covered | Status |
-|----|-------|----------|-----------------|--------|
-| 08 | Persistent Volumes | /storage/persistent-volumes/ | PV/PVC lifecycle, access modes, reclaim policy | ✅ Done |
-| NEW | Volumes | /storage/volumes/ | emptyDir, hostPath, nfs, configMap/secret as volumes | 🔲 Planned |
-| NEW | Storage Classes | /storage/storage-classes/ | Dynamic provisioning, provisioner, reclaim policy | 🔲 Planned |
-| NEW | Ephemeral Volumes | /storage/ephemeral-volumes/ | Generic ephemeral, CSI ephemeral, emptyDir deep dive | 🔲 Planned |
-| NEW | Volume Snapshots | /storage/volume-snapshots/ + /volume-snapshot-classes/ | Snapshot API, VolumeSnapshotContent | 🔲 Planned |
-| NEW | Dynamic Provisioning | /storage/dynamic-provisioning/ | StorageClass, auto-creating PVs, cloud provisioners | 🔲 Planned |
+### Section 11: Cluster Administration
 
----
-
-### Section 7: Configuration (3 episodes — 2 existing)
-
-| Ep | Title | Docs URL | Concepts Covered | Status |
-|----|-------|----------|-----------------|--------|
-| 06 | ConfigMaps | /configuration/configmap/ | ConfigMap vs Secret, env injection, volume mount | ✅ Done |
-| 07 | Secrets | /configuration/secret/ | Types, opaque/TLS/docker, encryption at rest | ✅ Done |
-| NEW | Resource Management | /configuration/manage-resources-containers/ | requests vs limits, CPU/memory, LimitRange, QoS classes | 🔲 Planned |
-| NEW | Liveness & Readiness Probes | /configuration/liveness-readiness-startup-probes/ | HTTP/exec/TCP probes, startup probes, failure thresholds | 🔲 Planned |
-
----
-
-### Section 8: Scheduling & Eviction (5 episodes — 0 existing)
-
-| Ep | Title | Docs URL | Concepts Covered | Status |
-|----|-------|----------|-----------------|--------|
-| NEW | The Scheduler | /scheduling-eviction/kube-scheduler/ | Filtering, scoring, binding, scheduler profiles | 🔲 Planned |
-| NEW | Assigning Pods to Nodes | /scheduling-eviction/assign-pod-node/ | nodeSelector, nodeAffinity, podAffinity, topologySpreadConstraints | 🔲 Planned |
-| NEW | Taints & Tolerations | /scheduling-eviction/taint-and-toleration/ | Taint effects (NoSchedule/NoExecute), toleration syntax | 🔲 Planned |
-| NEW | Pod Priority & Preemption | /scheduling-eviction/pod-priority-preemption/ | PriorityClass, preemption, when to use | 🔲 Planned |
-| NEW | Node Pressure Eviction | /scheduling-eviction/node-pressure-eviction/ | kubelet eviction, memory/disk pressure, eviction signals | 🔲 Planned |
+| # | Title | Docs Link | Key Concepts | Est. Length |
+|---|-------|-----------|--------------|-------------|
+| 59 | Networking Overview | [networking](https://kubernetes.io/docs/concepts/cluster-administration/networking/) | CNI, the Kubernetes network model, pod-to-pod routing requirements | ~95s |
+| 60 | Logging Architecture | [logging](https://kubernetes.io/docs/concepts/cluster-administration/logging/) | Node-level, sidecar, cluster-level logging patterns | ~90s |
+| 61 | Cluster Autoscaling | [node-autoscaling](https://kubernetes.io/docs/concepts/cluster-administration/node-autoscaling/) | Cluster Autoscaler, scale-up/down triggers, node groups | ~85s |
 
 ---
 
-### Section 9: Security (5 episodes — 0 existing)
+## Summary
 
-| Ep | Title | Docs URL | Concepts Covered | Status |
-|----|-------|----------|-----------------|--------|
-| NEW | RBAC | /security/controlling-access/ | AuthN vs AuthZ, RBAC, Roles, ClusterRoles, Bindings | 🔲 Planned |
-| NEW | Service Accounts | /security/service-accounts/ | Default SA, token mounting, IRSA pattern | 🔲 Planned |
-| NEW | Pod Security Standards | /security/pod-security-standards/ + /pod-security-admission/ | Privileged/Baseline/Restricted, PSA admission controller | 🔲 Planned |
-| NEW | Network Security | /security/secrets-good-practices/ + RBAC good practices | Defense in depth, secrets hygiene | 🔲 Planned |
-| NEW | Multi-tenancy | /security/multi-tenancy/ | Namespace isolation, soft vs hard tenancy | 🔲 Planned |
+| Section | Episodes | Approx. Total Time |
+|---------|----------|--------------------|
+| Overview (existing + new) | 4 | ~6 min |
+| Architecture | 6 | ~9 min |
+| Containers | 4 | ~6 min |
+| Workloads — Pods | 7 | ~10 min |
+| Workloads — Controllers | 5 (3 new) | ~8 min |
+| Services & Networking | 7 (2 existing) | ~10 min |
+| Storage | 6 (1 existing) | ~9 min |
+| Configuration | 4 (2 existing) | ~7 min |
+| Scheduling & Eviction | 5 | ~8 min |
+| Security | 5 | ~8 min |
+| Policies | 2 | ~3 min |
+| Cluster Admin | 3 | ~4.5 min |
+| **Total** | **61** | **~88 min** |
 
----
+**50 new episodes** needed. At 1/day: ~2 months to full K8s coverage.
 
-### Section 10: Policies (2 episodes — 0 existing)
+## Recommended Priority Order (next 10)
 
-| Ep | Title | Docs URL | Concepts Covered | Status |
-|----|-------|----------|-----------------|--------|
-| NEW | Resource Quotas | /policy/resource-quotas/ | Namespace-scoped limits, compute/object quotas | 🔲 Planned |
-| NEW | LimitRange | /policy/limit-range/ | Default requests/limits, min/max per container | 🔲 Planned |
-
----
-
-### Section 11: Cluster Administration (3 episodes — 0 existing)
-
-| Ep | Title | Docs URL | Concepts Covered | Status |
-|----|-------|----------|-----------------|--------|
-| NEW | Networking Overview | /cluster-administration/networking/ | CNI, network model, pod-to-pod routing | 🔲 Planned |
-| NEW | Logging | /cluster-administration/logging/ | Node-level, sidecar, cluster-level logging architectures | 🔲 Planned |
-| NEW | Cluster Autoscaling | /cluster-administration/node-autoscaling/ | Cluster Autoscaler, scale-up/down triggers | 🔲 Planned |
-
----
-
-### Sections Skipped (out of scope for beginner series)
-
-| Section | Reason |
-|---------|--------|
-| Windows in Kubernetes | Platform-specific, niche audience |
-| Extending Kubernetes (CRD/Operator) | Advanced — save for dedicated series |
-| Mixed-version proxy | Very advanced operational topic |
-| cgroup v2 deep dives | Linux internals — brief mention only |
-| Gang scheduling | Batch/ML specific |
-
----
-
-## Episode Count Summary
-
-| Section | Existing | New | Total |
-|---------|----------|-----|-------|
-| Overview | 2 | 3 | 5 |
-| Architecture | 0 | 6 | 6 |
-| Containers | 0 | 4 | 4 |
-| Workloads | 5 | 7 | 12 |
-| Services & Networking | 2 | 5 | 7 |
-| Storage | 1 | 5 | 6 |
-| Configuration | 2 | 2 | 4 |
-| Scheduling & Eviction | 0 | 5 | 5 |
-| Security | 0 | 5 | 5 |
-| Policies | 0 | 2 | 2 |
-| Cluster Admin | 0 | 3 | 3 |
-| **TOTAL** | **12** | **47** | **59** |
-
-**47 new episodes needed for full coverage of kubernetes.io/docs/concepts.**
-
----
-
-## Recommended Watch Order
-
-### Beginner Track (Episodes 1-15)
-1. What is Kubernetes
-2. Cluster Components
-3. The Kubernetes API
-4. Working with Objects / Labels & Namespaces
-5. Pods
-6. Pod Lifecycle
-7. Deployments
-8. Services
-9. ConfigMaps
-10. Secrets
-11. Persistent Volumes
-12. StatefulSets
-13. DaemonSets & Jobs
-14. CronJobs
-15. Ingress
-
-### Intermediate Track (Episodes 16-35)
-16. Resource Management (requests/limits)
-17. Liveness & Readiness Probes
-18. Init Containers
-19. Sidecar Containers
-20. Nodes
-21. Controllers (control loop)
-22. The Scheduler
-23. Taints & Tolerations
-24. Assigning Pods to Nodes
-25. Network Policies
-26. DNS for Pods & Services
-27. Volumes
-28. Storage Classes
-29. Dynamic Provisioning
-30. RBAC
-31. Service Accounts
-32. Pod Security Standards
-33. Resource Quotas
-34. LimitRange
-35. Autoscaling (HPA)
-
-### Advanced Track (Episodes 36-59)
-36. Gateway API
-37. EndpointSlices
-38. Ingress Controllers
-39. Ephemeral Volumes
-40. Volume Snapshots
-41. Pod Disruption Budgets
-42. Ephemeral Containers (kubectl debug)
-43. Downward API
-44. ReplicaSets
-45. Pod Priority & Preemption
-46. Node Pressure Eviction
-47. Garbage Collection
-48. Leases
-49. Networking Overview (CNI)
-50. Logging Architecture
-51. Cluster Autoscaling
-52. Runtime Classes
-53. Container Images & Registries
-54. Container Lifecycle Hooks
-55. Cloud Controller
-56. Multi-tenancy
-57. cgroups
-58. CRI
-59. Container Runtime Interface
-
----
-
-## Notes & Decisions Needed
-
-1. **Episode 11 (DaemonSets & Jobs)** — currently combined. Should split into separate episodes for full coverage. Jobs has parallelism, completions, backoffLimit that deserve full treatment. CronJobs needs its own ep regardless.
-
-2. **Operators/CRDs** — excluded from this plan. Could be a separate "Extending Kubernetes" series.
-
-3. **kubectl commands** — not a docs/concepts page but viewers will want practical demos. Keep as supplementary "quick tip" Shorts rather than full episodes.
-
-4. **Difficulty gating** — Advanced Track assumes viewer has done Beginner + Intermediate. Episodes should reference prerequisites explicitly.
-
-5. **Production rate** — at 1 episode/day we're looking at ~47 days for full coverage. Suggest prioritizing Intermediate Track next (resource management, probes, scheduling are high-value for practitioners).
+1. **Pod Lifecycle** (#26) — foundational, referenced everywhere
+2. **Resource Requests & Limits** (#45) — every practitioner needs this
+3. **Liveness & Readiness Probes** (#46) — pairs with resources
+4. **Taints & Tolerations** (#49) — common in real clusters
+5. **RBAC** (#52) — essential for any real cluster
+6. **Labels & Selectors** (#13) — foundational but skipped
+7. **Namespaces** (#14) — small, high-value
+8. **CronJobs** (#33) — natural follow-on from Jobs
+9. **Network Policies** (#36) — high security value
+10. **Storage Classes** (#41) — natural follow-on from PV
