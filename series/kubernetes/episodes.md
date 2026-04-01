@@ -1,11 +1,11 @@
 # Kubernetes Episodes
 
-All episodes are unlisted until released. YouTube links will be added after publication.
+Playlist: [Kubernetes — Run the Docs](https://www.youtube.com/playlist?list=PLdv4kqmXd-vVPLhuw8avEjDD7Tf5TrTES)
 
 | Ep | Title | Topic | Duration | Status | YouTube Link | Transcript |
 |----|-------|-------|----------|--------|--------------|-----------|
-| 01 | What is Kubernetes? | Overview | ~2:30 | Ready | TBD | [ep01.srt](./transcripts/ep01.srt) |
-| 02 | Cluster Components | Architecture | ~2:45 | Ready | TBD | [ep02.srt](./transcripts/ep02.srt) |
+| 01 | What is Kubernetes? | Overview | ~2:30 | ✅ Published | [Watch](https://youtu.be/oeZeViBO-34) | [ep01.srt](./transcripts/ep01.srt) |
+| 02 | Cluster Components | Architecture | ~2:45 | ✅ Published | [Watch](https://youtu.be/jzHthuaaJDE) | [ep02.srt](./transcripts/ep02.srt) |
 | 03 | Pods | Workloads | ~2:15 | Ready | TBD | [ep03.srt](./transcripts/ep03.srt) |
 | 04 | Deployments | Workloads | ~2:50 | Ready | TBD | [ep04.srt](./transcripts/ep04.srt) |
 | 05 | Services | Networking | ~2:45 | Ready | TBD | [ep05.srt](./transcripts/ep05.srt) |
@@ -18,8 +18,4 @@ All episodes are unlisted until released. YouTube links will be added after publ
 
 ## Release Strategy
 
-Episodes are uploaded to YouTube as **unlisted** until the series is complete, then moved to public. This allows for final review and link updates before announcement.
-
-## Playlist
-
-Playlist: [Kubernetes — Run the Docs](https://www.youtube.com/playlist/PLxxx) (TBD)
+Episodes are uploaded to the [Run the Docs YouTube channel](https://www.youtube.com/channel/UCAA-EgO7FejXuto6tHxDzHg) as **public** with English SRT captions.
