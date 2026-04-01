@@ -1,59 +1,131 @@
 1
-00:00:00,000 --> 00:00:03,000
-React is built on components.
-Let's learn what they are.
+00:00:02,000 --> 00:00:08,080
+React is built on components. They're the foundation of every user interface you build.
 
 2
-00:00:03,500 --> 00:00:08,000
-A component is a reusable piece of
-the user interface.
+00:00:08,460 --> 00:00:14,326
+A component is a reusable piece of UI — like a button, a card, or a sidebar.
 
 3
-00:00:08,500 --> 00:00:11,000
-It can be as small as a button,
-or as large as an entire page.
+00:00:14,706 --> 00:00:19,058
+It can be as small as a button, or as large as an entire page.
 
 4
-00:00:11,500 --> 00:00:15,000
-In React, components are just
-JavaScript functions that return markup.
+00:00:19,438 --> 00:00:26,564
+Just like HTML has tags like div and button, React lets you create your own custom components.
 
 5
-00:00:15,500 --> 00:00:20,000
-Here's a button component.
-It's a function called MyButton.
+00:00:26,943 --> 00:00:32,042
+Here's the key idea: a React component is just a JavaScript function.
 
 6
-00:00:20,500 --> 00:00:25,000
-To use your component, reference it
-like any other JSX element.
+00:00:32,422 --> 00:00:37,948
+It's a function that returns markup — HTML-like code called JSX.
 
 7
-00:00:25,500 --> 00:00:29,000
-Make sure to capitalize the first letter.
-That tells React it's a component.
+00:00:38,328 --> 00:00:42,551
+Let's call our function MyButton. It returns a button element.
 
 8
-00:00:29,500 --> 00:00:33,000
-You can use the same component
-multiple times.
+00:00:42,932 --> 00:00:46,643
+That's it. Function. Return markup. That's a component.
 
 9
-00:00:33,500 --> 00:00:37,000
-Nest components inside other components
-to build complex user interfaces.
+00:00:47,024 --> 00:00:50,906
+To use your component in other files, you need to export it.
 
 10
-00:00:37,500 --> 00:00:42,000
-Components are the building blocks
-of every React app.
+00:00:51,286 --> 00:00:54,977
+First: add the export default prefix before your function.
 
 11
-00:00:42,500 --> 00:00:46,000
-Start with functions, and you
-can build anything.
+00:00:55,357 --> 00:01:00,413
+This tells JavaScript that MyButton is the main thing this file exports.
 
 12
-00:00:46,500 --> 00:00:50,000
-Next episode: learn about Props
-to pass data to your components.
+00:01:00,793 --> 00:01:05,017
+You can learn more about imports and exports in the next episode.
+
+13
+00:01:05,397 --> 00:01:10,261
+For now, just remember: export default makes your component reusable.
+
+14
+00:01:10,641 --> 00:01:14,801
+Now that you've defined MyButton, you can use it anywhere in your app.
+
+15
+00:01:15,181 --> 00:01:21,282
+Reference it like you would any JSX element. That's capital M, capital B: MyButton.
+
+16
+00:01:21,662 --> 00:01:29,022
+The capital letter matters. React uses capitalization to tell components apart from HTML tags.
+
+17
+00:01:29,402 --> 00:01:36,165
+So div is lowercase — that's an HTML tag. MyButton is capitalized — that's your component.
+
+18
+00:01:36,545 --> 00:01:40,769
+Components can contain other components. That's called nesting.
+
+19
+00:01:41,149 --> 00:01:45,608
+You can use MyButton inside a Gallery component, multiple times.
+
+20
+00:01:45,987 --> 00:01:50,766
+Each MyButton is independent. Each one can have its own state later.
+
+21
+00:01:51,146 --> 00:01:57,226
+You can build entire pages this way — one component inside another, all the way down.
+
+22
+00:01:57,606 --> 00:02:02,321
+Important rule: never define a component inside another component.
+
+23
+00:02:02,701 --> 00:02:07,394
+If you define MyButton inside Gallery, your app will be slow and buggy.
+
+24
+00:02:07,774 --> 00:02:12,638
+Always define components at the top level, outside of other functions.
+
+25
+00:02:13,018 --> 00:02:17,882
+If a child component needs data from a parent, pass it with props instead.
+
+26
+00:02:18,262 --> 00:02:21,313
+Your React app starts with a root component.
+
+27
+00:02:21,693 --> 00:02:25,106
+Most React apps use components all the way down.
+
+28
+00:02:25,486 --> 00:02:31,651
+Not just for small things like buttons, but for large sections like sidebars and pages.
+
+29
+00:02:32,032 --> 00:02:36,704
+Components are how you organize and structure your entire UI.
+
+30
+00:02:37,084 --> 00:02:42,801
+Here's what you learned: React components are JavaScript functions that return markup.
+
+31
+00:02:43,181 --> 00:02:46,402
+They let you build reusable UI pieces.
+
+32
+00:02:46,782 --> 00:02:53,139
+Capitalize their names. Export them to reuse them. Nest them to build complex interfaces.
+
+33
+00:02:53,520 --> 00:02:56,207
+You're ready for the next concept: Props.

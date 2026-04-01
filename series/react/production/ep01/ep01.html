@@ -1,205 +1,565 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>React: Your First Component</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background: #0a0a0a;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-        }
-        #canvas {
-            display: block;
-            width: 100%;
-            height: 100vh;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
-        }
-    </style>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0d0d1a; width: 1920px; height: 1080px; overflow: hidden; }
+  canvas { display: block; }
+</style>
 </head>
 <body>
-    <canvas id="c"></canvas>
-    <script>
-        const canvas = document.getElementById('c');
-        const ctx = canvas.getContext('2d');
-        canvas.width = 1920;
-        canvas.height = 1080;
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+const W = 1920, H = 1080, CX = 960, CY = 540;
 
-        // Color scheme
-        const colors = {
-            bg: '#0a0a0a',
-            grad1: '#1a1a2e',
-            grad2: '#16213e',
-            accent: '#0f3460',
-            highlight: '#e94560',
-            text: '#eee',
-            code: '#90ee90',
-            border: '#444',
-        };
+const BG     = '#0d0d1a';
+const REACT  = '#61dafb';
+const REACT2 = '#21a1c4';
+const TEXT   = '#f8fafc';
+const CODE_BG= '#0d1117';
+const GREEN  = '#22c55e';
+const YELLOW = '#eab308';
+const RED    = '#ef4444';
+const SUBTLE = '#334155';
+const PURPLE = '#a78bfa';
 
-        function clearCanvas() {
-            ctx.fillStyle = colors.bg;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // Gradient background
-            const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-            grad.addColorStop(0, colors.grad1);
-            grad.addColorStop(1, colors.grad2);
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-        }
+// TIMING injected below
+let TIMING = [{"index": 0, "text": "React is built on components. They're the foundation of every user interface you build.", "start": 2.0, "end": 8.08}, {"index": 1, "text": "A component is a reusable piece of UI \u2014 like a button, a card, or a sidebar.", "start": 8.46, "end": 14.3267}, {"index": 2, "text": "It can be as small as a button, or as large as an entire page.", "start": 14.7067, "end": 19.0587}, {"index": 3, "text": "Just like HTML has tags like div and button, React lets you create your own custom components.", "start": 19.4387, "end": 26.564}, {"index": 4, "text": "Here's the key idea: a React component is just a JavaScript function.", "start": 26.944, "end": 32.0427}, {"index": 5, "text": "It's a function that returns markup \u2014 HTML-like code called JSX.", "start": 32.4227, "end": 37.948}, {"index": 6, "text": "Let's call our function MyButton. It returns a button element.", "start": 38.328, "end": 42.552}, {"index": 7, "text": "That's it. Function. Return markup. That's a component.", "start": 42.932, "end": 46.644}, {"index": 8, "text": "To use your component in other files, you need to export it.", "start": 47.024, "end": 50.9067}, {"index": 9, "text": "First: add the export default prefix before your function.", "start": 51.2867, "end": 54.9773}, {"index": 10, "text": "This tells JavaScript that MyButton is the main thing this file exports.", "start": 55.3573, "end": 60.4133}, {"index": 11, "text": "You can learn more about imports and exports in the next episode.", "start": 60.7933, "end": 65.0173}, {"index": 12, "text": "For now, just remember: export default makes your component reusable.", "start": 65.3973, "end": 70.2613}, {"index": 13, "text": "Now that you've defined MyButton, you can use it anywhere in your app.", "start": 70.6413, "end": 74.8013}, {"index": 14, "text": "Reference it like you would any JSX element. That's capital M, capital B: MyButton.", "start": 75.1813, "end": 81.2827}, {"index": 15, "text": "The capital letter matters. React uses capitalization to tell components apart from HTML tags.", "start": 81.6627, "end": 89.0227}, {"index": 16, "text": "So div is lowercase \u2014 that's an HTML tag. MyButton is capitalized \u2014 that's your component.", "start": 89.4027, "end": 96.1653}, {"index": 17, "text": "Components can contain other components. That's called nesting.", "start": 96.5453, "end": 100.7693}, {"index": 18, "text": "You can use MyButton inside a Gallery component, multiple times.", "start": 101.1493, "end": 105.608}, {"index": 19, "text": "Each MyButton is independent. Each one can have its own state later.", "start": 105.988, "end": 110.7667}, {"index": 20, "text": "You can build entire pages this way \u2014 one component inside another, all the way down.", "start": 111.1467, "end": 117.2267}, {"index": 21, "text": "Important rule: never define a component inside another component.", "start": 117.6067, "end": 122.3213}, {"index": 22, "text": "If you define MyButton inside Gallery, your app will be slow and buggy.", "start": 122.7013, "end": 127.3947}, {"index": 23, "text": "Always define components at the top level, outside of other functions.", "start": 127.7747, "end": 132.6387}, {"index": 24, "text": "If a child component needs data from a parent, pass it with props instead.", "start": 133.0187, "end": 137.8827}, {"index": 25, "text": "Your React app starts with a root component.", "start": 138.2627, "end": 141.3133}, {"index": 26, "text": "Most React apps use components all the way down.", "start": 141.6933, "end": 145.1067}, {"index": 27, "text": "Not just for small things like buttons, but for large sections like sidebars and pages.", "start": 145.4867, "end": 151.652}, {"index": 28, "text": "Components are how you organize and structure your entire UI.", "start": 152.032, "end": 156.704}, {"index": 29, "text": "Here's what you learned: React components are JavaScript functions that return markup.", "start": 157.084, "end": 162.8013}, {"index": 30, "text": "They let you build reusable UI pieces.", "start": 163.1813, "end": 166.4027}, {"index": 31, "text": "Capitalize their names. Export them to reuse them. Nest them to build complex interfaces.", "start": 166.7827, "end": 173.14}, {"index": 32, "text": "You're ready for the next concept: Props.", "start": 173.52, "end": 176.208}];
+let TOTAL_DURATION = 180.208;
 
-        function drawText(text, x, y, size, color, weight = '400', maxWidth = null) {
-            ctx.fillStyle = color;
-            ctx.font = `${weight} ${size}px -apple-system, BlinkMacSystemFont, sans-serif`;
-            ctx.textAlign = 'left';
-            ctx.textBaseline = 'top';
-            if (maxWidth) {
-                ctx.fillText(text, x, y, maxWidth);
-            } else {
-                ctx.fillText(text, x, y);
-            }
-        }
+const ease = {
+  out:    t => 1 - Math.pow(1-t, 3),
+  inOut:  t => t < 0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2,
+  spring: t => { const c4=(2*Math.PI)/2.5; return t===0?0:t===1?1:Math.pow(2,-10*t)*Math.sin((t*10-0.75)*c4)+1; },
+};
 
-        function drawCodeBox(code, x, y, w, h) {
-            // Box background
-            ctx.fillStyle = 'rgba(20, 20, 35, 0.9)';
-            ctx.fillRect(x, y, w, h);
-            
-            // Border
-            ctx.strokeStyle = colors.border;
-            ctx.lineWidth = 2;
-            ctx.strokeRect(x, y, w, h);
-            
-            // Code text
-            ctx.fillStyle = colors.code;
-            ctx.font = '24px Menlo, Monaco, monospace';
-            ctx.textAlign = 'left';
-            ctx.textBaseline = 'top';
-            
-            const lines = code.split('\n');
-            lines.forEach((line, i) => {
-                ctx.fillText(line, x + 24, y + 20 + i * 32);
-            });
-        }
+function seg(t, start, end) { return Math.max(0, Math.min(1, (t-start)/(end-start))); }
 
-        function renderFrame(frameIndex) {
-            const t = frameIndex / 30; // 30 fps
-            const duration = 90; // seconds
-            const totalFrames = duration * 30;
-            
-            clearCanvas();
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y);
+  ctx.closePath();
+}
 
-            // Timeline:
-            // 0-2s: Intro title
-            // 2-15s: What is a component
-            // 15-30s: Function component example
-            // 30-45s: Component naming rules
-            // 45-60s: Using components
-            // 60-75s: Nesting components
-            // 75-90s: Recap + CTA
+function drawGrid(ctx) {
+  ctx.strokeStyle = 'rgba(97,218,251,0.03)';
+  ctx.lineWidth = 1;
+  for (let x=0; x<W; x+=80) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+  for (let y=0; y<H; y+=80) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+}
 
-            if (t < 2) {
-                // Intro fade in
-                const alpha = Math.min(1, t / 0.5);
-                ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.1})`;
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                drawText('React', 960, 380, 120, `rgba(239, 68, 96, ${alpha})`, '700', canvas.width);
-                drawText('Your First Component', 960, 520, 64, `rgba(238, 238, 238, ${alpha})`, '400', canvas.width);
-            }
-            else if (t < 15) {
-                // What is a component?
-                const phase = (t - 2) / 13;
-                drawText('What is a component?', 100, 100, 56, colors.text, '600');
-                
-                // Animated box showing component concept
-                const boxX = 200;
-                const boxY = 250;
-                const boxW = 1520;
-                const boxH = 600;
-                
-                ctx.fillStyle = `rgba(239, 68, 96, ${0.1 + phase * 0.1})`;
-                ctx.fillRect(boxX, boxY, boxW, boxH);
-                
-                ctx.strokeStyle = `rgba(239, 68, 96, ${0.3 + phase * 0.2})`;
-                ctx.lineWidth = 3;
-                ctx.strokeRect(boxX, boxY, boxW, boxH);
-                
-                drawText('A component is a reusable piece of the UI', 250, 350, 48, colors.text);
-                drawText('It can be as small as a button, or as large as a page', 250, 450, 48, colors.text);
-                drawText('Components are just JavaScript functions', 250, 550, 48, colors.text);
-            }
-            else if (t < 30) {
-                // Function component example
-                drawText('Building a Button Component', 100, 100, 56, colors.text, '600');
-                
-                const codeX = 150;
-                const codeY = 250;
-                const codeW = 1620;
-                const codeH = 400;
-                
-                drawCodeBox(
-                    'function MyButton() {\n  return <button>Click me</button>\n}',
-                    codeX, codeY, codeW, codeH
-                );
-                
-                // Label
-                drawText('← JavaScript function that returns JSX', 1900, 350, 32, colors.highlight, '400');
-            }
-            else if (t < 45) {
-                // Component naming
-                drawText('Component Naming Rules', 100, 100, 56, colors.text, '600');
-                
-                drawText('✓ Capitalize first letter', 150, 300, 44, '#90ee90', '400');
-                drawText('MyButton, Header, LoginForm', 250, 360, 40, colors.code, '400');
-                
-                drawText('✗ Lowercase (reserved for HTML)', 150, 500, 44, '#ff6b6b', '400');
-                drawText('myButton, button, div', 250, 560, 40, colors.code, '400');
-            }
-            else if (t < 60) {
-                // Using components
-                drawText('Using Your Component', 100, 100, 56, colors.text, '600');
-                
-                const codeX = 150;
-                const codeY = 250;
-                const codeW = 1620;
-                const codeH = 400;
-                
-                drawCodeBox(
-                    'export default function App() {\n  return <MyButton />\n}',
-                    codeX, codeY, codeW, codeH
-                );
-                
-                drawText('← Use your component with JSX', 1900, 350, 32, colors.highlight, '400');
-            }
-            else if (t < 75) {
-                // Nesting components
-                drawText('Nesting Components', 100, 100, 56, colors.text, '600');
-                
-                const codeX = 150;
-                const codeY = 250;
-                const codeW = 1620;
-                const codeH = 450;
-                
-                drawCodeBox(
-                    'export default function App() {\n  return (\n    <div>\n      <MyButton />\n      <MyButton />\n    </div>\n  )\n}',
-                    codeX, codeY, codeW, codeH
-                );
-            }
-            else {
-                // Recap
-                drawText('Components are the building blocks of React apps', 150, 300, 44, colors.text);
-                drawText('Start with functions, build complex UIs', 150, 380, 44, colors.text);
-                drawText('Next: Learn about Props', 150, 500, 44, colors.highlight, '600');
-            }
-        }
+function drawReactLogo(ctx, cx, cy, r, alpha, t) {
+  if (alpha <= 0) return;
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = REACT;
+  ctx.lineWidth = r * 0.06;
+  ctx.shadowColor = REACT;
+  ctx.shadowBlur = 18 * alpha;
+  for (let i=0; i<3; i++) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(i * Math.PI/3 + t * 0.4);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, r, r*0.38, 0, 0, Math.PI*2);
+    ctx.stroke();
+    ctx.restore();
+  }
+  ctx.fillStyle = REACT;
+  ctx.shadowBlur = 0;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r*0.18, 0, Math.PI*2);
+  ctx.fill();
+  ctx.restore();
+}
 
-        // For debugging / frame capture
-        window.renderFrame = renderFrame;
-        window.canvas = canvas;
-    </script>
+function drawCaption(ctx, t) {
+  let activeText = '';
+  for (const s of TIMING) {
+    if (t >= s.start - 0.1 && t <= s.end + 0.3) { activeText = s.text; break; }
+  }
+  if (!activeText) return;
+  ctx.save();
+  const PILL_H=44, PAD=24;
+  ctx.font = '500 20px "JetBrains Mono", monospace';
+  const tw = ctx.measureText(activeText).width;
+  const pw = Math.min(tw + PAD*2, W - 100);
+  ctx.globalAlpha = 0.9;
+  ctx.fillStyle = 'rgba(0,0,0,0.85)';
+  roundRect(ctx, CX-pw/2, 990-PILL_H/2, pw, PILL_H, 22);
+  ctx.fill();
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = TEXT;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  let display = activeText;
+  const maxW = pw - PAD*2;
+  while (ctx.measureText(display).width > maxW && display.length > 10) display = display.slice(0,-1);
+  if (display !== activeText) display += '…';
+  ctx.fillText(display, CX, 990);
+  ctx.restore();
+}
+
+// ============================================================
+// SCENE 1: Hook — React logo reveal (0–8.46s)
+// ============================================================
+function drawScene1(ctx, t) {
+  ctx.fillStyle = BG; ctx.fillRect(0,0,W,H); drawGrid(ctx);
+
+  const logoP = ease.spring(seg(t, 2.0, 3.0));
+  drawReactLogo(ctx, CX, CY - 110, 130 * logoP, logoP, t);
+
+  const word = 'React';
+  ctx.font = 'bold 130px "JetBrains Mono", monospace';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  let totalW = 0; const widths = [];
+  for (const ch of word) { const w = ctx.measureText(ch).width; widths.push(w); totalW += w; }
+  let cx2 = CX - totalW/2;
+  word.split('').forEach((ch, i) => {
+    const lp = ease.spring(seg(t, 2.5 + i*0.1, 2.9 + i*0.1));
+    ctx.save();
+    ctx.globalAlpha = lp;
+    ctx.translate(cx2 + widths[i]/2, CY + 90 - (1-lp)*40);
+    ctx.fillStyle = REACT; ctx.shadowColor = REACT; ctx.shadowBlur = 20*lp;
+    ctx.fillText(ch, 0, 0);
+    ctx.shadowBlur = 0;
+    ctx.restore();
+    cx2 += widths[i];
+  });
+
+  const subA = ease.out(seg(t, 3.3, 4.1));
+  if (subA > 0) {
+    ctx.save(); ctx.globalAlpha = subA;
+    ctx.font = '500 52px "JetBrains Mono", monospace';
+    ctx.fillStyle = TEXT; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('Your First Component', CX, CY + 210);
+    ctx.restore();
+  }
+  const metaA = ease.out(seg(t, 4.1, 5.0));
+  if (metaA > 0) {
+    ctx.save(); ctx.globalAlpha = metaA;
+    ctx.font = '400 28px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#64748b'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('By Meta  ·  2013  ·  Open Source', CX, CY + 280);
+    ctx.restore();
+  }
+}
+
+// ============================================================
+// SCENE 2: What is a Component (8.46–19.44s)
+// ============================================================
+function drawScene2(ctx, t) {
+  const s = 8.46;
+  ctx.fillStyle = BG; ctx.fillRect(0,0,W,H); drawGrid(ctx);
+
+  const titleA = ease.out(seg(t, s, s+0.4));
+  ctx.save(); ctx.globalAlpha = titleA;
+  ctx.font = '600 42px "JetBrains Mono", monospace';
+  ctx.fillStyle = REACT; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('A component is a reusable piece of UI', CX, 130);
+  ctx.restore();
+
+  const comps = [
+    { icon: '🔘', label: 'Button',  desc: 'small, reusable action',  color: REACT,   x: CX-580 },
+    { icon: '🃏', label: 'Card',    desc: 'groups related content',   color: YELLOW,  x: CX     },
+    { icon: '📐', label: 'Sidebar', desc: 'larger layout component',  color: GREEN,   x: CX+580 },
+  ];
+  comps.forEach((comp, i) => {
+    const cp = ease.spring(seg(t, s+0.4+i*0.35, s+1.3+i*0.35));
+    if (cp <= 0) return;
+    ctx.save(); ctx.globalAlpha = cp;
+    ctx.translate(comp.x, CY - 10 + (1-cp)*50);
+    const cw=340, ch=300;
+    ctx.fillStyle = 'rgba(97,218,251,0.05)';
+    roundRect(ctx,-cw/2,-ch/2,cw,ch,16); ctx.fill();
+    ctx.strokeStyle = comp.color+'99'; ctx.lineWidth=2; ctx.stroke();
+    ctx.font='72px serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(comp.icon, 0, -70);
+    ctx.font='bold 34px "JetBrains Mono", monospace';
+    ctx.fillStyle=comp.color;
+    ctx.fillText('<'+comp.label+' />', 0, 10);
+    ctx.font='400 22px "JetBrains Mono", monospace';
+    ctx.fillStyle='#94a3b8';
+    ctx.fillText(comp.desc, 0, 65);
+    ctx.restore();
+  });
+
+  const tagA = ease.out(seg(t, s+2.0, s+2.8));
+  if (tagA > 0) {
+    ctx.save(); ctx.globalAlpha = tagA;
+    ctx.font='500 30px "JetBrains Mono", monospace';
+    ctx.fillStyle='#94a3b8'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('Like custom HTML tags — but you define them yourself', CX, H-120);
+    ctx.restore();
+  }
+}
+
+// ============================================================
+// SCENE 3: Code — function, JSX (19.44–42.93s)
+// ============================================================
+function drawScene3(ctx, t) {
+  const s = 19.44;
+  ctx.fillStyle = BG; ctx.fillRect(0,0,W,H); drawGrid(ctx);
+
+  const titleA = ease.out(seg(t, s, s+0.4));
+  ctx.save(); ctx.globalAlpha = titleA;
+  ctx.font='600 42px "JetBrains Mono", monospace';
+  ctx.fillStyle=REACT; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('A component is just a JavaScript function', CX, 120);
+  ctx.restore();
+
+  const boxP = ease.out(seg(t, s+0.3, s+0.8));
+  if (boxP > 0) {
+    const bx=CX-680, by=200, bw=1360, bh=520;
+    ctx.save(); ctx.globalAlpha=boxP;
+    ctx.fillStyle=CODE_BG;
+    roundRect(ctx,bx,by,bw,bh,12); ctx.fill();
+    ctx.strokeStyle='rgba(97,218,251,0.3)'; ctx.lineWidth=2; ctx.stroke();
+    [RED,YELLOW,GREEN].forEach((c,i) => {
+      ctx.fillStyle=c; ctx.beginPath();
+      ctx.arc(bx+28+i*28, by+28, 9, 0, Math.PI*2); ctx.fill();
+    });
+    ctx.restore();
+
+    const lines = [
+      { text: 'function MyButton() {',           color: '#c792ea', delay: 0.0 },
+      { text: '  return (',                       color: TEXT,      delay: 0.3 },
+      { text: '    <button>',                     color: '#89ddff', delay: 0.6 },
+      { text: '      Click me',                   color: TEXT,      delay: 0.9 },
+      { text: '    </button>',                    color: '#89ddff', delay: 1.2 },
+      { text: '  );',                             color: TEXT,      delay: 1.5 },
+      { text: '}',                                color: '#c792ea', delay: 1.8 },
+      { text: '',                                 color: TEXT,      delay: 2.0 },
+      { text: 'export default MyButton;',         color: '#c3e88d', delay: 2.1 },
+    ];
+    ctx.font='500 30px "JetBrains Mono", monospace';
+    ctx.textAlign='left'; ctx.textBaseline='top';
+    lines.forEach((line, i) => {
+      const lp = ease.out(seg(t, s+0.8+line.delay, s+1.2+line.delay));
+      ctx.save(); ctx.globalAlpha=boxP*lp;
+      ctx.fillStyle=line.color;
+      ctx.fillText(line.text, bx+48, by+60+i*52);
+      ctx.restore();
+    });
+  }
+
+  const jsxA = ease.out(seg(t, s+4.0, s+5.0));
+  if (jsxA > 0) {
+    ctx.save(); ctx.globalAlpha=jsxA;
+    ctx.fillStyle='rgba(97,218,251,0.08)';
+    roundRect(ctx,CX-600,770,1200,80,12); ctx.fill();
+    ctx.strokeStyle=REACT+'66'; ctx.lineWidth=2; ctx.stroke();
+    ctx.font='500 30px "JetBrains Mono", monospace';
+    ctx.fillStyle=REACT; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('⚡  JSX = HTML-like syntax React compiles to JavaScript', CX, 810);
+    ctx.restore();
+  }
+}
+
+// ============================================================
+// SCENE 4: Export, Import, Capitalize (42.93–70.64s)
+// ============================================================
+function drawScene4(ctx, t) {
+  const s = 42.93;
+  ctx.fillStyle = BG; ctx.fillRect(0,0,W,H); drawGrid(ctx);
+
+  const titleA = ease.out(seg(t, s, s+0.4));
+  ctx.save(); ctx.globalAlpha=titleA;
+  ctx.font='600 42px "JetBrains Mono", monospace';
+  ctx.fillStyle=REACT; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('Export  ·  Import  ·  Capitalize', CX, 120);
+  ctx.restore();
+
+  const rules = [
+    { icon:'📤', label:'export default MyButton',          desc:'Makes MyButton the main export of this file',                  color:GREEN,  y:240, delay:0.0 },
+    { icon:'📥', label:"import MyButton from './MyButton'", desc:'Pull it into any other component',                             color:REACT,  y:430, delay:0.5 },
+    { icon:'🔠', label:'<MyButton />',                      desc:'Capital letter — React tells components from HTML tags this way', color:YELLOW, y:620, delay:1.0 },
+  ];
+  rules.forEach(rule => {
+    const rp = ease.spring(seg(t, s+0.4+rule.delay, s+1.3+rule.delay));
+    if (rp <= 0) return;
+    ctx.save(); ctx.globalAlpha=rp; ctx.translate(0,(1-rp)*30);
+    ctx.fillStyle='rgba(97,218,251,0.04)';
+    roundRect(ctx,160,rule.y,1600,150,12); ctx.fill();
+    ctx.strokeStyle=rule.color+'77'; ctx.lineWidth=2; ctx.stroke();
+    ctx.fillStyle=rule.color;
+    roundRect(ctx,160,rule.y,5,150,2); ctx.fill();
+    ctx.font='48px serif'; ctx.textAlign='left'; ctx.textBaseline='middle';
+    ctx.fillText(rule.icon, 200, rule.y+50);
+    ctx.font='bold 30px "JetBrains Mono", monospace';
+    ctx.fillStyle=rule.color;
+    ctx.fillText(rule.label, 270, rule.y+38);
+    ctx.font='400 22px "JetBrains Mono", monospace';
+    ctx.fillStyle='#94a3b8';
+    ctx.fillText(rule.desc, 270, rule.y+90);
+    ctx.restore();
+  });
+}
+
+// ============================================================
+// SCENE 5: Nesting (70.64–117.61s)
+// ============================================================
+function drawScene5(ctx, t) {
+  const s = 70.64;
+  ctx.fillStyle = BG; ctx.fillRect(0,0,W,H); drawGrid(ctx);
+
+  const titleA = ease.out(seg(t, s, s+0.4));
+  ctx.save(); ctx.globalAlpha=titleA;
+  ctx.font='600 42px "JetBrains Mono", monospace';
+  ctx.fillStyle=REACT; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('Components nest inside components', CX, 120);
+  ctx.restore();
+
+  const gallP = ease.spring(seg(t, s+0.5, s+1.5));
+  if (gallP > 0) {
+    ctx.save(); ctx.globalAlpha=gallP;
+    ctx.fillStyle='rgba(97,218,251,0.05)';
+    roundRect(ctx,160,200,1600,680,16); ctx.fill();
+    ctx.strokeStyle=REACT+'aa'; ctx.lineWidth=3; ctx.stroke();
+    ctx.font='600 28px "JetBrains Mono", monospace';
+    ctx.fillStyle=REACT; ctx.textAlign='left'; ctx.textBaseline='middle';
+    ctx.fillText('<Gallery>', 200, 240);
+    ctx.fillText('</Gallery>', 200, 860);
+    ctx.restore();
+
+    [0,1,2].forEach(i => {
+      const bp = ease.spring(seg(t, s+0.9+i*0.3, s+1.8+i*0.3));
+      if (bp <= 0) return;
+      const bx = 300 + i*520;
+      ctx.save(); ctx.globalAlpha=bp;
+      ctx.fillStyle='rgba(168,85,247,0.12)';
+      roundRect(ctx,bx,380,380,360,12); ctx.fill();
+      ctx.strokeStyle=PURPLE+'bb'; ctx.lineWidth=2; ctx.stroke();
+      ctx.font='600 24px "JetBrains Mono", monospace';
+      ctx.fillStyle=PURPLE; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText('<MyButton />', bx+190, 430);
+      ctx.font='32px serif';
+      ctx.fillText('🔘', bx+190, 560);
+      ctx.font='400 20px "JetBrains Mono", monospace';
+      ctx.fillStyle='#64748b';
+      ctx.fillText('independent', bx+190, 670);
+      ctx.restore();
+    });
+  }
+
+  const indepA = ease.out(seg(t, s+3.0, s+4.0));
+  if (indepA > 0) {
+    ctx.save(); ctx.globalAlpha=indepA;
+    ctx.font='500 28px "JetBrains Mono", monospace';
+    ctx.fillStyle='#64748b'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('Each <MyButton /> can later hold its own state', CX, H-90);
+    ctx.restore();
+  }
+}
+
+// ============================================================
+// SCENE 6: Rules — never nest definitions (117.61–157.08s)
+// ============================================================
+function drawScene6(ctx, t) {
+  const s = 117.61;
+  ctx.fillStyle = BG; ctx.fillRect(0,0,W,H); drawGrid(ctx);
+
+  const titleA = ease.out(seg(t, s, s+0.4));
+  ctx.save(); ctx.globalAlpha=titleA;
+  ctx.font='600 42px "JetBrains Mono", monospace';
+  ctx.fillStyle=RED; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('⚠️  One Important Rule', CX, 120);
+  ctx.restore();
+
+  // Wrong way - code block
+  const wrongP = ease.out(seg(t, s+0.4, s+1.0));
+  if (wrongP > 0) {
+    ctx.save(); ctx.globalAlpha=wrongP;
+    ctx.fillStyle=CODE_BG;
+    roundRect(ctx,160,200,760,340,12); ctx.fill();
+    ctx.strokeStyle=RED+'77'; ctx.lineWidth=2; ctx.stroke();
+    ctx.font='600 24px "JetBrains Mono", monospace';
+    ctx.fillStyle=RED; ctx.textAlign='left'; ctx.textBaseline='top';
+    ctx.fillText('❌  Never do this:', 190, 220);
+    ctx.font='400 22px "JetBrains Mono", monospace';
+    ctx.fillStyle='#94a3b8';
+    ctx.fillText('function Gallery() {',         190, 270);
+    ctx.fillStyle=RED+'cc';
+    ctx.fillText('  function MyButton() {',      190, 310);  // highlighted bad
+    ctx.fillText('    return <button/>;',        190, 345);
+    ctx.fillText('  }',                          190, 380);
+    ctx.fillStyle='#94a3b8';
+    ctx.fillText('}',                            190, 415);
+    ctx.restore();
+  }
+
+  // Right way - code block
+  const rightP = ease.out(seg(t, s+1.2, s+1.8));
+  if (rightP > 0) {
+    ctx.save(); ctx.globalAlpha=rightP;
+    ctx.fillStyle=CODE_BG;
+    roundRect(ctx,1000,200,760,340,12); ctx.fill();
+    ctx.strokeStyle=GREEN+'77'; ctx.lineWidth=2; ctx.stroke();
+    ctx.font='600 24px "JetBrains Mono", monospace';
+    ctx.fillStyle=GREEN; ctx.textAlign='left'; ctx.textBaseline='top';
+    ctx.fillText('✅  Do this instead:', 1030, 220);
+    ctx.font='400 22px "JetBrains Mono", monospace';
+    ctx.fillStyle=GREEN+'cc';
+    ctx.fillText('function MyButton() {',        1030, 270);
+    ctx.fillText('  return <button/>;',          1030, 310);
+    ctx.fillText('}',                            1030, 345);
+    ctx.fillStyle='#94a3b8';
+    ctx.fillText('',                             1030, 380);
+    ctx.fillText('function Gallery() {',         1030, 415);
+    ctx.fillText('  return <MyButton />;',       1030, 455);
+    ctx.restore();
+  }
+
+  // Explanation
+  const explA = ease.out(seg(t, s+2.0, s+2.8));
+  if (explA > 0) {
+    ctx.save(); ctx.globalAlpha=explA;
+    ctx.fillStyle='rgba(239,68,68,0.07)';
+    roundRect(ctx,160,580,1600,160,12); ctx.fill();
+    ctx.strokeStyle=RED+'44'; ctx.lineWidth=2; ctx.stroke();
+    ctx.font='500 28px "JetBrains Mono", monospace';
+    ctx.fillStyle=TEXT; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('Defining inside = recreated on every render = slow and buggy', CX, 640);
+    ctx.font='400 24px "JetBrains Mono", monospace';
+    ctx.fillStyle='#94a3b8';
+    ctx.fillText('Pass data down with props instead', CX, 695);
+    ctx.restore();
+  }
+
+  // Props teaser
+  const propsA = ease.out(seg(t, s+5.0, s+5.8));
+  if (propsA > 0) {
+    ctx.save(); ctx.globalAlpha=propsA;
+    ctx.font='500 28px "JetBrains Mono", monospace';
+    ctx.fillStyle=REACT; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('<MyButton label="Submit" />  — that\'s props. Next episode.', CX, 810);
+    ctx.restore();
+  }
+}
+
+// ============================================================
+// SCENE 7: Recap (157.08–176.2s)
+// ============================================================
+function drawScene7(ctx, t) {
+  const s = 157.08;
+  ctx.fillStyle = BG; ctx.fillRect(0,0,W,H);
+  const bgGlow = ctx.createRadialGradient(CX,CY,50,CX,CY,700);
+  bgGlow.addColorStop(0,'rgba(97,218,251,0.08)'); bgGlow.addColorStop(1,'transparent');
+  ctx.fillStyle=bgGlow; ctx.fillRect(0,0,W,H);
+  drawGrid(ctx);
+
+  const bgA = ease.out(seg(t, s, s+0.6));
+  drawReactLogo(ctx, CX, CY-270, 70, bgA, t);
+
+  const titleA = ease.out(seg(t, s, s+0.5));
+  ctx.save(); ctx.globalAlpha=titleA;
+  ctx.font='600 38px "JetBrains Mono", monospace';
+  ctx.fillStyle=TEXT; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText("Here's what you learned", CX, CY-150);
+  ctx.restore();
+
+  const recap = [
+    { icon:'🔧', text:'Component = JavaScript function that returns JSX',   color:REACT,   delay:0.4 },
+    { icon:'🔠', text:'Capitalize: <MyButton /> not <mybutton />',           color:YELLOW,  delay:0.8 },
+    { icon:'📤', text:'export default to share it, import to use it',        color:GREEN,   delay:1.2 },
+    { icon:'🌳', text:'Nest freely — define at top level, pass data via props', color:PURPLE, delay:1.6 },
+  ];
+  recap.forEach((item, i) => {
+    const rp = ease.spring(seg(t, s+item.delay, s+item.delay+0.5));
+    if (rp <= 0) return;
+    const ry = CY - 30 + i*100;
+    ctx.save(); ctx.globalAlpha=rp; ctx.translate(0,(1-rp)*20);
+    ctx.font='36px serif'; ctx.textAlign='left'; ctx.textBaseline='middle';
+    ctx.fillText(item.icon, CX-650, ry);
+    ctx.font='500 28px "JetBrains Mono", monospace';
+    ctx.fillStyle=item.color;
+    ctx.fillText(item.text, CX-590, ry);
+    ctx.restore();
+  });
+
+  const nextA = ease.out(seg(t, s+2.6, s+3.4));
+  if (nextA > 0) {
+    ctx.save(); ctx.globalAlpha=nextA;
+    ctx.font='bold 52px "JetBrains Mono", monospace';
+    ctx.fillStyle=REACT; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.shadowColor=REACT; ctx.shadowBlur=20;
+    ctx.fillText('Next up: Props  →', CX, CY+430);
+    ctx.shadowBlur=0;
+    ctx.restore();
+  }
+}
+
+// ============================================================
+// SCENE 8: Outro (176.2–180.5s)
+// ============================================================
+function drawScene8(ctx, t) {
+  const s = 176.2;
+  ctx.fillStyle=BG; ctx.fillRect(0,0,W,H);
+  const glow=ctx.createRadialGradient(CX,CY,50,CX,CY,600);
+  glow.addColorStop(0,'rgba(97,218,251,0.15)'); glow.addColorStop(1,'transparent');
+  ctx.fillStyle=glow; ctx.fillRect(0,0,W,H);
+
+  const bgA = ease.out(seg(t, s, s+0.5));
+  drawReactLogo(ctx, CX, CY-120, 90, bgA, t);
+  ctx.save(); ctx.globalAlpha=bgA;
+  ctx.font='bold 100px "JetBrains Mono", monospace';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.shadowColor=REACT; ctx.shadowBlur=30;
+  ctx.fillStyle=TEXT; ctx.fillText('Run the Docs', CX, CY+40);
+  ctx.shadowBlur=0;
+  ctx.font='400 34px "JetBrains Mono", monospace';
+  ctx.fillStyle='#64748b';
+  ctx.fillText('Technical docs. Made watchable.', CX, CY+115);
+  ctx.font='500 24px "JetBrains Mono", monospace';
+  ctx.fillStyle=REACT;
+  ctx.fillText('react  ·  ep 1  ·  components', CX, CY+175);
+  ctx.restore();
+}
+
+// ============================================================
+// Scene routing with crossfades
+// ============================================================
+const SCENE_TIMES = [0, 8.46, 19.44, 42.93, 70.64, 117.61, 157.08, 176.2];
+const SCENE_FNS   = [drawScene1, drawScene2, drawScene3, drawScene4, drawScene5, drawScene6, drawScene7, drawScene8];
+
+window.renderFrame = function(frameIndex) {
+  const t = frameIndex / 30;
+  const ctx = document.getElementById('c').getContext('2d');
+  ctx.clearRect(0,0,W,H);
+
+  let si = 0;
+  for (let i=1; i<SCENE_TIMES.length; i++) { if (t >= SCENE_TIMES[i]) si=i; else break; }
+  SCENE_FNS[si](ctx, t);
+
+  // Crossfade at scene boundaries
+  for (let i=1; i<SCENE_TIMES.length; i++) {
+    const xf = SCENE_TIMES[i];
+    if (t >= xf && t < xf + 0.4) {
+      const ov = seg(t, xf, xf+0.4);
+      ctx.globalAlpha = ov; ctx.fillStyle=BG; ctx.fillRect(0,0,W,H); ctx.globalAlpha=1;
+      SCENE_FNS[i](ctx, t);
+      break;
+    }
+  }
+
+  drawCaption(ctx, t);
+
+  if (t > TOTAL_DURATION - 1.5) {
+    ctx.globalAlpha = seg(t, TOTAL_DURATION-1.0, TOTAL_DURATION);
+    ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H); ctx.globalAlpha=1;
+  }
+};
+
+window.setTiming = function(segments, totalDuration) {
+  TIMING = segments; TOTAL_DURATION = totalDuration;
+};
+</script>
 </body>
 </html>
