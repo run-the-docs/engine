@@ -1,0 +1,116 @@
+1
+00:00:00,000 --> 00:00:06,640
+Your components need to show different things depending on conditions.
+
+2
+00:00:06,640 --> 00:00:10,520
+React handles this with plain Java script.
+
+3
+00:00:10,520 --> 00:00:16,920
+Start with if statements, a function component can return different JSX based on a prop.
+
+4
+00:00:16,920 --> 00:00:23,080
+IsPact is true, return the item with a checkmark, isPact is false, return it without, two
+
+5
+00:00:23,080 --> 00:00:25,260
+separate return statements.
+
+6
+00:00:25,260 --> 00:00:27,180
+You can also return null.
+
+7
+00:00:27,180 --> 00:00:31,540
+If isPact is true, return null, the component renders nothing.
+
+8
+00:00:31,540 --> 00:00:33,700
+It disappears from the output.
+
+9
+00:00:33,700 --> 00:00:36,180
+But returning null is rare.
+
+10
+00:00:36,180 --> 00:00:41,700
+Usually, you conditionally include or exclude the component from the parent instead.
+
+11
+00:00:41,700 --> 00:00:45,100
+For inline conditions, use the ternary operator.
+
+12
+00:00:45,100 --> 00:00:51,940
+IsPact questionmark, name plus checkmark colon name, one expression, two outcomes.
+
+13
+00:00:51,940 --> 00:00:57,340
+Please keep your JSX compact, but don't nest them, deeply nested ternaries are hard
+
+14
+00:00:57,340 --> 00:00:58,340
+to read.
+
+15
+00:00:58,340 --> 00:01:04,540
+There's an even shorter pattern, logical end, isPact ampersand ampersand checkmark.
+
+16
+00:01:04,540 --> 00:01:09,460
+If isPact is true, render the checkmark, if false, render nothing.
+
+17
+00:01:09,460 --> 00:01:11,340
+Watch out for a common trap.
+
+18
+00:01:11,340 --> 00:01:16,180
+If the left side is zero, react renders the number zero, not nothing.
+
+19
+00:01:16,180 --> 00:01:18,940
+Use a Boolean condition, not a number.
+
+20
+00:01:18,940 --> 00:01:24,420
+You can also assign JSX to a variable, let item content equals name.
+
+21
+00:01:24,420 --> 00:01:31,140
+Then if isPact, reassign it to name plus checkmark, return the variable in your JSX.
+
+22
+00:01:31,140 --> 00:01:34,140
+This variable approach is the most flexible.
+
+23
+00:01:34,140 --> 00:01:39,700
+You can mix in any logic if else if switch before your return statement.
+
+24
+00:01:39,700 --> 00:01:44,540
+Let's recap, use if and return for completely different JSX.
+
+25
+00:01:44,540 --> 00:01:47,700
+Use ternary for inline either or choices.
+
+26
+00:01:47,700 --> 00:01:51,580
+Use logical and for conditionally including an element.
+
+27
+00:01:51,580 --> 00:01:54,940
+Use variables when the logic gets complex.
+
+28
+00:01:54,940 --> 00:02:00,780
+All of this is just JavaScript, no special react syntax, that's the point.
+
+29
+00:02:00,780 --> 00:02:02,380
+Next up, rendering lists.
+

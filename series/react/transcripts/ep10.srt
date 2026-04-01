@@ -1,0 +1,116 @@
+1
+00:00:00,000 --> 00:00:07,160
+A pure function always returns the same output for the same input.
+
+2
+00:00:07,160 --> 00:00:10,120
+It doesn't change anything outside itself.
+
+3
+00:00:10,120 --> 00:00:13,040
+React is designed around this idea.
+
+4
+00:00:13,040 --> 00:00:17,480
+Every component should be a pure function of its props and state.
+
+5
+00:00:17,480 --> 00:00:19,880
+Pure components are predictable.
+
+6
+00:00:19,880 --> 00:00:24,320
+Given the same inputs, they always render the same JSX.
+
+7
+00:00:24,320 --> 00:00:27,000
+In pure components have side effects.
+
+8
+00:00:27,000 --> 00:00:32,360
+They change variables outside their scope, make network calls during render, or modify
+
+9
+00:00:32,360 --> 00:00:34,800
+the DOM directly.
+
+10
+00:00:34,800 --> 00:00:39,120
+React renders components twice in development strict mode.
+
+11
+00:00:39,120 --> 00:00:44,080
+This catches impure components that produce different output on each call.
+
+12
+00:00:44,080 --> 00:00:48,840
+Here's the rule, don't mutate anything that existed before the render started.
+
+13
+00:00:48,840 --> 00:00:52,400
+Props, state, and context are read only.
+
+14
+00:00:52,400 --> 00:00:58,120
+You can create and mutate variables inside the component during render, that's fine.
+
+15
+00:00:58,120 --> 00:01:00,680
+They didn't exist before the call.
+
+16
+00:01:00,680 --> 00:01:04,320
+Side effects belong in event handlers, not in render.
+
+17
+00:01:04,320 --> 00:01:09,000
+User clicks, form submissions, timers, those are the right places.
+
+18
+00:01:09,000 --> 00:01:13,440
+If no event handler fits, use use effect as a last resort.
+
+19
+00:01:13,440 --> 00:01:17,600
+It runs after render outside the pure rendering phase.
+
+20
+00:01:17,600 --> 00:01:24,440
+Pure components unlock two react superpowers, memorization, and concurrent rendering.
+
+21
+00:01:24,440 --> 00:01:30,160
+Memoization means react can skip re-rendering a component if its inputs haven't changed.
+
+22
+00:01:30,160 --> 00:01:33,720
+This only works if the component is pure.
+
+23
+00:01:33,720 --> 00:01:38,760
+Concurrent rendering means react can pause, restart, or abandon renders.
+
+24
+00:01:38,760 --> 00:01:41,600
+In pure components break this entirely.
+
+25
+00:01:41,600 --> 00:01:47,240
+The mental model, react components are like math functions, f of x always equals the
+
+26
+00:01:47,240 --> 00:01:49,840
+same result, no surprises.
+
+27
+00:01:49,840 --> 00:01:57,160
+Let's recap, components must be pure, same input, same output, no mutations during render.
+
+28
+00:01:57,160 --> 00:02:00,720
+Side effects go in event handlers or use effect.
+
+29
+00:02:00,720 --> 00:02:05,320
+That's the react series, one concept at a time from the actual docs.
+

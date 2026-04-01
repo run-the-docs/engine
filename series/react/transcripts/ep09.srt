@@ -1,0 +1,100 @@
+1
+00:00:00,000 --> 00:00:07,920
+React can render lists from arrays, you need JavaScript's map method, that's it.
+
+2
+00:00:07,920 --> 00:00:14,960
+Call array.map, pass a function, return JSX, react renders one element per item.
+
+3
+00:00:14,960 --> 00:00:17,440
+Each list item needs a key prop.
+
+4
+00:00:17,440 --> 00:00:22,520
+Keys help React track which items changed, were added or removed.
+
+5
+00:00:22,520 --> 00:00:27,680
+Keys must be unique among siblings, they don't need to be globally unique, just within
+
+6
+00:00:27,680 --> 00:00:28,960
+that list.
+
+7
+00:00:28,960 --> 00:00:34,640
+You stable ID from your data as keys, database ID are ideal.
+
+8
+00:00:34,640 --> 00:00:40,000
+Don't use array indexes as keys unless the list never changes order.
+
+9
+00:00:40,000 --> 00:00:42,840
+Index keys break when items move.
+
+10
+00:00:42,840 --> 00:00:45,560
+Never use math.random as a key.
+
+11
+00:00:45,560 --> 00:00:49,440
+It changes every render and destroys performance.
+
+12
+00:00:49,440 --> 00:00:51,600
+Keys are not passed as props.
+
+13
+00:00:51,600 --> 00:00:57,080
+If your component needs the ID, pass it as a separate prop with a different name.
+
+14
+00:00:57,080 --> 00:00:59,480
+You can filter and map together.
+
+15
+00:00:59,480 --> 00:01:03,720
+Call array.filter first, then dot map on the results.
+
+16
+00:01:03,720 --> 00:01:11,160
+JSX lets you embed the whole map expression inside curly braces, right in the return statement.
+
+17
+00:01:11,160 --> 00:01:16,920
+If your list items need more than one DOM element, wrap them in a fragment.
+
+18
+00:01:16,920 --> 00:01:21,480
+Fragments let you add a key without adding extra DOM nodes.
+
+19
+00:01:21,480 --> 00:01:23,680
+Nested lists work the same way.
+
+20
+00:01:23,680 --> 00:01:26,880
+Map inside map, each with its own key.
+
+21
+00:01:26,880 --> 00:01:30,400
+Act shows a warning in the console if keys are missing.
+
+22
+00:01:30,400 --> 00:01:35,480
+Take it seriously, it means list updates will be slow or incorrect.
+
+23
+00:01:35,480 --> 00:01:41,560
+Let's recap, use map to render lists, give every item a stable key, avoid indexes and
+
+24
+00:01:41,560 --> 00:01:43,360
+random values.
+
+25
+00:01:43,360 --> 00:01:45,360
+Next up, keeping components pure.
+
