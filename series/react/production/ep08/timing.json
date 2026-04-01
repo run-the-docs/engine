@@ -1,0 +1,113 @@
+{
+  "total_voice_duration": 122.456,
+  "total_duration": 126.836,
+  "total_frames_30fps": 3805,
+  "sample_rate": 44100,
+  "segments": [
+    {
+      "index": 0,
+      "text": "Your components need to show different things depending on conditions. React handles this with plain JavaScript.",
+      "start": 2.0,
+      "end": 9.787,
+      "duration": 7.787
+    },
+    {
+      "index": 1,
+      "text": "Start with if statements. A function component can return different JSX based on a prop.",
+      "start": 10.167,
+      "end": 16.439,
+      "duration": 6.272
+    },
+    {
+      "index": 2,
+      "text": "isPacked is true? Return the item with a checkmark. isPacked is false? Return it without. Two separate return statements.",
+      "start": 16.819,
+      "end": 24.797,
+      "duration": 7.979
+    },
+    {
+      "index": 3,
+      "text": "You can also return null. If isPacked is true, return null \u2014 the component renders nothing. It disappears from the output.",
+      "start": 25.177,
+      "end": 33.22,
+      "duration": 8.043
+    },
+    {
+      "index": 4,
+      "text": "But returning null is rare. Usually you conditionally include or exclude the component from the parent instead.",
+      "start": 33.6,
+      "end": 41.237,
+      "duration": 7.637
+    },
+    {
+      "index": 5,
+      "text": "For inline conditions, use the ternary operator. isPacked question mark, name plus checkmark, colon, name. One expression, two outcomes.",
+      "start": 41.617,
+      "end": 51.111,
+      "duration": 9.493
+    },
+    {
+      "index": 6,
+      "text": "Ternaries keep your JSX compact. But don't nest them \u2014 deeply nested ternaries are hard to read.",
+      "start": 51.491,
+      "end": 58.061,
+      "duration": 6.571
+    },
+    {
+      "index": 7,
+      "text": "There's an even shorter pattern: logical AND. isPacked ampersand ampersand, checkmark. If isPacked is true, render the checkmark. If false, render nothing.",
+      "start": 58.441,
+      "end": 68.895,
+      "duration": 10.453
+    },
+    {
+      "index": 8,
+      "text": "Watch out for a common trap. If the left side is zero, React renders the number zero \u2014 not nothing. Use a boolean condition, not a number.",
+      "start": 69.275,
+      "end": 78.512,
+      "duration": 9.237
+    },
+    {
+      "index": 9,
+      "text": "You can also assign JSX to a variable. Let itemContent equals name. Then, if isPacked, reassign it to name plus checkmark. Return the variable in your JSX.",
+      "start": 78.892,
+      "end": 90.647,
+      "duration": 11.755
+    },
+    {
+      "index": 10,
+      "text": "This variable approach is the most flexible. You can mix in any logic \u2014 if, else if, switch \u2014 before your return statement.",
+      "start": 91.027,
+      "end": 99.133,
+      "duration": 8.107
+    },
+    {
+      "index": 11,
+      "text": "Let's recap. Use if and return for completely different JSX. Use ternary for inline either-or choices.",
+      "start": 99.513,
+      "end": 107.151,
+      "duration": 7.637
+    },
+    {
+      "index": 12,
+      "text": "Use logical AND for conditionally including an element. Use variables when the logic gets complex.",
+      "start": 107.531,
+      "end": 114.421,
+      "duration": 6.891
+    },
+    {
+      "index": 13,
+      "text": "All of this is just JavaScript. No special React syntax. That's the point.",
+      "start": 114.801,
+      "end": 120.071,
+      "duration": 5.269
+    },
+    {
+      "index": 14,
+      "text": "Next up: rendering lists.",
+      "start": 120.451,
+      "end": 122.456,
+      "duration": 2.005
+    }
+  ]
+}

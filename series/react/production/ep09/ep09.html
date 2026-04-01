@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#0d0d1a;width:1920px;height:1080px;overflow:hidden;}canvas{display:block;}</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+const W=1920,H=1080,CX=960,CY=540;
+const BG='#0d0d1a',REACT='#61dafb',TEXT='#f8fafc',CODE_BG='#0d1117';
+const GREEN='#22c55e',YELLOW='#eab308',RED='#ef4444',PURPLE='#a78bfa',ORANGE='#f97316';
+
+let TIMING=[{"index":0,"text":"React can render lists from arrays. You need JavaScript\u2019s map method \u2014 that\u2019s it.","start":2.0,"end":7.397},{"index":1,"text":"Call array dot map, pass a function, return JSX. React renders one element per item.","start":7.777,"end":14.455},{"index":2,"text":"Each list item needs a key prop. Keys help React track which items changed, were added, or removed.","start":14.835,"end":21.789},{"index":3,"text":"Keys must be unique among siblings. They don\u2019t need to be globally unique \u2014 just within that list.","start":22.169,"end":28.463},{"index":4,"text":"Use stable IDs from your data as keys. Database IDs are ideal.","start":28.843,"end":34.091},{"index":5,"text":"Don\u2019t use array indexes as keys unless the list never changes order. Index keys break when items move.","start":34.471,"end":42.193},{"index":6,"text":"Never use Math dot random as a key. It changes every render and destroys performance.","start":42.573,"end":48.717},{"index":7,"text":"Keys are not passed as props. If your component needs the ID, pass it as a separate prop with a different name.","start":49.097,"end":56.585},{"index":8,"text":"You can filter and map together. Call array dot filter first, then dot map on the result.","start":56.965,"end":63.195},{"index":9,"text":"JSX lets you embed the whole map expression inside curly braces, right in the return statement.","start":63.575,"end":70.7},{"index":10,"text":"If your list items need more than one DOM element, wrap them in a Fragment. Fragments let you add a key without adding extra DOM nodes.","start":71.08,"end":80.765},{"index":11,"text":"Nested lists work the same way. Map inside map, each with its own key.","start":81.145,"end":86.159},{"index":12,"text":"React shows a warning in the console if keys are missing. Take it seriously \u2014 it means list updates will be slow or incorrect.","start":86.539,"end":94.88},{"index":13,"text":"Let\u2019s recap. Use map to render lists. Give every item a stable key. Avoid indexes and random values.","start":95.26,"end":102.641},{"index":14,"text":"Next up: keeping components pure.","start":103.021,"end":105.496}];
+let TOTAL_DURATION=109.496;
+
+const ease={
+  out:t=>1-Math.pow(1-t,3),
+  in:t=>t*t*t,
+  inOut:t=>t<0.5?4*t*t*t:(1-Math.pow(-2*t+2,3)/2),
+  spring:t=>{const c=(2*Math.PI)/2.5;return t===0?0:t===1?1:Math.pow(2,-10*t)*Math.sin((t*10-0.75)*c)+1;}
+};
+function seg(t,s,e){return Math.max(0,Math.min(1,(t-s)/(e-s)));}
+function roundRect(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.quadraticCurveTo(x+w,y,x+w,y+r);c.lineTo(x+w,y+h-r);c.quadraticCurveTo(x+w,y+h,x+w-r,y+h);c.lineTo(x+r,y+h);c.quadraticCurveTo(x,y+h,x,y+h-r);c.lineTo(x,y+r);c.quadraticCurveTo(x,y,x+r,y);c.closePath();}
+function drawGrid(c){c.strokeStyle='rgba(97,218,251,0.03)';c.lineWidth=1;for(let x=0;x<W;x+=80){c.beginPath();c.moveTo(x,0);c.lineTo(x,H);c.stroke();}for(let y=0;y<H;y+=80){c.beginPath();c.moveTo(0,y);c.lineTo(W,y);c.stroke();}}
+function drawReactLogo(c,cx,cy,r,a,t){if(a<=0)return;c.save();c.globalAlpha=a;c.strokeStyle=REACT;c.lineWidth=r*0.06;c.shadowColor=REACT;c.shadowBlur=18*a;for(let i=0;i<3;i++){c.save();c.translate(cx,cy);c.rotate(i*Math.PI/3+t*0.4);c.beginPath();c.ellipse(0,0,r,r*0.38,0,0,Math.PI*2);c.stroke();c.restore();}c.fillStyle=REACT;c.shadowBlur=0;c.beginPath();c.arc(cx,cy,r*0.18,0,Math.PI*2);c.fill();c.restore();}
+function drawCaption(c,t){let txt='';for(const s of TIMING){if(t>=s.start-0.1&&t<=s.end+0.3){txt=s.text;break;}}if(!txt)return;c.save();c.font='500 20px "JetBrains Mono",monospace';const tw=c.measureText(txt).width,pw=Math.min(tw+48,W-100);c.globalAlpha=0.9;c.fillStyle='rgba(0,0,0,0.85)';roundRect(c,CX-pw/2,968,pw,44,22);c.fill();c.globalAlpha=1;c.fillStyle=TEXT;c.textAlign='center';c.textBaseline='middle';let d=txt;while(c.measureText(d).width>pw-48&&d.length>10)d=d.slice(0,-1);if(d!==txt)d+='…';c.fillText(d,CX,990);c.restore();}
+function drawCodeBox(c,x,y,w,h,title,color,alpha){c.save();c.globalAlpha=alpha;c.fillStyle=CODE_BG;roundRect(c,x,y,w,h,12);c.fill();c.strokeStyle=color+'66';c.lineWidth=2;c.stroke();if(title){c.fillStyle=color+'22';roundRect(c,x,y-32,Math.min(240,title.length*13+20),32,6);c.fill();c.font='500 17px "JetBrains Mono",monospace';c.fillStyle=color;c.textAlign='left';c.textBaseline='middle';c.fillText(title,x+12,y-16);}c.restore();}
+
+// Scene 1: Title (0–10s)
+function drawScene1(c,t){
+  c.fillStyle=BG;c.fillRect(0,0,W,H);drawGrid(c);
+  const lp=ease.spring(seg(t,1,2.2));
+  drawReactLogo(c,CX,CY-150,120*lp,lp,t);
+  const ta=ease.out(seg(t,1.5,2.8));
+  if(ta>0){
+    c.save();c.globalAlpha=ta;
+    c.font='bold 96px "JetBrains Mono",monospace';c.fillStyle=REACT;
+    c.textAlign='center';c.textBaseline='middle';
+    c.shadowColor=REACT;c.shadowBlur=24;
+    c.fillText('Rendering Lists',CX,CY+60);
+    c.shadowBlur=0;c.restore();
+  }
+  const sa=ease.out(seg(t,2.5,3.5));
+  if(sa>0){
+    c.save();c.globalAlpha=sa;
+    c.font='500 34px "JetBrains Mono",monospace';c.fillStyle=TEXT;
+    c.textAlign='center';c.textBaseline='middle';
+    c.fillText('Using .map() to Transform Arrays into JSX',CX,CY+170);
+    c.restore();
+  }
+  const ma=ease.out(seg(t,3.2,4.2));
+  if(ma>0){
+    c.save();c.globalAlpha=ma;
+    c.font='400 26px "JetBrains Mono",monospace';c.fillStyle='#64748b';
+    c.textAlign='center';c.textBaseline='middle';
+    c.fillText('react.dev/learn  ·  Episode 9',CX,CY+235);
+    c.restore();
+  }
+}
+
+// Scene 2: map() code (10–25s) — sentences 0,1,2
+function drawScene2(c,t){
+  c.fillStyle=BG;c.fillRect(0,0,W,H);drawGrid(c);
+  const s=10;
+  c.save();c.globalAlpha=ease.out(seg(t,s,s+0.7));
+  c.font='600 40px "JetBrains Mono",monospace';c.fillStyle=REACT;
+  c.textAlign='center';c.textBaseline='middle';
+  c.fillText('Rendering a List with .map()',CX,72);c.restore();
+
+  // Array data on left
+  const ap=ease.out(seg(t,s+0.5,s+1.5));
+  if(ap>0){
+    drawCodeBox(c,80,120,680,320,'products array',GREEN,ap);
+    c.save();c.globalAlpha=ap;c.font='500 22px "JetBrains Mono",monospace';
+    c.textAlign='left';c.textBaseline='top';
+    const lh=36,x0=108,y0=140;
+    c.fillStyle=PURPLE;c.fillText('const',x0,y0);
+    c.fillStyle=TEXT;c.fillText(' products = [',x0+90,y0);
+    c.fillStyle=TEXT;c.fillText('  { id: ',x0,y0+lh);c.fillStyle=YELLOW;c.fillText('1',x0+120,y0+lh);c.fillStyle=TEXT;c.fillText(', title: ',x0+140,y0+lh);c.fillStyle='#89ddff';c.fillText('"Cabbage"',x0+250,y0+lh);c.fillStyle=TEXT;c.fillText(' },',x0+390,y0+lh);
+    c.fillStyle=TEXT;c.fillText('  { id: ',x0,y0+lh*2);c.fillStyle=YELLOW;c.fillText('2',x0+120,y0+lh*2);c.fillStyle=TEXT;c.fillText(', title: ',x0+140,y0+lh*2);c.fillStyle='#89ddff';c.fillText('"Garlic"',x0+250,y0+lh*2);c.fillStyle=TEXT;c.fillText('   },',x0+390,y0+lh*2);
+    c.fillStyle=TEXT;c.fillText('  { id: ',x0,y0+lh*3);c.fillStyle=YELLOW;c.fillText('3',x0+120,y0+lh*3);c.fillStyle=TEXT;c.fillText(', title: ',x0+140,y0+lh*3);c.fillStyle='#89ddff';c.fillText('"Apple"',x0+250,y0+lh*3);c.fillStyle=TEXT;c.fillText('   },',x0+390,y0+lh*3);
+    c.fillStyle=TEXT;c.fillText('];',x0,y0+lh*4);
+    c.restore();
+  }
+
+  // Arrow
+  const arrowP=ease.out(seg(t,s+2,s+3));
+  if(arrowP>0){
+    c.save();c.globalAlpha=arrowP;
+    c.strokeStyle=REACT+'88';c.lineWidth=3;
+    c.setLineDash([8,5]);
+    c.beginPath();c.moveTo(775,280);c.lineTo(860,280);c.stroke();
+    c.setLineDash([]);
+    c.fillStyle=REACT+'88';
+    c.beginPath();c.moveTo(875,280);c.lineTo(855,268);c.lineTo(855,292);c.closePath();c.fill();
+    c.restore();
+  }
+
+  // .map() result on right
+  const mp=ease.out(seg(t,s+2,s+3.5));
+  if(mp>0){
+    drawCodeBox(c,880,120,960,640,'List component + .map()',REACT,mp);
+    c.save();c.globalAlpha=mp;c.font='500 22px "JetBrains Mono",monospace';
+    c.textAlign='left';c.textBaseline='top';
+    const lh=36,x0=908,y0=140;
+    c.fillStyle='#c792ea';c.fillText('function',x0,y0);c.fillStyle=REACT;c.fillText(' List',x0+130,y0);c.fillStyle=TEXT;c.fillText('() {',x0+190,y0);
+    c.fillStyle=PURPLE;c.fillText('  return',x0,y0+lh);c.fillStyle=TEXT;c.fillText(' (',x0+120,y0+lh);
+    c.fillStyle='#89ddff';c.fillText('    <ul>',x0,y0+lh*2);
+
+    // Highlight .map() call
+    const mhl=ease.out(seg(t,14.5,15.5));
+    if(mhl>0){c.save();c.globalAlpha=mhl*0.15;c.fillStyle=REACT;roundRect(c,x0-4,y0+lh*3-4,900,lh*3+8,6);c.fill();c.restore();}
+
+    c.fillStyle=TEXT;c.fillText('      {products',x0,y0+lh*3);
+    c.fillStyle=REACT;c.fillText('.map',x0+220,y0+lh*3);
+    c.fillStyle=TEXT;c.fillText('(',x0+300,y0+lh*3);
+    c.fillStyle=ORANGE;c.fillText('item',x0+320,y0+lh*3);
+    c.fillStyle=TEXT;c.fillText(' => (',x0+390,y0+lh*3);
+    c.fillStyle='#89ddff';c.fillText('        <li',x0,y0+lh*4);
+
+    // key prop highlight
+    const khl=ease.out(seg(t,14.8,15.8));
+    if(khl>0){c.save();c.globalAlpha=khl;c.font='500 22px "JetBrains Mono",monospace';c.textAlign='left';c.textBaseline='top';c.fillStyle=YELLOW;c.fillText(' key',x0+148,y0+lh*4);c.fillStyle=TEXT;c.fillText('={',x0+210,y0+lh*4);c.fillStyle=ORANGE;c.fillText('item',x0+244,y0+lh*4);c.fillStyle=TEXT;c.fillText('.id}',x0+296,y0+lh*4);c.restore();}
+
+    c.fillStyle='#89ddff';c.fillText('        >',x0,y0+lh*5);
+    c.fillStyle=TEXT;c.fillText('          {',x0,y0+lh*6);c.fillStyle=ORANGE;c.fillText('item',x0+88,y0+lh*6);c.fillStyle=TEXT;c.fillText('.title}',x0+140,y0+lh*6);
+    c.fillStyle='#89ddff';c.fillText('        </li>',x0,y0+lh*7);
+    c.fillStyle=TEXT;c.fillText('      ))}',x0,y0+lh*8);
+    c.fillStyle='#89ddff';c.fillText('    </ul>',x0,y0+lh*9);
+    c.fillStyle=TEXT;c.fillText('  );',x0,y0+lh*10);
+    c.fillStyle='#c792ea';c.fillText('}',x0,y0+lh*11);
+    c.restore();
+  }
+
+  // Rendered list output at bottom left
+  const op=ease.out(seg(t,s+4,s+5));
+  if(op>0){
+    drawCodeBox(c,80,470,680,260,'rendered output',GREEN,op);
+    c.save();c.globalAlpha=op;c.font='500 22px "JetBrains Mono",monospace';
+    c.textAlign='left';c.textBaseline='top';
+    const lh=36,x0=108,y0=490;
+    c.fillStyle='#89ddff';c.fillText('<ul>',x0,y0);
+    c.fillStyle=TEXT;c.fillText('  <li>Cabbage</li>',x0,y0+lh);
+    c.fillStyle=TEXT;c.fillText('  <li>Garlic</li>',x0,y0+lh*2);
+    c.fillStyle=TEXT;c.fillText('  <li>Apple</li>',x0,y0+lh*3);
+    c.fillStyle='#89ddff';c.fillText('</ul>',x0,y0+lh*4);
+    c.restore();
+  }
+}
+
+// Scene 3: Keys — stable IDs good, indexes bad, Math.random worst (25–45s)
+// Sentences 2,3,4,5,6
+function drawScene3(c,t){
+  c.fillStyle=BG;c.fillRect(0,0,W,H);drawGrid(c);
+  const s=25;
+  c.save();c.globalAlpha=ease.out(seg(t,s,s+0.7));
+  c.font='600 40px "JetBrains Mono",monospace';c.fillStyle=REACT;
+  c.textAlign='center';c.textBaseline='middle';
+  c.fillText('Choosing the Right Key',CX,72);c.restore();
+
+  // Column headers
+  const hdr=ease.out(seg(t,s+0.5,s+1.5));
+  if(hdr>0){
+    c.save();c.globalAlpha=hdr;
+    c.font='bold 28px "JetBrains Mono",monospace';c.textAlign='center';c.textBaseline='middle';
+    // Good column
+    c.fillStyle=GREEN;c.fillText('✅ Stable ID',380,130);
+    // Caution column
+    c.fillStyle=YELLOW;c.fillText('⚠️ Index',960,130);
+    // Bad column
+    c.fillStyle=RED;c.fillText('❌ Math.random()',1540,130);
+    c.restore();
+  }
+
+  // Stable ID column
+  const col1=ease.out(seg(t,s+1,s+2.5));
+  if(col1>0){
+    drawCodeBox(c,80,160,560,340,'database id',GREEN,col1);
+    c.save();c.globalAlpha=col1;c.font='500 20px "JetBrains Mono",monospace';
+    c.textAlign='left';c.textBaseline='top';
+    const lh=32,x0=108,y0=178;
+    c.fillStyle=TEXT;c.fillText('products.map(',x0,y0);
+    c.fillStyle=ORANGE;c.fillText('item',x0,y0+lh);
+    c.fillStyle=TEXT;c.fillText(' => (',x0+72,y0+lh);
+    c.fillStyle='#89ddff';c.fillText('  <li',x0,y0+lh*2);
+    c.fillStyle=YELLOW;c.fillText(' key',x0+80,y0+lh*2);
+    c.fillStyle=TEXT;c.fillText('={',x0+140,y0+lh*2);
+    c.fillStyle=GREEN;c.fillText('item.id',x0+172,y0+lh*2);
+    c.fillStyle=TEXT;c.fillText('}',x0+280,y0+lh*2);
+    c.fillStyle='#89ddff';c.fillText('  >',x0,y0+lh*3);
+    c.fillStyle=TEXT;c.fillText('{item.title}',x0,y0+lh*4);
+    c.fillStyle='#89ddff';c.fillText('  </li>',x0,y0+lh*5);
+    c.fillStyle=TEXT;c.fillText('))',x0,y0+lh*6);
+    c.restore();
+
+    // Stable badge
+    const b1=ease.out(seg(t,s+3,s+4));
+    if(b1>0){
+      c.save();c.globalAlpha=b1;c.fillStyle=GREEN+'22';roundRect(c,80,530,560,80,12);c.fill();
+      c.strokeStyle=GREEN+'88';c.lineWidth=2;c.stroke();
+      c.font='bold 24px "JetBrains Mono",monospace';c.fillStyle=GREEN;c.textAlign='center';c.textBaseline='middle';
+      c.fillText('Stable across re-renders',360,570);c.restore();
+    }
+  }
+
+  // Index column
+  const col2=ease.out(seg(t,s+3.5,s+5));
+  if(col2>0){
+    drawCodeBox(c,680,160,560,340,'array index',YELLOW,col2);
+    c.save();c.globalAlpha=col2;c.font='500 20px "JetBrains Mono",monospace';
+    c.textAlign='left';c.textBaseline='top';
+    const lh=32,x0=708,y0=178;
+    c.fillStyle=TEXT;c.fillText('products.map(',x0,y0);
+    c.fillStyle=ORANGE;c.fillText('(item,',x0,y0+lh);
+    c.fillStyle=YELLOW;c.fillText(' index',x0+80,y0+lh);
+    c.fillStyle=TEXT;c.fillText(') => (',x0+160,y0+lh);
+    c.fillStyle='#89ddff';c.fillText('  <li',x0,y0+lh*2);
+    c.fillStyle=YELLOW;c.fillText(' key',x0+80,y0+lh*2);
+    c.fillStyle=TEXT;c.fillText('={',x0+140,y0+lh*2);
+    c.fillStyle=YELLOW;c.fillText('index',x0+172,y0+lh*2);
+    c.fillStyle=TEXT;c.fillText('}',x0+250,y0+lh*2);
+    c.fillStyle='#89ddff';c.fillText('  >',x0,y0+lh*3);
+    c.fillStyle=TEXT;c.fillText('{item.title}',x0,y0+lh*4);
+    c.fillStyle='#89ddff';c.fillText('  </li>',x0,y0+lh*5);
+    c.fillStyle=TEXT;c.fillText('))',x0,y0+lh*6);
+    c.restore();
+
+    // Warning badge
+    const b2=ease.out(seg(t,s+5,s+6));
+    if(b2>0){
+      c.save();c.globalAlpha=b2;c.fillStyle=YELLOW+'22';roundRect(c,680,530,560,80,12);c.fill();
+      c.strokeStyle=YELLOW+'88';c.lineWidth=2;c.stroke();
+      c.font='bold 22px "JetBrains Mono",monospace';c.fillStyle=YELLOW;c.textAlign='center';c.textBaseline='middle';
+      c.fillText('Breaks when items reorder',960,570);c.restore();
+    }
+  }
+
+  // Math.random column
+  const col3=ease.out(seg(t,s+7,s+8.5));
+  if(col3>0){
+    drawCodeBox(c,1280,160,560,340,'Math.random()',RED,col3);
+    c.save();c.globalAlpha=col3;c.font='500 20px "JetBrains Mono",monospace';
+    c.textAlign='left';c.textBaseline='top';
+    const lh=32,x0=1308,y0=178;
+    c.fillStyle=TEXT;c.fillText('products.map(',x0,y0);
+    c.fillStyle=ORANGE;c.fillText('item',x0,y0+lh);
+    c.fillStyle=TEXT;c.fillText(' => (',x0+72,y0+lh);
+    c.fillStyle='#89ddff';c.fillText('  <li',x0,y0+lh*2);
+    c.fillStyle=YELLOW;c.fillText(' key',x0+80,y0+lh*2);
+    c.fillStyle=TEXT;c.fillText('={',x0+140,y0+lh*2);
+    c.fillStyle=RED;c.fillText('Math.random()',x0+172,y0+lh*2);
+    c.fillStyle=TEXT;c.fillText('}',x0+370,y0+lh*2);
+    c.fillStyle='#89ddff';c.fillText('  >',x0,y0+lh*3);
+    c.fillStyle=TEXT;c.fillText('{item.title}',x0,y0+lh*4);
+    c.fillStyle='#89ddff';c.fillText('  </li>',x0,y0+lh*5);
+    c.fillStyle=TEXT;c.fillText('))',x0,y0+lh*6);
+    c.restore();
+
+    // Error badge
+    const b3=ease.out(seg(t,s+9,s+10));
+    if(b3>0){
+      c.save();c.globalAlpha=b3;c.fillStyle=RED+'22';roundRect(c,1280,530,560,80,12);c.fill();
+      c.strokeStyle=RED+'88';c.lineWidth=2;c.stroke();
+      c.font='bold 22px "JetBrains Mono",monospace';c.fillStyle=RED;c.textAlign='center';c.textBaseline='middle';
+      c.fillText('Destroys performance!',1560,570);c.restore();
+    }
+  }
+
+  // Scope note — keys unique among siblings
+  const scope=ease.out(seg(t,s+5,s+6.5));
+  if(scope>0){
+    c.save();c.globalAlpha=scope;
+    c.fillStyle='rgba(97,218,251,0.08)';
+    roundRect(c,80,640,1760,100,14);c.fill();
+    c.strokeStyle=REACT+'44';c.lineWidth=2;c.stroke();
+    c.font='500 26px "JetBrains Mono",monospace';c.fillStyle=REACT;
+    c.textAlign='center';c.textBaseline='middle';
+    c.fillText('Keys must be unique among siblings — not globally unique. Two separate lists can use the same keys.',CX,690);
+    c.restore();
+  }
+}
+
+// Scene 4: Keys not props (45–70s) — sentences 7
+function drawScene4(c,t){
+  c.fillStyle=BG;c.fillRect(0,0,W,H);drawGrid(c);
+  const s=45;
+  c.save();c.globalAlpha=ease.out(seg(t,s,s+0.7));
+  c.font='600 40px "JetBrains Mono",monospace';c.fillStyle=REACT;
+  c.textAlign='center';c.textBaseline='middle';
+  c.fillText('key is Special — Not a Prop',CX,72);c.restore();
+
+  // Wrong: trying to use key as prop
+  const w=ease.out(seg(t,s+1,s+2.5));
+  if(w>0){
+    drawCodeBox(c,80,120,840,400,'❌ key is not passed as prop',RED,w);
+    c.save();c.globalAlpha=w;c.font='500 22px "JetBrains Mono",monospace';
+    c.textAlign='left';c.textBaseline='top';
+    const lh=36,x0=110,y0=142;
+    // Inside Item component trying to read props.key
+    c.fillStyle='#c792ea';c.fillText('function',x0,y0);c.fillStyle=REACT;c.fillText(' Item',x0+130,y0);c.fillStyle=TEXT;c.fillText('({ key }) {',x0+190,y0);
+
+    // Cross out the key destructure
+    const xa=ease.out(seg(t,s+2,s+2.5));
+    if(xa>0){
+      c.save();c.globalAlpha=xa;c.strokeStyle=RED;c.lineWidth=3;
+      // Strike through { key }
+      c.beginPath();c.moveTo(x0+178,y0+16);c.lineTo(x0+295,y0+16);c.stroke();
+      c.restore();
+    }
+
+    c.fillStyle=PURPLE;c.fillText('  return',x0,y0+lh);
+    c.fillStyle='#89ddff';c.fillText(' <li>',x0+120,y0+lh);
+    c.fillStyle=RED;c.fillText('key',x0+200,y0+lh);
+    c.fillStyle='#89ddff';c.fillText('</li>',x0+258,y0+lh);
+    c.fillStyle=TEXT;c.fillText(';',x0+338,y0+lh);
+    c.fillStyle='#c792ea';c.fillText('}',x0,y0+lh*2);
+
+    c.fillStyle='#64748b';c.fillText('// key is always undefined here!',x0,y0+lh*4);
+    c.fillStyle=RED+'cc';c.fillText('// key is reserved by React',x0,y0+lh*5);
+    c.restore();
+  }
+
+  // Arrow between panels
+  const arrP=ease.out(seg(t,s+3,s+4));
+  if(arrP>0){
+    c.save();c.globalAlpha=arrP;
+    c.strokeStyle=REACT+'88';c.lineWidth=3;c.setLineDash([8,5]);
+    c.beginPath();c.moveTo(940,340);c.lineTo(1030,340);c.stroke();
+    c.setLineDash([]);
+    c.fillStyle=REACT+'88';
+    c.beginPath();c.moveTo(1045,340);c.lineTo(1025,328);c.lineTo(1025,352);c.closePath();c.fill();
+    c.restore();
+  }
+
+  // Correct: pass id as separate prop
+  const r=ease.out(seg(t,s+3,s+5));
+  if(r>0){
+    drawCodeBox(c,1060,120,780,480,'✅ Pass id as separate prop',GREEN,r);
+    c.save();c.globalAlpha=r;c.font='500 22px "JetBrains Mono",monospace';
+    c.textAlign='left';c.textBaseline='top';
+    const lh=36,x0=1090,y0=142;
+    // render site
+    c.fillStyle='#64748b';c.fillText('// In the list:',x0,y0);
+    c.fillStyle='#89ddff';c.fillText('<Item',x0,y0+lh);
+    c.fillStyle=YELLOW;c.fillText('  key',x0,y0+lh*2);
+    c.fillStyle=TEXT;c.fillText('={item.id}',x0+95,y0+lh*2);
+    c.fillStyle=GREEN;c.fillText('  id',x0,y0+lh*3);
+    c.fillStyle=TEXT;c.fillText('={item.id}',x0+75,y0+lh*3);
+    c.fillStyle='#89ddff';c.fillText('/>',x0,y0+lh*4);
+
+    c.fillStyle=TEXT;c.fillText('',x0,y0+lh*5);
+
+    // Item component reading id
+    c.fillStyle='#c792ea';c.fillText('function',x0,y0+lh*6);c.fillStyle=REACT;c.fillText(' Item',x0+130,y0+lh*6);c.fillStyle=TEXT;c.fillText('({',x0+190,y0+lh*6);
+    c.fillStyle=GREEN;c.fillText(' id',x0+228,y0+lh*6);
+    c.fillStyle=TEXT;c.fillText(' }) {',x0+262,y0+lh*6);
+    c.fillStyle=PURPLE;c.fillText('  return',x0,y0+lh*7);
+    c.fillStyle='#89ddff';c.fillText(' <li>',x0+120,y0+lh*7);
+    c.fillStyle=GREEN;c.fillText('id',x0+200,y0+lh*7);
+    c.fillStyle='#89ddff';c.fillText('</li>',x0+240,y0+lh*7);
+    c.fillStyle=TEXT;c.fillText(';',x0+320,y0+lh*7);
+    c.fillStyle='#c792ea';c.fillText('}',x0,y0+lh*8);
+    c.restore();
+  }
+
+  // Key note at bottom
+  const note=ease.out(seg(t,s+5,s+7));
+  if(note>0){
+    c.save();c.globalAlpha=note;
+    c.fillStyle='rgba(234,179,8,0.1)';
+    roundRect(c,80,640,1760,100,14);c.fill();
+    c.strokeStyle=YELLOW+'55';c.lineWidth=2;c.stroke();
+    c.font='500 26px "JetBrains Mono",monospace';c.fillStyle=YELLOW;
+    c.textAlign='center';c.textBaseline='middle';
+    c.fillText('React uses key internally for reconciliation. It never appears in your component\'s props.',CX,690);
+    c.restore();
+  }
+}
+
+// Scene 5: filter + map (70–85s) — sentences 8,9
+function drawScene5(c,t){
+  c.fillStyle=BG;c.fillRect(0,0,W,H);drawGrid(c);
+  const s=70;
+  c.save();c.globalAlpha=ease.out(seg(t,s,s+0.7));
+  c.font='600 40px "JetBrains Mono",monospace';c.fillStyle=REACT;
+  c.textAlign='center';c.textBaseline='middle';
+  c.fillText('.filter() + .map() Chained',CX,72);c.restore();
+
+  // Data
+  const dp=ease.out(seg(t,s+0.5,s+2));
+  if(dp>0){
+    drawCodeBox(c,80,120,740,260,'data with category',PURPLE,dp);
+    c.save();c.globalAlpha=dp;c.font='500 21px "JetBrains Mono",monospace';
+    c.textAlign='left';c.textBaseline='top';
+    const lh=34,x0=108,y0=140;
+    c.fillStyle=PURPLE;c.fillText('const',x0,y0);c.fillStyle=TEXT;c.fillText(' people = [',x0+90,y0);
+    c.fillStyle=TEXT;c.fillText('  { id: ',x0,y0+lh);c.fillStyle=YELLOW;c.fillText('1',x0+120,y0+lh);c.fillStyle=TEXT;c.fillText(', name: ',x0+140,y0+lh);c.fillStyle='#89ddff';c.fillText('"Ana"',x0+236,y0+lh);c.fillStyle=TEXT;c.fillText(', role: ',x0+330,y0+lh);c.fillStyle=GREEN;c.fillText('"chemist"',x0+420,y0+lh);c.fillStyle=TEXT;c.fillText(' },',x0+540,y0+lh);
+    c.fillStyle=TEXT;c.fillText('  { id: ',x0,y0+lh*2);c.fillStyle=YELLOW;c.fillText('2',x0+120,y0+lh*2);c.fillStyle=TEXT;c.fillText(', name: ',x0+140,y0+lh*2);c.fillStyle='#89ddff';c.fillText('"Bob"',x0+236,y0+lh*2);c.fillStyle=TEXT;c.fillText(', role: ',x0+330,y0+lh*2);c.fillStyle=ORANGE;c.fillText('"chef"',x0+420,y0+lh*2);c.fillStyle=TEXT;c.fillText('    },',x0+504,y0+lh*2);
+    c.fillStyle=TEXT;c.fillText('  { id: ',x0,y0+lh*3);c.fillStyle=YELLOW;c.fillText('3',x0+120,y0+lh*3);c.fillStyle=TEXT;c.fillText(', name: ',x0+140,y0+lh*3);c.fillStyle='#89ddff';c.fillText('"Clara"',x0+236,y0+lh*3);c.fillStyle=TEXT;c.fillText(', role: ',x0+336,y0+lh*3);c.fillStyle=GREEN;c.fillText('"chemist"',x0+420,y0+lh*3);c.fillStyle=TEXT;c.fillText(' },',x0+540,y0+lh*3);
+    c.fillStyle=TEXT;c.fillText('];',x0,y0+lh*4);
+    c.restore();
+  }
+
+  // Arrow
+  const arrP=ease.out(seg(t,s+2,s+3));
+  if(arrP>0){
+    c.save();c.globalAlpha=arrP;c.strokeStyle=REACT+'88';c.lineWidth=3;c.setLineDash([8,5]);
+    c.beginPath();c.moveTo(838,250);c.lineTo(930,250);c.stroke();c.setLineDash([]);
+    c.fillStyle=REACT+'88';c.beginPath();c.moveTo(945,250);c.lineTo(925,238);c.lineTo(925,262);c.closePath();c.fill();
+    c.restore();
+  }
+
+  // filter+map code
+  const mp=ease.out(seg(t,s+2,s+3.5));
+  if(mp>0){
+    drawCodeBox(c,960,120,880,440,'filter → map',REACT,mp);
+    c.save();c.globalAlpha=mp;c.font='500 21px "JetBrains Mono",monospace';
+    c.textAlign='left';c.textBaseline='top';
+    const lh=34,x0=988,y0=140;
+    c.fillStyle=PURPLE;c.fillText('const',x0,y0);c.fillStyle=TEXT;c.fillText(' chemists = people',x0+90,y0);
+    c.fillStyle=REACT;c.fillText('.filter',x0,y0+lh);
+    c.fillStyle=TEXT;c.fillText('(',x0+112,y0+lh);
+    c.fillStyle=ORANGE;c.fillText('p',x0+130,y0+lh);
+    c.fillStyle=TEXT;c.fillText(' => p.role ===',x0+152,y0+lh);
+    c.fillStyle=GREEN;c.fillText(' "chemist"',x0+306,y0+lh);
+    c.fillStyle=TEXT;c.fillText(');',x0+464,y0+lh);
+
+    c.fillStyle=TEXT;c.fillText('',x0,y0+lh*2);
+
+    const mhl=ease.out(seg(t,s+4,s+5));
+    if(mhl>0){c.save();c.globalAlpha=mhl*0.15;c.fillStyle=REACT;roundRect(c,x0-4,y0+lh*3-4,840,lh*5+8,6);c.fill();c.restore();}
+
+    c.fillStyle=PURPLE;c.fillText('return',x0,y0+lh*3);
+    c.fillStyle='#89ddff';c.fillText(' <ul>',x0+110,y0+lh*3);
+    c.fillStyle=TEXT;c.fillText('  {chemists',x0,y0+lh*4);
+    c.fillStyle=REACT;c.fillText('.map',x0+204,y0+lh*4);
+    c.fillStyle=TEXT;c.fillText('(',x0+280,y0+lh*4);
+    c.fillStyle=ORANGE;c.fillText('p',x0+300,y0+lh*4);c.fillStyle=TEXT;c.fillText(' => (',x0+320,y0+lh*4);
+    c.fillStyle='#89ddff';c.fillText('    <li',x0,y0+lh*5);
+    c.fillStyle=YELLOW;c.fillText(' key',x0+120,y0+lh*5);
+    c.fillStyle=TEXT;c.fillText('={',x0+180,y0+lh*5);c.fillStyle=ORANGE;c.fillText('p',x0+212,y0+lh*5);c.fillStyle=TEXT;c.fillText('.id}>{',x0+228,y0+lh*5);c.fillStyle=ORANGE;c.fillText('p',x0+320,y0+lh*5);c.fillStyle=TEXT;c.fillText('.name}',x0+336,y0+lh*5);c.fillStyle='#89ddff';c.fillText('</li>',x0+460,y0+lh*5);
+    c.fillStyle=TEXT;c.fillText('  ))}',x0,y0+lh*6);
+    c.fillStyle='#89ddff';c.fillText('</ul>',x0,y0+lh*7);
+    c.restore();
+  }
+
+  // Result
+  const rp=ease.out(seg(t,s+5,s+6.5));
+  if(rp>0){
+    drawCodeBox(c,80,420,740,220,'result — only chemists',GREEN,rp);
+    c.save();c.globalAlpha=rp;c.font='500 22px "JetBrains Mono",monospace';
+    c.textAlign='left';c.textBaseline='top';
+    const lh=34,x0=108,y0=440;
+    c.fillStyle='#89ddff';c.fillText('<ul>',x0,y0);
+    c.fillStyle=TEXT;c.fillText('  <li>Ana</li>',x0,y0+lh);
+    c.fillStyle=TEXT;c.fillText('  <li>Clara</li>',x0,y0+lh*2);
+    c.fillStyle='#89ddff';c.fillText('</ul>',x0,y0+lh*3);
+    c.restore();
+  }
+
+  // Inline note
+  const inn=ease.out(seg(t,s+6,s+8));
+  if(inn>0){
+    c.save();c.globalAlpha=inn;
+    c.fillStyle='rgba(97,218,251,0.08)';
+    roundRect(c,80,680,1760,100,14);c.fill();
+    c.strokeStyle=REACT+'44';c.lineWidth=2;c.stroke();
+    c.font='500 26px "JetBrains Mono",monospace';c.fillStyle=REACT;
+    c.textAlign='center';c.textBaseline='middle';
+    c.fillText('Embed the whole expression in JSX using { } — no intermediate variable needed.',CX,730);
+    c.restore();
+  }
+}
+
+// Scene 6: Fragment keys (85–100s) — sentences 10,11
+function drawScene6(c,t){
+  c.fillStyle=BG;c.fillRect(0,0,W,H);drawGrid(c);
+  const s=85;
+  c.save();c.globalAlpha=ease.out(seg(t,s,s+0.7));
+  c.font='600 40px "JetBrains Mono",monospace';c.fillStyle=REACT;
+  c.textAlign='center';c.textBaseline='middle';
+  c.fillText('Fragment Keys & Nested Lists',CX,72);c.restore();
+
+  // Fragment code
+  const fp=ease.out(seg(t,s+0.5,s+2));
+  if(fp>0){
+    drawCodeBox(c,80,120,840,440,'<Fragment> with key',PURPLE,fp);
+    c.save();c.globalAlpha=fp;c.font='500 21px "JetBrains Mono",monospace';
+    c.textAlign='left';c.textBaseline='top';
+    const lh=34,x0=108,y0=142;
+    c.fillStyle='#64748b';c.fillText('// Can\'t use <> shorthand with key',x0,y0);
+    c.fillStyle='#64748b';c.fillText('// Must use Fragment explicitly',x0,y0+lh);
+
+    c.fillStyle=TEXT;c.fillText('items.map(',x0,y0+lh*2);
+    c.fillStyle=ORANGE;c.fillText('item',x0,y0+lh*3);c.fillStyle=TEXT;c.fillText(' => (',x0+72,y0+lh*3);
+
+    const fhl=ease.out(seg(t,s+2,s+3));
+    if(fhl>0){c.save();c.globalAlpha=fhl*0.18;c.fillStyle=PURPLE;roundRect(c,x0-4,y0+lh*4-4,800,lh*3+8,6);c.fill();c.restore();}
+
+    c.fillStyle='#89ddff';c.fillText('  <Fragment',x0,y0+lh*4);
+    c.fillStyle=YELLOW;c.fillText(' key',x0+184,y0+lh*4);
+    c.fillStyle=TEXT;c.fillText('={item.id}',x0+244,y0+lh*4);
+    c.fillStyle='#89ddff';c.fillText('>',x0+380,y0+lh*4);
+    c.fillStyle='#89ddff';c.fillText('    <h1>',x0,y0+lh*5);
+    c.fillStyle=TEXT;c.fillText('{item.heading}',x0+136,y0+lh*5);
+    c.fillStyle='#89ddff';c.fillText('</h1>',x0+312,y0+lh*5);
+    c.fillStyle='#89ddff';c.fillText('    <p>',x0,y0+lh*6);
+    c.fillStyle=TEXT;c.fillText('{item.body}',x0+104,y0+lh*6);
+    c.fillStyle='#89ddff';c.fillText('</p>',x0+256,y0+lh*6);
+    c.fillStyle='#89ddff';c.fillText('  </Fragment>',x0,y0+lh*7);
+    c.fillStyle=TEXT;c.fillText('))',x0,y0+lh*8);
+    c.restore();
+  }
+
+  // Why Fragment note
+  const fn2=ease.out(seg(t,s+2.5,s+4));
+  if(fn2>0){
+    c.save();c.globalAlpha=fn2;
+    c.fillStyle='rgba(167,139,250,0.1)';roundRect(c,80,600,840,120,14);c.fill();
+    c.strokeStyle=PURPLE+'55';c.lineWidth=2;c.stroke();
+    c.font='500 23px "JetBrains Mono",monospace';c.fillStyle=PURPLE;
+    c.textAlign='center';c.textBaseline='middle';
+    c.fillText('<Fragment> adds the key without',360,640);
+    c.fillText('adding an extra DOM node.',360,672);
+    c.restore();
+  }
+
+  // Nested lists
+  const np=ease.out(seg(t,s+4,s+5.5));
+  if(np>0){
+    drawCodeBox(c,960,120,880,500,'nested list — map inside map',ORANGE,np);
+    c.save();c.globalAlpha=np;c.font='500 21px "JetBrains Mono",monospace';
+    c.textAlign='left';c.textBaseline='top';
+    const lh=34,x0=988,y0=142;
+    c.fillStyle='#c792ea';c.fillText('function',x0,y0);c.fillStyle=REACT;c.fillText(' NestedList',x0+130,y0);c.fillStyle=TEXT;c.fillText('() {',x0+272,y0);
+    c.fillStyle=PURPLE;c.fillText('  return',x0,y0+lh);c.fillStyle=TEXT;c.fillText(' (',x0+120,y0+lh);
+    c.fillStyle='#89ddff';c.fillText('    <ul>',x0,y0+lh*2);
+    c.fillStyle=TEXT;c.fillText('      {categories',x0,y0+lh*3);
+    c.fillStyle=REACT;c.fillText('.map',x0+288,y0+lh*3);
+    c.fillStyle=TEXT;c.fillText('(',x0+364,y0+lh*3);
+    c.fillStyle=ORANGE;c.fillText('cat',x0+384,y0+lh*3);c.fillStyle=TEXT;c.fillText(' => (',x0+432,y0+lh*3);
+    c.fillStyle='#89ddff';c.fillText('        <li',x0,y0+lh*4);c.fillStyle=YELLOW;c.fillText(' key',x0+160,y0+lh*4);c.fillStyle=TEXT;c.fillText('={',x0+220,y0+lh*4);c.fillStyle=ORANGE;c.fillText('cat',x0+252,y0+lh*4);c.fillStyle=TEXT;c.fillText('.id}>',x0+300,y0+lh*4);
+    c.fillStyle=TEXT;c.fillText('          {',x0,y0+lh*5);c.fillStyle=ORANGE;c.fillText('cat',x0+88,y0+lh*5);c.fillStyle=TEXT;c.fillText('.name}',x0+136,y0+lh*5);
+    c.fillStyle='#89ddff';c.fillText('          <ul>',x0,y0+lh*6);
+    c.fillStyle=TEXT;c.fillText('            {',x0,y0+lh*7);c.fillStyle=ORANGE;c.fillText('cat',x0+104,y0+lh*7);c.fillStyle=TEXT;c.fillText('.items',x0+160,y0+lh*7);c.fillStyle=REACT;c.fillText('.map',x0+270,y0+lh*7);c.fillStyle=TEXT;c.fillText('(',x0+304,y0+lh*7);
+    c.fillStyle=ORANGE;c.fillText('it',x0+324,y0+lh*7);c.fillStyle=TEXT;c.fillText(' => <li',x0+352,y0+lh*7);c.fillStyle=YELLOW;c.fillText(' key',x0+464,y0+lh*7);c.fillStyle=TEXT;c.fillText('={',x0+524,y0+lh*7);c.fillStyle=ORANGE;c.fillText('it',x0+556,y0+lh*7);c.fillStyle=TEXT;c.fillText('.id}>',x0+580,y0+lh*7);c.fillStyle=ORANGE;c.fillText('it',x0+640,y0+lh*7);c.fillStyle=TEXT;c.fillText('.n</li>)}',x0+664,y0+lh*7);
+    c.fillStyle='#89ddff';c.fillText('          </ul>',x0,y0+lh*8);
+    c.fillStyle='#89ddff';c.fillText('        </li>',x0,y0+lh*9);
+    c.restore();
+  }
+
+  // Each with its own key
+  const kn=ease.out(seg(t,s+6,s+7));
+  if(kn>0){
+    c.save();c.globalAlpha=kn;
+    c.fillStyle='rgba(97,218,251,0.08)';roundRect(c,80,770,1760,80,14);c.fill();
+    c.strokeStyle=REACT+'44';c.lineWidth=2;c.stroke();
+    c.font='500 26px "JetBrains Mono",monospace';c.fillStyle=REACT;
+    c.textAlign='center';c.textBaseline='middle';
+    c.fillText('Map inside map — each level needs its own key. Keys only need to be unique within their list.',CX,810);
+    c.restore();
+  }
+}
+
+// Scene 7: Recap (100–109s) — sentences 12,13,14
+function drawScene7(c,t){
+  c.fillStyle=BG;c.fillRect(0,0,W,H);drawGrid(c);
+  const s=100;
+  c.save();c.globalAlpha=ease.out(seg(t,s,s+0.7));
+  c.font='600 40px "JetBrains Mono",monospace';c.fillStyle=REACT;
+  c.textAlign='center';c.textBaseline='middle';
+  c.fillText('Recap',CX,72);c.restore();
+
+  // Warning console message
+  const warnP=ease.out(seg(t,s+0.5,s+2));
+  if(warnP>0){
+    c.save();c.globalAlpha=warnP;
+    c.fillStyle='rgba(234,179,8,0.12)';roundRect(c,80,110,1760,120,14);c.fill();
+    c.strokeStyle=YELLOW+'66';c.lineWidth=2;c.stroke();
+    c.font='500 22px "JetBrains Mono",monospace';c.fillStyle=YELLOW;c.textAlign='left';c.textBaseline='top';
+    c.fillText('⚠️  Warning: Each child in a list should have a unique "key" prop.',110,130);
+    c.font='400 20px "JetBrains Mono",monospace';c.fillStyle='#94a3b8';
+    c.fillText('   Check the render method of `List`. See https://reactjs.org/link/warning-keys for more information.',110,162);
+    c.restore();
+  }
+
+  const cards=[
+    {color:REACT,icon:'🗂️',title:'Use .map()',desc:'Transform arrays into JSX elements'},
+    {color:GREEN,icon:'🔑',title:'Stable keys',desc:'Use IDs from your data, not indexes'},
+    {color:RED,icon:'🚫',title:'No Math.random()',desc:'New key each render = broken updates'},
+    {color:YELLOW,icon:'🏷️',title:'key ≠ prop',desc:'Pass id separately if component needs it'},
+    {color:PURPLE,icon:'🔍',title:'filter + map',desc:'Filter first, then map the result'},
+    {color:ORANGE,icon:'🧩',title:'Fragment key',desc:'Wrap multi-element rows in <Fragment>'},
+  ];
+
+  cards.forEach((card,i)=>{
+    const col=i%3,row=Math.floor(i/3);
+    const cx2=200+col*520,cy2=310+row*240;
+    const delay=s+2+i*0.3;
+    const a=ease.spring(seg(t,delay,delay+0.8));
+    if(a<=0)return;
+    c.save();c.globalAlpha=a;
+    c.fillStyle=CODE_BG;roundRect(c,cx2-230,cy2-90,460,180,16);c.fill();
+    c.strokeStyle=card.color+'66';c.lineWidth=2;c.stroke();
+    c.font='36px "JetBrains Mono",monospace';c.textAlign='center';c.textBaseline='middle';c.fillText(card.icon,cx2-160,cy2-20);
+    c.font='bold 26px "JetBrains Mono",monospace';c.fillStyle=card.color;c.fillText(card.title,cx2+30,cy2-30);
+    c.font='400 20px "JetBrains Mono",monospace';c.fillStyle='#94a3b8';c.fillText(card.desc,cx2+30,cy2+10);
+    c.restore();
+  });
+}
+
+// Scene 8: Next up (109+s) — sentence 14 (next up)
+function drawScene8(c,t){
+  c.fillStyle=BG;c.fillRect(0,0,W,H);drawGrid(c);
+  const s=103;
+  const a=ease.out(seg(t,s,s+1.5));
+  drawReactLogo(c,CX,CY-80,80*a,a,t);
+  if(a>0){
+    c.save();c.globalAlpha=a;
+    c.font='bold 64px "JetBrains Mono",monospace';c.fillStyle=REACT;
+    c.textAlign='center';c.textBaseline='middle';
+    c.shadowColor=REACT;c.shadowBlur=16;
+    c.fillText('Next Up',CX,CY+60);
+    c.shadowBlur=0;c.restore();
+  }
+  const b=ease.out(seg(t,s+1,s+2.5));
+  if(b>0){
+    c.save();c.globalAlpha=b;
+    c.font='500 44px "JetBrains Mono",monospace';c.fillStyle=TEXT;
+    c.textAlign='center';c.textBaseline='middle';
+    c.fillText('Keeping Components Pure',CX,CY+150);
+    c.restore();
+  }
+  const ep=ease.out(seg(t,s+2,s+3));
+  if(ep>0){
+    c.save();c.globalAlpha=ep;
+    c.font='400 28px "JetBrains Mono",monospace';c.fillStyle='#64748b';
+    c.textAlign='center';c.textBaseline='middle';
+    c.fillText('Episode 10  ·  react.dev/learn',CX,CY+220);
+    c.restore();
+  }
+}
+
+window.renderFrame = function(frameIndex){
+  const ctx=document.getElementById('c').getContext('2d');
+  const t=frameIndex/30;
+
+  // Scene routing by time
+  if(t<10) drawScene1(ctx,t);
+  else if(t<25) drawScene2(ctx,t);
+  else if(t<45) drawScene3(ctx,t);
+  else if(t<70) drawScene4(ctx,t);
+  else if(t<85) drawScene5(ctx,t);
+  else if(t<100) drawScene6(ctx,t);
+  else if(t<103) drawScene7(ctx,t);
+  else drawScene8(ctx,t);
+
+  drawCaption(ctx,t);
+};
+
+// Start at frame 0
+renderFrame(0);
+</script>
+</body>
+</html>

@@ -10,7 +10,7 @@ Playlist: [Kubernetes — Run the Docs](https://www.youtube.com/playlist?list=PL
 | 04 | Deployments | Workloads | ~2:50 | ✅ Published | [Watch](https://youtu.be/RF4ntSQ_pgA) | [ep04.srt](./transcripts/ep04.srt) |
 | 05 | Services | Networking | ~2:45 | ✅ Published | [Watch](https://youtu.be/wnU00LpKbfI) | [ep05.srt](./transcripts/ep05.srt) |
 | 06 | ConfigMaps | Configuration | ~2:30 | ✅ Published | [Watch](https://youtu.be/jxyX_3lViyU) | [ep06.srt](./transcripts/ep06.srt) |
-| 07 | Secrets | Configuration | ~2:20 | ✅ Published | [Watch](https://youtu.be/kiAP0Sd2h-s) | [ep07.srt](./transcripts/ep07.srt) |
+| 07 | Secrets | Configuration | ~2:20 | ✅ Published | [Watch](https://youtu.be/iKiU2DXgrRE) | [ep07.srt](./transcripts/ep07.srt) |
 | 08 | Persistent Volumes | Storage | ~2:40 | ✅ Published | [Watch](https://youtu.be/NQ06EXGPxXg) | [ep08.srt](./transcripts/ep08.srt) |
 | 09 | Ingress | Networking | ~2:35 | ✅ Published | [Watch](https://youtu.be/HRCcIP-IMHM) | [ep09.srt](./transcripts/ep09.srt) |
 | 10 | StatefulSets | Workloads | ~2:25 | ⚠️ Video uploaded, caption pending | [Watch](https://youtu.be/vO6UTF7e0y8) | [ep10.srt](./transcripts/ep10.srt) |

@@ -1,0 +1,113 @@
+{
+  "total_voice_duration": 105.496,
+  "total_duration": 109.496,
+  "total_frames_30fps": 3284,
+  "sample_rate": 44100,
+  "segments": [
+    {
+      "index": 0,
+      "text": "React can render lists from arrays. You need JavaScript's map method \u2014 that's it.",
+      "start": 2.0,
+      "end": 7.397,
+      "duration": 5.397
+    },
+    {
+      "index": 1,
+      "text": "Call array dot map, pass a function, return JSX. React renders one element per item.",
+      "start": 7.777,
+      "end": 14.455,
+      "duration": 6.677
+    },
+    {
+      "index": 2,
+      "text": "Each list item needs a key prop. Keys help React track which items changed, were added, or removed.",
+      "start": 14.835,
+      "end": 21.789,
+      "duration": 6.955
+    },
+    {
+      "index": 3,
+      "text": "Keys must be unique among siblings. They don't need to be globally unique \u2014 just within that list.",
+      "start": 22.169,
+      "end": 28.463,
+      "duration": 6.293
+    },
+    {
+      "index": 4,
+      "text": "Use stable IDs from your data as keys. Database IDs are ideal.",
+      "start": 28.843,
+      "end": 34.091,
+      "duration": 5.248
+    },
+    {
+      "index": 5,
+      "text": "Don't use array indexes as keys unless the list never changes order. Index keys break when items move.",
+      "start": 34.471,
+      "end": 42.193,
+      "duration": 7.723
+    },
+    {
+      "index": 6,
+      "text": "Never use Math dot random as a key. It changes every render and destroys performance.",
+      "start": 42.573,
+      "end": 48.717,
+      "duration": 6.144
+    },
+    {
+      "index": 7,
+      "text": "Keys are not passed as props. If your component needs the ID, pass it as a separate prop with a different name.",
+      "start": 49.097,
+      "end": 56.585,
+      "duration": 7.488
+    },
+    {
+      "index": 8,
+      "text": "You can filter and map together. Call array dot filter first, then dot map on the result.",
+      "start": 56.965,
+      "end": 63.195,
+      "duration": 6.229
+    },
+    {
+      "index": 9,
+      "text": "JSX lets you embed the whole map expression inside curly braces, right in the return statement.",
+      "start": 63.575,
+      "end": 70.7,
+      "duration": 7.125
+    },
+    {
+      "index": 10,
+      "text": "If your list items need more than one DOM element, wrap them in a Fragment. Fragments let you add a key without adding extra DOM nodes.",
+      "start": 71.08,
+      "end": 80.765,
+      "duration": 9.685
+    },
+    {
+      "index": 11,
+      "text": "Nested lists work the same way. Map inside map, each with its own key.",
+      "start": 81.145,
+      "end": 86.159,
+      "duration": 5.013
+    },
+    {
+      "index": 12,
+      "text": "React shows a warning in the console if keys are missing. Take it seriously \u2014 it means list updates will be slow or incorrect.",
+      "start": 86.539,
+      "end": 94.88,
+      "duration": 8.341
+    },
+    {
+      "index": 13,
+      "text": "Let's recap. Use map to render lists. Give every item a stable key. Avoid indexes and random values.",
+      "start": 95.26,
+      "end": 102.641,
+      "duration": 7.381
+    },
+    {
+      "index": 14,
+      "text": "Next up: keeping components pure.",
+      "start": 103.021,
+      "end": 105.496,
+      "duration": 2.475
+    }
+  ]
+}

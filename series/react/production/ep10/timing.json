@@ -1,0 +1,113 @@
+{
+  "total_voice_duration": 125.357,
+  "total_duration": 129.737,
+  "total_frames_30fps": 3892,
+  "sample_rate": 44100,
+  "segments": [
+    {
+      "index": 0,
+      "text": "A pure function always returns the same output for the same input. It doesn't change anything outside itself.",
+      "start": 2.0,
+      "end": 9.637,
+      "duration": 7.637
+    },
+    {
+      "index": 1,
+      "text": "React is designed around this idea. Every component should be a pure function of its props and state.",
+      "start": 10.017,
+      "end": 16.908,
+      "duration": 6.891
+    },
+    {
+      "index": 2,
+      "text": "Pure components are predictable. Given the same inputs, they always render the same JSX.",
+      "start": 17.288,
+      "end": 23.859,
+      "duration": 6.571
+    },
+    {
+      "index": 3,
+      "text": "Impure components have side effects \u2014 they change variables outside their scope, make network calls during render, or modify the DOM directly.",
+      "start": 24.239,
+      "end": 34.073,
+      "duration": 9.835
+    },
+    {
+      "index": 4,
+      "text": "React renders components twice in development Strict Mode. This catches impure components that produce different output on each call.",
+      "start": 34.453,
+      "end": 43.669,
+      "duration": 9.216
+    },
+    {
+      "index": 5,
+      "text": "Here's the rule: don't mutate anything that existed before the render started. Props, state, and context are read-only.",
+      "start": 44.049,
+      "end": 51.943,
+      "duration": 7.893
+    },
+    {
+      "index": 6,
+      "text": "You can create and mutate variables inside the component during render \u2014 that's fine. They didn't exist before the call.",
+      "start": 52.323,
+      "end": 60.024,
+      "duration": 7.701
+    },
+    {
+      "index": 7,
+      "text": "Side effects belong in event handlers, not in render. User clicks, form submissions, timers \u2014 those are the right places.",
+      "start": 60.404,
+      "end": 68.553,
+      "duration": 8.149
+    },
+    {
+      "index": 8,
+      "text": "If no event handler fits, use useEffect as a last resort. It runs after render, outside the pure rendering phase.",
+      "start": 68.933,
+      "end": 77.061,
+      "duration": 8.128
+    },
+    {
+      "index": 9,
+      "text": "Pure components unlock two React superpowers: memoization and concurrent rendering.",
+      "start": 77.441,
+      "end": 83.329,
+      "duration": 5.888
+    },
+    {
+      "index": 10,
+      "text": "Memoization means React can skip re-rendering a component if its inputs haven't changed. This only works if the component is pure.",
+      "start": 83.709,
+      "end": 92.883,
+      "duration": 9.173
+    },
+    {
+      "index": 11,
+      "text": "Concurrent rendering means React can pause, restart, or abandon renders. Impure components break this entirely.",
+      "start": 93.263,
+      "end": 101.177,
+      "duration": 7.915
+    },
+    {
+      "index": 12,
+      "text": "The mental model: React components are like math functions. f of x always equals the same result. No surprises.",
+      "start": 101.557,
+      "end": 109.728,
+      "duration": 8.171
+    },
+    {
+      "index": 13,
+      "text": "Let's recap. Components must be pure \u2014 same input, same output. No mutations during render. Side effects go in event handlers or useEffect.",
+      "start": 110.108,
+      "end": 120.199,
+      "duration": 10.091
+    },
+    {
+      "index": 14,
+      "text": "That's the React series. One concept at a time, from the actual docs.",
+      "start": 120.579,
+      "end": 125.357,
+      "duration": 4.779
+    }
+  ]
+}
