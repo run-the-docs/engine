@@ -127,13 +127,58 @@ ffprobe -v error -show_format <series>/videos/ep<NN>.mp4 | grep duration
 - **Outro buffer: 4.0s** (after last sentence, for final scene fade).
 - **FPS: 30** (not 24, not 60). All timing calculations assume 30fps.
 
+## Animation Quality Standards (MANDATORY)
+
+Every episode MUST meet these visual standards. Study the gold standard references.
+
+### Required visual elements per scene:
+- **Icons/emoji** — each concept gets a visual anchor (🔘, 📤, ❌, ✅, etc.)
+- **Semantic color coding** — consistent per concept type (green=correct, red=wrong, brand color=titles)
+- **Caption overlay** — subtitle pill at bottom showing current narration text
+- **Progressive reveal** — elements animate in with easing, not instant appear
+- **Code blocks** — editor-style with window dots (red/yellow/green), syntax coloring
+- **Scene routing with crossfades** — no jump cuts between scenes
+- **Brand identity** — series logo (React atom, K8s helm, etc.) in hook + outro
+
+### Scene structure pattern:
+```
+Scene 1: Hook (0–8s)     — logo reveal + title + subtitle
+Scene 2-N: Content        — one concept per scene, cards/code/diagrams
+Scene N+1: Recap          — bullet list of what you learned
+Scene N+2: Outro          — Run the Docs end card
+```
+
+### Animation function pattern:
+```javascript
+// Per-scene function with time-based alpha
+function drawScene2(ctx, t) {
+  const s = TIMING[1].start;  // scene start from timing
+  ctx.fillStyle = BG; ctx.fillRect(0,0,W,H); drawGrid(ctx);
+  
+  // Title with eased fade-in
+  const titleA = ease.out(seg(t, s, s+0.4));
+  // ... content with spring animations, progressive delays
+}
+```
+
+### Validation before posting:
+1. Extract 1 frame per scene, visually inspect ALL of them
+2. Check for black/empty gaps between scenes
+3. Verify captions are rendering
+4. Compare side-by-side with K8s reference frames
+
+### Gold standard references:
+- **K8s ep01** — `series/kubernetes/production/k8s_ep1.html` (900+ lines, 7 scenes)
+- **React ep01** — `series/react/production/ep01/ep01.html` (565 lines, 8 scenes)
+- Both demonstrate: logo drawing, spring easing, card layouts, code blocks, caption overlay, scene routing
+
 ## Reference Files
 
 - **STYLE_GUIDE.md** — Brand colors, fonts, Kokoro voice settings
 - **K8s Series** — `series/kubernetes/production/` — Reference implementations (11 episodes)
-  - Study `k8s_ep5_build.py` for HTML generation patterns
-  - Study `k8s_ep1v5.html` for animation easing + shapes
+  - Study `k8s_ep1.html` for animation easing + shapes
   - Study timing flow across all episodes
+- **React Series** — `series/react/production/ep01/ep01.html` — Latest gold standard
 
 ## Testing Checklist
 
