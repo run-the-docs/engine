@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#0d0d1a;width:1920px;height:1080px;overflow:hidden;}canvas{display:block;}</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+const W=1920,H=1080,CX=960,CY=540;
+const BG='#0d0d1a',REACT='#61dafb',TEXT='#f8fafc',CODE_BG='#0d1117';
+const GREEN='#22c55e',YELLOW='#eab308',RED='#ef4444',PURPLE='#a78bfa',ORANGE='#f97316';
+let TIMING=[{"index": 0, "text": "React lets you respond to user interactions: clicks, hovers, form inputs. That's event handling.", "start": 2.0, "end": 8.549}, {"index": 1, "text": "Three steps. Define a function inside your component. Add your logic. Pass it to the JSX element.", "start": 8.929, "end": 16.012}, {"index": 2, "text": "onClick equals open brace, handleClick, close brace. That tells React: call this function when the button is clicked.", "start": 16.392, "end": 24.136}, {"index": 3, "text": "By convention, name handlers as handle plus the event name. handleClick, handleMouseEnter, handleSubmit.", "start": 24.516, "end": 32.089}, {"index": 4, "text": "You can also define handlers inline. onClick equals arrow function, alert, hello. Works the same.", "start": 32.469, "end": 39.488}, {"index": 5, "text": "Critical mistake: don't call the function. onClick equals handleClick \u2014 correct. onClick equals handleClick parentheses \u2014 wrong.", "start": 39.868, "end": 48.487}, {"index": 6, "text": "With parentheses, the function fires immediately during render, not on click. Pass the function, don't call it.", "start": 48.867, "end": 56.035}, {"index": 7, "text": "Event handlers have access to the component's props. They're defined inside the component, so they can read everything.", "start": 56.415, "end": 63.903}, {"index": 8, "text": "You can pass event handlers as props too. Parent passes onClick to a Button component. The Button attaches it to the real button.", "start": 64.283, "end": 73.051}, {"index": 9, "text": "This is how design systems work. A generic Button component handles styling. The parent decides what happens on click.", "start": 73.431, "end": 81.452}, {"index": 10, "text": "Name your handler props starting with on. onPlay, onClick, onSubmit. The handler function starts with handle.", "start": 81.832, "end": 88.957}, {"index": 11, "text": "Events propagate up the tree. A click on a button inside a div triggers both the button's and the div's onClick.", "start": 89.337, "end": 97.081}, {"index": 12, "text": "This is called bubbling. The event fires on the target, then moves up to each parent.", "start": 97.461, "end": 102.944}, {"index": 13, "text": "To stop propagation, call e dot stopPropagation in your handler. The event object e is the first argument.", "start": 103.324, "end": 111.239}, {"index": 14, "text": "There's also e dot preventDefault. Use it to stop the browser's default action, like a form submission refreshing the page.", "start": 111.619, "end": 119.981}, {"index": 15, "text": "Let's recap. Event handlers are functions you pass to JSX elements: onClick, onChange, onSubmit.", "start": 120.361, "end": 127.871}, {"index": 16, "text": "Pass functions, don't call them. No parentheses after the name.", "start": 128.251, "end": 132.645}, {"index": 17, "text": "Events propagate upward. Use stopPropagation to stop bubbling, preventDefault to stop browser defaults.", "start": 133.025, "end": 140.535}, {"index": 18, "text": "Next up: conditional rendering.", "start": 140.915, "end": 143.091}];let TOTAL_DURATION=147.471;
+const ease={out:t=>1-Math.pow(1-t,3),spring:t=>{const c=(2*Math.PI)/2.5;return t===0?0:t===1?1:Math.pow(2,-10*t)*Math.sin((t*10-0.75)*c)+1;}};
+function seg(t,s,e){return Math.max(0,Math.min(1,(t-s)/(e-s)));}
+function roundRect(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.quadraticCurveTo(x+w,y,x+w,y+r);c.lineTo(x+w,y+h-r);c.quadraticCurveTo(x+w,y+h,x+w-r,y+h);c.lineTo(x+r,y+h);c.quadraticCurveTo(x,y+h,x,y+h-r);c.lineTo(x,y+r);c.quadraticCurveTo(x,y,x+r,y);c.closePath();}
+function drawGrid(c){c.strokeStyle='rgba(97,218,251,0.03)';c.lineWidth=1;for(let x=0;x<W;x+=80){c.beginPath();c.moveTo(x,0);c.lineTo(x,H);c.stroke();}for(let y=0;y<H;y+=80){c.beginPath();c.moveTo(0,y);c.lineTo(W,y);c.stroke();}}
+function drawReactLogo(c,cx,cy,r,a,t){if(a<=0)return;c.save();c.globalAlpha=a;c.strokeStyle=REACT;c.lineWidth=r*0.06;c.shadowColor=REACT;c.shadowBlur=18*a;for(let i=0;i<3;i++){c.save();c.translate(cx,cy);c.rotate(i*Math.PI/3+t*0.4);c.beginPath();c.ellipse(0,0,r,r*0.38,0,0,Math.PI*2);c.stroke();c.restore();}c.fillStyle=REACT;c.shadowBlur=0;c.beginPath();c.arc(cx,cy,r*0.18,0,Math.PI*2);c.fill();c.restore();}
+function drawCaption(c,t){let txt='';for(const s of TIMING){if(t>=s.start-0.1&&t<=s.end+0.3){txt=s.text;break;}}if(!txt)return;c.save();c.font='500 20px "JetBrains Mono",monospace';const tw=c.measureText(txt).width,pw=Math.min(tw+48,W-100);c.globalAlpha=0.9;c.fillStyle='rgba(0,0,0,0.85)';roundRect(c,CX-pw/2,968,pw,44,22);c.fill();c.globalAlpha=1;c.fillStyle=TEXT;c.textAlign='center';c.textBaseline='middle';let d=txt;while(c.measureText(d).width>pw-48&&d.length>10)d=d.slice(0,-1);if(d!==txt)d+='…';c.fillText(d,CX,990);c.restore();}
+function drawFileBox(c,x,y,w,h,name,color,a){c.save();c.globalAlpha=a;c.fillStyle=CODE_BG;roundRect(c,x,y,w,h,12);c.fill();c.strokeStyle=color+'88';c.lineWidth=2;c.stroke();c.fillStyle=color+'33';roundRect(c,x,y-30,Math.min(220,name.length*12+20),30,6);c.fill();c.font='500 16px "JetBrains Mono",monospace';c.fillStyle=color;c.textAlign='left';c.textBaseline='middle';c.fillText(name,x+12,y-15);c.restore();}
+
+// S1: Hook
+function drawScene1(c,t){
+  c.fillStyle=BG;c.fillRect(0,0,W,H);drawGrid(c);
+  const lp=ease.spring(seg(t,2,3));drawReactLogo(c,CX,CY-110,130*lp,lp,t);
+  const ta=ease.out(seg(t,2.5,3.5));
+  if(ta>0){c.save();c.globalAlpha=ta;c.font='bold 100px "JetBrains Mono",monospace';c.fillStyle=ORANGE;c.textAlign='center';c.textBaseline='middle';c.shadowColor=ORANGE;c.shadowBlur=20;c.fillText('Events',CX,CY+80);c.shadowBlur=0;c.restore();}
+  const sa=ease.out(seg(t,3.3,4.1));
+  if(sa>0){c.save();c.globalAlpha=sa;c.font='500 48px "JetBrains Mono",monospace';c.fillStyle=TEXT;c.textAlign='center';c.textBaseline='middle';c.fillText('Responding to User Interactions',CX,CY+210);c.restore();}
+  const ma=ease.out(seg(t,4.1,5));
+  if(ma>0){c.save();c.globalAlpha=ma;c.font='400 28px "JetBrains Mono",monospace';c.fillStyle='#64748b';c.textAlign='center';c.textBaseline='middle';c.fillText('react.dev/learn  ·  Episode 7',CX,CY+270);c.restore();}
+}
+
+// S2: Three Steps + Code (8–48s)
+function drawScene2(c,t){
+  const s=8.5;
+  c.fillStyle=BG;c.fillRect(0,0,W,H);drawGrid(c);
+  c.save();c.globalAlpha=ease.out(seg(t,s,s+0.4));c.font='600 42px "JetBrains Mono",monospace';c.fillStyle=ORANGE;c.textAlign='center';c.textBaseline='middle';c.fillText('Adding Event Handlers',CX,100);c.restore();
+
+  // Code block
+  const cp=ease.out(seg(t,s+0.5,s+1.5));
+  if(cp>0){
+    drawFileBox(c,200,170,1520,450,'Button.jsx',REACT,cp);
+    c.save();c.globalAlpha=cp;c.font='500 26px "JetBrains Mono",monospace';c.textAlign='left';c.textBaseline='top';
+    c.fillStyle='#c792ea';c.fillText('function Button() {',230,200);
+    c.fillStyle=ORANGE;c.fillText('  function handleClick() {',230,240);
+    c.fillText("    alert('You clicked me!');",230,280);
+    c.fillText('  }',230,320);
+    c.fillStyle=TEXT;c.fillText('',230,360);
+    c.fillStyle=TEXT;c.fillText('  return (',230,400);
+    c.fillStyle='#89ddff';c.fillText('    <button',230,440);
+    c.fillStyle=GREEN;c.fillText(' onClick={handleClick}',370,440);
+    c.fillStyle='#89ddff';c.fillText('>',660,440);
+    c.fillText('      Click me',230,480);
+    c.fillText('    </button>',230,520);
+    c.fillStyle=TEXT;c.fillText('  );',230,560);
+    c.fillStyle='#c792ea';c.fillText('}',230,600);
+    c.restore();
+  }
+
+  // Naming convention
+  const ncA=ease.out(seg(t,24.5,25.5));
+  if(ncA>0){c.save();c.globalAlpha=ncA;c.fillStyle='rgba(249,115,22,0.06)';roundRect(c,200,660,1520,100,12);c.fill();c.strokeStyle=ORANGE+'44';c.lineWidth=2;c.stroke();c.font='500 26px "JetBrains Mono",monospace';c.fillStyle=ORANGE;c.textAlign='center';c.textBaseline='middle';c.fillText('Convention: handle + EventName → handleClick, handleMouseEnter, handleSubmit',CX,710);c.restore();}
+
+  // Inline alternative
+  const inA=ease.out(seg(t,32.5,33.5));
+  if(inA>0){c.save();c.globalAlpha=inA;c.fillStyle='rgba(97,218,251,0.06)';roundRect(c,200,790,1520,100,12);c.fill();c.strokeStyle=REACT+'44';c.lineWidth=2;c.stroke();c.font='500 26px "JetBrains Mono",monospace';c.fillStyle=REACT;c.textAlign='center';c.textBaseline='middle';c.fillText("Inline: onClick={() => alert('hello')}  — works for short handlers",CX,840);c.restore();}
+}
+
+// S3: Pass vs Call (39–64s)
+function drawScene3(c,t){
+  const s=39.86;
+  c.fillStyle=BG;c.fillRect(0,0,W,H);drawGrid(c);
+  c.save();c.globalAlpha=ease.out(seg(t,s,s+0.4));c.font='600 42px "JetBrains Mono",monospace';c.fillStyle=RED;c.textAlign='center';c.textBaseline='middle';c.fillText('⚠️  Pass, Don\'t Call',CX,100);c.restore();
+
+  // Correct
+  const cp=ease.spring(seg(t,s+0.5,s+1.5));
+  if(cp>0){
+    c.save();c.globalAlpha=cp;
+    c.fillStyle='rgba(34,197,94,0.06)';roundRect(c,100,200,820,300,16);c.fill();
+    c.strokeStyle=GREEN+'66';c.lineWidth=3;c.stroke();
+    c.font='48px serif';c.textAlign='left';c.textBaseline='middle';c.fillText('✅',140,260);
+    c.font='600 30px "JetBrains Mono",monospace';c.fillStyle=GREEN;c.fillText('Passing (correct)',210,260);
+    c.font='500 26px "JetBrains Mono",monospace';c.fillStyle=GREEN;
+    c.fillText('onClick={handleClick}',160,340);
+    c.font='400 22px "JetBrains Mono",monospace';c.fillStyle='#94a3b8';
+    c.fillText('Passes the function reference',160,400);
+    c.fillText('Called when user clicks',160,440);
+    c.restore();
+  }
+
+  // Wrong
+  const wp=ease.spring(seg(t,s+1.0,s+2.0));
+  if(wp>0){
+    c.save();c.globalAlpha=wp;
+    c.fillStyle='rgba(239,68,68,0.06)';roundRect(c,1000,200,820,300,16);c.fill();
+    c.strokeStyle=RED+'66';c.lineWidth=3;c.stroke();
+    c.font='48px serif';c.textAlign='left';c.textBaseline='middle';c.fillText('❌',1040,260);
+    c.font='600 30px "JetBrains Mono",monospace';c.fillStyle=RED;c.fillText('Calling (wrong)',1110,260);
+    c.font='500 26px "JetBrains Mono",monospace';c.fillStyle=RED;
+    c.fillText('onClick={handleClick()}',1060,340);
+    c.font='400 22px "JetBrains Mono",monospace';c.fillStyle='#94a3b8';
+    c.fillText('Calls immediately during render!',1060,400);
+    c.fillText('Fires on every re-render',1060,440);
+    c.restore();
+  }
+
+  // Big warning
+  const wa=ease.out(seg(t,48.9,50));
+  if(wa>0){c.save();c.globalAlpha=wa;c.fillStyle='rgba(239,68,68,0.08)';roundRect(c,200,560,1520,120,12);c.fill();c.strokeStyle=RED+'66';c.lineWidth=2;c.stroke();c.font='bold 32px "JetBrains Mono",monospace';c.fillStyle=RED;c.textAlign='center';c.textBaseline='middle';c.fillText('No parentheses! handleClick not handleClick()',CX,620);c.restore();}
+}
+
+// S4: Props + Propagation (56–120s)
+function drawScene4(c,t){
+  const s=56.38;
+  c.fillStyle=BG;c.fillRect(0,0,W,H);drawGrid(c);
+  c.save();c.globalAlpha=ease.out(seg(t,s,s+0.4));c.font='600 42px "JetBrains Mono",monospace';c.fillStyle=PURPLE;c.textAlign='center';c.textBaseline='middle';c.fillText('Handlers as Props + Event Propagation',CX,100);c.restore();
+
+  const items=[
+    {icon:'📤',code:'<Button onClick={handlePlay}>',desc:'Parent passes handler as prop — child attaches to real element',color:GREEN,delay:0},
+    {icon:'📛',code:'on + EventName for props',desc:'onPlay, onClick, onSubmit (prop) → handlePlay, handleClick (function)',color:ORANGE,delay:0.5},
+    {icon:'🫧',code:'Events bubble upward',desc:'Click on button → fires button onClick → then parent div onClick',color:REACT,delay:1.0},
+    {icon:'🛑',code:'e.stopPropagation()',desc:'Stop the event from reaching parent handlers',color:RED,delay:1.5},
+    {icon:'🚫',code:'e.preventDefault()',desc:'Stop browser defaults: form submit refresh, link navigation',color:YELLOW,delay:2.0},
+  ];
+  items.forEach((item,i)=>{
+    const ip=ease.spring(seg(t,s+0.5+item.delay,s+1.3+item.delay));
+    if(ip<=0)return;
+    const iy=180+i*150;
+    c.save();c.globalAlpha=ip;c.translate(0,(1-ip)*20);
+    c.fillStyle='rgba(97,218,251,0.04)';roundRect(c,150,iy,1620,120,12);c.fill();
+    c.strokeStyle=item.color+'55';c.lineWidth=2;c.stroke();
+    c.fillStyle=item.color;roundRect(c,150,iy,5,120,2);c.fill();
+    c.font='40px serif';c.textAlign='left';c.textBaseline='middle';c.fillText(item.icon,180,iy+35);
+    c.font='bold 26px "JetBrains Mono",monospace';c.fillStyle=item.color;c.fillText(item.code,240,iy+30);
+    c.font='400 20px "JetBrains Mono",monospace';c.fillStyle='#94a3b8';c.fillText(item.desc,240,iy+80);
+    c.restore();
+  });
+}
+
+// S5: Recap (120–143s)
+function drawScene5(c,t){
+  const s=120.36;
+  c.fillStyle=BG;c.fillRect(0,0,W,H);
+  const bg=c.createRadialGradient(CX,CY,50,CX,CY,700);bg.addColorStop(0,'rgba(97,218,251,0.08)');bg.addColorStop(1,'transparent');c.fillStyle=bg;c.fillRect(0,0,W,H);drawGrid(c);
+  drawReactLogo(c,CX,CY-280,60,ease.out(seg(t,s,s+0.6)),t);
+  c.save();c.globalAlpha=ease.out(seg(t,s,s+0.5));c.font='600 38px "JetBrains Mono",monospace';c.fillStyle=TEXT;c.textAlign='center';c.textBaseline='middle';c.fillText("Here's what you learned",CX,CY-170);c.restore();
+
+  const recap=[
+    {icon:'👆',text:'Event handlers: functions passed to onClick, onChange, onSubmit',color:ORANGE,delay:0.4},
+    {icon:'⚠️',text:'Pass functions — never call them (no parentheses!)',color:RED,delay:0.8},
+    {icon:'📤',text:'Handlers can be passed as props for reusable components',color:GREEN,delay:1.2},
+    {icon:'🫧',text:'Events bubble up — use e.stopPropagation() to stop',color:REACT,delay:1.6},
+    {icon:'🚫',text:'e.preventDefault() stops browser default behavior',color:YELLOW,delay:2.0},
+  ];
+  recap.forEach((item,i)=>{
+    const rp=ease.spring(seg(t,s+item.delay,s+item.delay+0.5));if(rp<=0)return;
+    const ry=CY-60+i*90;
+    c.save();c.globalAlpha=rp;c.translate(0,(1-rp)*20);
+    c.font='36px serif';c.textAlign='left';c.textBaseline='middle';c.fillText(item.icon,CX-650,ry);
+    c.font='500 24px "JetBrains Mono",monospace';c.fillStyle=item.color;c.fillText(item.text,CX-590,ry);c.restore();
+  });
+  const na=ease.out(seg(t,s+3,s+3.8));
+  if(na>0){c.save();c.globalAlpha=na;c.font='bold 48px "JetBrains Mono",monospace';c.fillStyle=REACT;c.textAlign='center';c.textBaseline='middle';c.shadowColor=REACT;c.shadowBlur=20;c.fillText('Next up: Conditional Rendering  →',CX,CY+380);c.shadowBlur=0;c.restore();}
+}
+
+// S6: Outro
+function drawScene6(c,t){
+  const s=143.5;c.fillStyle=BG;c.fillRect(0,0,W,H);
+  const g=c.createRadialGradient(CX,CY,50,CX,CY,600);g.addColorStop(0,'rgba(97,218,251,0.15)');g.addColorStop(1,'transparent');c.fillStyle=g;c.fillRect(0,0,W,H);
+  const a=ease.out(seg(t,s,s+0.5));drawReactLogo(c,CX,CY-120,90,a,t);
+  c.save();c.globalAlpha=a;c.font='bold 100px "JetBrains Mono",monospace';c.textAlign='center';c.textBaseline='middle';c.shadowColor=REACT;c.shadowBlur=30;c.fillStyle=TEXT;c.fillText('Run the Docs',CX,CY+40);c.shadowBlur=0;c.font='400 34px "JetBrains Mono",monospace';c.fillStyle='#64748b';c.fillText('Technical docs. Made watchable.',CX,CY+115);c.font='500 24px "JetBrains Mono",monospace';c.fillStyle=REACT;c.fillText('react  ·  ep 7  ·  events',CX,CY+175);c.restore();
+}
+
+const ST=[0,8.5,39.86,56.38,120.36,143.5];
+const SF=[drawScene1,drawScene2,drawScene3,drawScene4,drawScene5,drawScene6];
+window.renderFrame=function(fi){
+  const t=fi/30,c=document.getElementById('c').getContext('2d');c.clearRect(0,0,W,H);
+  let si=0;for(let i=1;i<ST.length;i++){if(t>=ST[i])si=i;else break;}
+  SF[si](c,t);
+  for(let i=1;i<ST.length;i++){const xf=ST[i];if(t>=xf&&t<xf+0.4){const ov=seg(t,xf,xf+0.4);c.globalAlpha=ov;c.fillStyle=BG;c.fillRect(0,0,W,H);c.globalAlpha=1;SF[i](c,t);break;}}
+  drawCaption(c,t);
+  if(t>TOTAL_DURATION-1.5){c.globalAlpha=seg(t,TOTAL_DURATION-1,TOTAL_DURATION);c.fillStyle='#000';c.fillRect(0,0,W,H);c.globalAlpha=1;}
+};
+window.setTiming=function(s,d){TIMING=s;TOTAL_DURATION=d;};
+</script>
+</body>
+</html>

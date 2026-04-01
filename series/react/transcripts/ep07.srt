@@ -1,0 +1,75 @@
+1
+00:00:02,000 --> 00:00:08,548
+React lets you respond to user interactions: clicks, hovers, form inputs. That's event handling.
+
+2
+00:00:08,929 --> 00:00:16,012
+Three steps. Define a function inside your component. Add your logic. Pass it to the JSX element.
+
+3
+00:00:16,391 --> 00:00:24,135
+onClick equals open brace, handleClick, close brace. That tells React: call this function when the button is clicked.
+
+4
+00:00:24,515 --> 00:00:32,088
+By convention, name handlers as handle plus the event name. handleClick, handleMouseEnter, handleSubmit.
+
+5
+00:00:32,469 --> 00:00:39,487
+You can also define handlers inline. onClick equals arrow function, alert, hello. Works the same.
+
+6
+00:00:39,868 --> 00:00:48,487
+Critical mistake: don't call the function. onClick equals handleClick — correct. onClick equals handleClick parentheses — wrong.
+
+7
+00:00:48,866 --> 00:00:56,034
+With parentheses, the function fires immediately during render, not on click. Pass the function, don't call it.
+
+8
+00:00:56,414 --> 00:01:03,902
+Event handlers have access to the component's props. They're defined inside the component, so they can read everything.
+
+9
+00:01:04,283 --> 00:01:13,051
+You can pass event handlers as props too. Parent passes onClick to a Button component. The Button attaches it to the real button.
+
+10
+00:01:13,430 --> 00:01:21,451
+This is how design systems work. A generic Button component handles styling. The parent decides what happens on click.
+
+11
+00:01:21,831 --> 00:01:28,956
+Name your handler props starting with on. onPlay, onClick, onSubmit. The handler function starts with handle.
+
+12
+00:01:29,337 --> 00:01:37,081
+Events propagate up the tree. A click on a button inside a div triggers both the button's and the div's onClick.
+
+13
+00:01:37,460 --> 00:01:42,944
+This is called bubbling. The event fires on the target, then moves up to each parent.
+
+14
+00:01:43,323 --> 00:01:51,239
+To stop propagation, call e dot stopPropagation in your handler. The event object e is the first argument.
+
+15
+00:01:51,618 --> 00:01:59,980
+There's also e dot preventDefault. Use it to stop the browser's default action, like a form submission refreshing the page.
+
+16
+00:02:00,361 --> 00:02:07,870
+Let's recap. Event handlers are functions you pass to JSX elements: onClick, onChange, onSubmit.
+
+17
+00:02:08,251 --> 00:02:12,645
+Pass functions, don't call them. No parentheses after the name.
+
+18
+00:02:13,025 --> 00:02:20,534
+Events propagate upward. Use stopPropagation to stop bubbling, preventDefault to stop browser defaults.
+
+19
+00:02:20,914 --> 00:02:23,091
+Next up: conditional rendering.
