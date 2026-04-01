@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#0d0d1a;width:1920px;height:1080px;overflow:hidden;}canvas{display:block;}</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+const W=1920,H=1080,CX=960,CY=540;
+const BG='#0d0d1a',REACT='#61dafb',TEXT='#f8fafc',CODE_BG='#0d1117';
+const GREEN='#22c55e',YELLOW='#eab308',RED='#ef4444',PURPLE='#a78bfa',ORANGE='#f97316';
+let TIMING=[{"index": 0, "text": "React components communicate through props. Parents pass data down to children \u2014 that's the flow.", "start": 2.0, "end": 8.336}, {"index": 1, "text": "You already know props. Every HTML attribute is a prop: className, src, alt, width, height.", "start": 8.716, "end": 16.225}, {"index": 2, "text": "But your custom components can accept any props you define. That's what makes them configurable.", "start": 16.605, "end": 22.643}, {"index": 3, "text": "Passing props happens in two steps. Step one: pass them from the parent. Step two: read them in the child.", "start": 23.023, "end": 30.105}, {"index": 4, "text": "In the parent: Avatar, person equals open brace, the object, close brace, size equals open brace, 100, close brace.", "start": 30.485, "end": 39.424}, {"index": 5, "text": "In the child: function Avatar, open paren, open brace, person comma size, close brace, close paren.", "start": 39.804, "end": 47.441}, {"index": 6, "text": "That's destructuring. You're unpacking the props object into named variables.", "start": 47.821, "end": 52.664}, {"index": 7, "text": "You can also write it as function Avatar props, then use props dot person and props dot size. Same result.", "start": 53.044, "end": 60.703}, {"index": 8, "text": "Props are like function arguments. React components are functions, and props are the single argument they receive.", "start": 61.083, "end": 68.357}, {"index": 9, "text": "Default values are easy. size equals 100 in the destructuring means: if no size prop is passed, use 100.", "start": 68.737, "end": 77.377}, {"index": 10, "text": "One catch: null and zero are not missing. Default values only kick in for undefined or absent props.", "start": 77.757, "end": 85.16}, {"index": 11, "text": "Sometimes you forward all props from parent to child. The spread syntax does that: Avatar, dot dot dot props.", "start": 85.54, "end": 93.391}, {"index": 12, "text": "But use spread sparingly. If you use it everywhere, your components are probably too tangled.", "start": 93.771, "end": 99.381}, {"index": 13, "text": "Now the powerful one: children. When you nest JSX inside a component, it arrives as a prop called children.", "start": 99.761, "end": 107.356}, {"index": 14, "text": "Card, open angle bracket, Avatar, close. Card receives Avatar as its children prop.", "start": 107.736, "end": 114.157}, {"index": 15, "text": "The Card component renders open brace children close brace inside a wrapper div. It doesn't need to know what's inside.", "start": 114.537, "end": 122.431}, {"index": 16, "text": "Think of children as a slot. The parent fills it, the child renders it. Panels, grids, layouts \u2014 all use this pattern.", "start": 122.811, "end": 130.619}, {"index": 17, "text": "Props are read-only. A component never modifies its own props. It reads them and renders accordingly.", "start": 130.999, "end": 138.167}, {"index": 18, "text": "If something needs to change over time, that's state \u2014 the next topic.", "start": 138.547, "end": 143.048}, {"index": 19, "text": "Let's recap. Props flow from parent to child \u2014 one direction only.", "start": 143.428, "end": 148.121}, {"index": 20, "text": "Destructure them in the function signature. Set defaults with equals.", "start": 148.501, "end": 153.216}, {"index": 21, "text": "Use children for flexible wrappers. Never mutate props.", "start": 153.596, "end": 157.457}, {"index": 22, "text": "Next up: state \u2014 a component's memory.", "start": 157.837, "end": 160.781}];let TOTAL_DURATION=165.161;
+const ease={out:t=>1-Math.pow(1-t,3),spring:t=>{const c=(2*Math.PI)/2.5;return t===0?0:t===1?1:Math.pow(2,-10*t)*Math.sin((t*10-0.75)*c)+1;}};
+function seg(t,s,e){return Math.max(0,Math.min(1,(t-s)/(e-s)));}
+function roundRect(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.quadraticCurveTo(x+w,y,x+w,y+r);c.lineTo(x+w,y+h-r);c.quadraticCurveTo(x+w,y+h,x+w-r,y+h);c.lineTo(x+r,y+h);c.quadraticCurveTo(x,y+h,x,y+h-r);c.lineTo(x,y+r);c.quadraticCurveTo(x,y,x+r,y);c.closePath();}
+function drawGrid(c){c.strokeStyle='rgba(97,218,251,0.03)';c.lineWidth=1;for(let x=0;x<W;x+=80){c.beginPath();c.moveTo(x,0);c.lineTo(x,H);c.stroke();}for(let y=0;y<H;y+=80){c.beginPath();c.moveTo(0,y);c.lineTo(W,y);c.stroke();}}
+function drawReactLogo(c,cx,cy,r,a,t){if(a<=0)return;c.save();c.globalAlpha=a;c.strokeStyle=REACT;c.lineWidth=r*0.06;c.shadowColor=REACT;c.shadowBlur=18*a;for(let i=0;i<3;i++){c.save();c.translate(cx,cy);c.rotate(i*Math.PI/3+t*0.4);c.beginPath();c.ellipse(0,0,r,r*0.38,0,0,Math.PI*2);c.stroke();c.restore();}c.fillStyle=REACT;c.shadowBlur=0;c.beginPath();c.arc(cx,cy,r*0.18,0,Math.PI*2);c.fill();c.restore();}
+function drawCaption(c,t){let txt='';for(const s of TIMING){if(t>=s.start-0.1&&t<=s.end+0.3){txt=s.text;break;}}if(!txt)return;c.save();c.font='500 20px "JetBrains Mono",monospace';const tw=c.measureText(txt).width,pw=Math.min(tw+48,W-100);c.globalAlpha=0.9;c.fillStyle='rgba(0,0,0,0.85)';roundRect(c,CX-pw/2,968,pw,44,22);c.fill();c.globalAlpha=1;c.fillStyle=TEXT;c.textAlign='center';c.textBaseline='middle';let d=txt;while(c.measureText(d).width>pw-48&&d.length>10)d=d.slice(0,-1);if(d!==txt)d+='…';c.fillText(d,CX,990);c.restore();}
+function drawFileBox(c,x,y,w,h,name,color,a){c.save();c.globalAlpha=a;c.fillStyle=CODE_BG;roundRect(c,x,y,w,h,12);c.fill();c.strokeStyle=color+'88';c.lineWidth=2;c.stroke();c.fillStyle=color+'33';roundRect(c,x,y-30,Math.min(200,name.length*14),30,6);c.fill();c.font='500 16px "JetBrains Mono",monospace';c.fillStyle=color;c.textAlign='left';c.textBaseline='middle';c.fillText(name,x+12,y-15);c.restore();}
+
+// S1: Hook
+function drawScene1(c,t){
+  c.fillStyle=BG;c.fillRect(0,0,W,H);drawGrid(c);
+  const lp=ease.spring(seg(t,2,3));drawReactLogo(c,CX,CY-110,130*lp,lp,t);
+  const ta=ease.out(seg(t,2.5,3.5));
+  if(ta>0){c.save();c.globalAlpha=ta;c.font='bold 110px "JetBrains Mono",monospace';c.fillStyle=GREEN;c.textAlign='center';c.textBaseline='middle';c.shadowColor=GREEN;c.shadowBlur=20;c.fillText('Props',CX,CY+80);c.shadowBlur=0;c.restore();}
+  const sa=ease.out(seg(t,3.3,4.1));
+  if(sa>0){c.save();c.globalAlpha=sa;c.font='500 48px "JetBrains Mono",monospace';c.fillStyle=TEXT;c.textAlign='center';c.textBaseline='middle';c.fillText('Passing Data to Components',CX,CY+210);c.restore();}
+  const ma=ease.out(seg(t,4.1,5));
+  if(ma>0){c.save();c.globalAlpha=ma;c.font='400 28px "JetBrains Mono",monospace';c.fillStyle='#64748b';c.textAlign='center';c.textBaseline='middle';c.fillText('react.dev/learn  ·  Episode 5',CX,CY+270);c.restore();}
+}
+
+// S2: Two Steps (8–47s)
+function drawScene2(c,t){
+  const s=8.68;
+  c.fillStyle=BG;c.fillRect(0,0,W,H);drawGrid(c);
+  c.save();c.globalAlpha=ease.out(seg(t,s,s+0.4));c.font='600 42px "JetBrains Mono",monospace';c.fillStyle=GREEN;c.textAlign='center';c.textBaseline='middle';c.fillText('Two Steps: Pass & Read',CX,100);c.restore();
+
+  // Parent code
+  const pp=ease.out(seg(t,23,24));
+  if(pp>0){
+    drawFileBox(c,100,170,800,350,'Step 1: Parent passes',REACT,pp);
+    c.save();c.globalAlpha=pp;c.font='500 24px "JetBrains Mono",monospace';c.textAlign='left';c.textBaseline='top';
+    c.fillStyle='#c3e88d';c.fillText('<Avatar',130,200);
+    c.fillStyle=GREEN;c.fillText('  person={{ name: "Lin" }}',130,236);
+    c.fillText('  size={100}',130,272);
+    c.fillStyle='#c3e88d';c.fillText('/>',130,308);
+    c.font='400 20px "JetBrains Mono",monospace';c.fillStyle='#64748b';
+    c.fillText('Props look like HTML attributes',130,370);
+    c.fillText('but can be any JavaScript value',130,400);
+    c.restore();
+  }
+
+  // Child code
+  const cp=ease.spring(seg(t,39.8,41));
+  if(cp>0){
+    drawFileBox(c,1020,170,800,350,'Step 2: Child reads',YELLOW,cp);
+    c.save();c.globalAlpha=cp;c.font='500 24px "JetBrains Mono",monospace';c.textAlign='left';c.textBaseline='top';
+    c.fillStyle='#c792ea';c.fillText('function Avatar(',1050,200);
+    c.fillStyle=YELLOW;c.fillText('  { person, size }',1050,236);
+    c.fillStyle='#c792ea';c.fillText(') {',1050,272);
+    c.fillStyle=TEXT;c.fillText('  return <img',1050,308);
+    c.fillStyle=GREEN;c.fillText('    src={getUrl(person)}',1050,344);
+    c.fillStyle=GREEN;c.fillText('    width={size}',1050,380);
+    c.fillStyle=TEXT;c.fillText('  />;',1050,416);
+    c.fillStyle='#c792ea';c.fillText('}',1050,452);
+    c.restore();
+  }
+
+  // Arrow
+  const arrowA=ease.out(seg(t,41,42));
+  if(arrowA>0){c.save();c.globalAlpha=arrowA;c.strokeStyle=GREEN;c.lineWidth=3;c.beginPath();c.moveTo(900,350);c.lineTo(1020,350);c.stroke();c.fillStyle=GREEN;c.beginPath();c.moveTo(1020,350);c.lineTo(1008,344);c.lineTo(1008,356);c.closePath();c.fill();c.font='500 20px "JetBrains Mono",monospace';c.fillStyle=GREEN;c.textAlign='center';c.textBaseline='bottom';c.fillText('props flow →',960,340);c.restore();}
+
+  // Destructuring note
+  const dnA=ease.out(seg(t,47.8,48.8));
+  if(dnA>0){c.save();c.globalAlpha=dnA;c.fillStyle='rgba(234,179,8,0.06)';roundRect(c,200,560,1520,120,12);c.fill();c.strokeStyle=YELLOW+'44';c.lineWidth=2;c.stroke();c.font='500 28px "JetBrains Mono",monospace';c.fillStyle=YELLOW;c.textAlign='center';c.textBaseline='middle';c.fillText('{ person, size } = destructuring the props object',CX,600);c.font='400 22px "JetBrains Mono",monospace';c.fillStyle='#64748b';c.fillText('Same as: const person = props.person; const size = props.size;',CX,640);c.restore();}
+}
+
+// S3: Defaults & Spread (61–99s)
+function drawScene3(c,t){
+  const s=61.09;
+  c.fillStyle=BG;c.fillRect(0,0,W,H);drawGrid(c);
+  c.save();c.globalAlpha=ease.out(seg(t,s,s+0.4));c.font='600 42px "JetBrains Mono",monospace';c.fillStyle=ORANGE;c.textAlign='center';c.textBaseline='middle';c.fillText('Defaults, Spread & Arguments',CX,100);c.restore();
+
+  const items=[
+    {icon:'🎯',code:'{ size = 100 }',desc:'Default value — used when prop is undefined or absent',color:GREEN,delay:0},
+    {icon:'⚠️',code:'null and 0 ≠ missing',desc:'Default does NOT apply for null or zero — only undefined',color:RED,delay:0.5},
+    {icon:'📦',code:'<Avatar {...props} />',desc:'Spread: forward all props to child. Use sparingly!',color:PURPLE,delay:1.0},
+    {icon:'🔧',code:'function Avatar(props)',desc:'Props = the single argument. Components are just functions.',color:REACT,delay:1.5},
+  ];
+  items.forEach((item,i)=>{
+    const ip=ease.spring(seg(t,s+0.5+item.delay,s+1.3+item.delay));
+    if(ip<=0)return;
+    const iy=200+i*180;
+    c.save();c.globalAlpha=ip;c.translate(0,(1-ip)*20);
+    c.fillStyle='rgba(97,218,251,0.04)';roundRect(c,200,iy,1520,140,12);c.fill();
+    c.strokeStyle=item.color+'55';c.lineWidth=2;c.stroke();
+    c.fillStyle=item.color;roundRect(c,200,iy,5,140,2);c.fill();
+    c.font='48px serif';c.textAlign='left';c.textBaseline='middle';c.fillText(item.icon,230,iy+45);
+    c.font='bold 30px "JetBrains Mono",monospace';c.fillStyle=item.color;c.fillText(item.code,310,iy+40);
+    c.font='400 22px "JetBrains Mono",monospace';c.fillStyle='#94a3b8';c.fillText(item.desc,310,iy+95);
+    c.restore();
+  });
+}
+
+// S4: Children (99–138s)
+function drawScene4(c,t){
+  const s=99.77;
+  c.fillStyle=BG;c.fillRect(0,0,W,H);drawGrid(c);
+  c.save();c.globalAlpha=ease.out(seg(t,s,s+0.4));c.font='600 42px "JetBrains Mono",monospace';c.fillStyle=PURPLE;c.textAlign='center';c.textBaseline='middle';c.fillText('The children Prop',CX,100);c.restore();
+
+  // Parent usage
+  const pp=ease.out(seg(t,s+0.5,s+1.5));
+  if(pp>0){
+    drawFileBox(c,100,170,800,260,'Parent: uses <Card>',REACT,pp);
+    c.save();c.globalAlpha=pp;c.font='500 26px "JetBrains Mono",monospace';c.textAlign='left';c.textBaseline='top';
+    c.fillStyle=REACT;c.fillText('<Card>',130,200);
+    c.fillStyle=PURPLE;c.fillText('  <Avatar size={100} />',130,240);
+    c.fillStyle=REACT;c.fillText('</Card>',130,280);
+    c.font='400 20px "JetBrains Mono",monospace';c.fillStyle='#64748b';
+    c.fillText('Whatever is nested → becomes children',130,340);
+    c.restore();
+  }
+
+  // Child definition
+  const cp=ease.spring(seg(t,114.5,116));
+  if(cp>0){
+    drawFileBox(c,1020,170,800,260,'Card: receives children',PURPLE,cp);
+    c.save();c.globalAlpha=cp;c.font='500 26px "JetBrains Mono",monospace';c.textAlign='left';c.textBaseline='top';
+    c.fillStyle='#c792ea';c.fillText('function Card({ children }) {',1050,200);
+    c.fillStyle=TEXT;c.fillText('  return (',1050,240);
+    c.fillStyle='#89ddff';c.fillText('    <div className="card">',1050,280);
+    c.fillStyle=PURPLE;c.fillText('      {children}',1050,320);
+    c.fillStyle='#89ddff';c.fillText('    </div>',1050,360);
+    c.fillStyle=TEXT;c.fillText('  );',1050,400);
+    c.fillStyle='#c792ea';c.fillText('}',1050,440);
+    c.restore();
+  }
+
+  // Slot visual
+  const slotA=ease.spring(seg(t,122.8,124));
+  if(slotA>0){
+    c.save();c.globalAlpha=slotA;
+    c.fillStyle='rgba(168,85,247,0.08)';roundRect(c,300,520,1320,280,16);c.fill();
+    c.strokeStyle=PURPLE+'66';c.lineWidth=3;c.stroke();
+    c.font='600 28px "JetBrains Mono",monospace';c.fillStyle=PURPLE;c.textAlign='center';c.textBaseline='middle';
+    c.fillText('🧩  children = a "slot" the parent fills',CX,580);
+    c.font='400 24px "JetBrains Mono",monospace';c.fillStyle='#94a3b8';
+    c.fillText('Panels, grids, modals, layouts — all use this pattern',CX,640);
+    c.fillText('The child doesn\'t need to know what\'s inside',CX,680);
+    c.restore();
+  }
+
+  // Read-only note
+  const roA=ease.out(seg(t,131,132));
+  if(roA>0){c.save();c.globalAlpha=roA;c.fillStyle='rgba(239,68,68,0.06)';roundRect(c,300,830,1320,80,12);c.fill();c.strokeStyle=RED+'44';c.lineWidth=2;c.stroke();c.font='500 26px "JetBrains Mono",monospace';c.fillStyle=RED;c.textAlign='center';c.textBaseline='middle';c.fillText('⚠️  Props are read-only. Never modify them. Need changes? Use state.',CX,870);c.restore();}
+}
+
+// S5: Recap (143–161s)
+function drawScene5(c,t){
+  const s=143.36;
+  c.fillStyle=BG;c.fillRect(0,0,W,H);
+  const bg=c.createRadialGradient(CX,CY,50,CX,CY,700);bg.addColorStop(0,'rgba(97,218,251,0.08)');bg.addColorStop(1,'transparent');c.fillStyle=bg;c.fillRect(0,0,W,H);drawGrid(c);
+  drawReactLogo(c,CX,CY-280,60,ease.out(seg(t,s,s+0.6)),t);
+  c.save();c.globalAlpha=ease.out(seg(t,s,s+0.5));c.font='600 38px "JetBrains Mono",monospace';c.fillStyle=TEXT;c.textAlign='center';c.textBaseline='middle';c.fillText("Here's what you learned",CX,CY-170);c.restore();
+
+  const recap=[
+    {icon:'⬇️',text:'Props flow parent → child, one direction only',color:GREEN,delay:0.4},
+    {icon:'📦',text:'Destructure: { person, size } in function signature',color:YELLOW,delay:0.8},
+    {icon:'🎯',text:'Defaults: { size = 100 } for missing/undefined props',color:ORANGE,delay:1.2},
+    {icon:'🧩',text:'children: nest JSX inside a component = slot pattern',color:PURPLE,delay:1.6},
+    {icon:'🔒',text:'Props are read-only. For changes, use state.',color:RED,delay:2.0},
+  ];
+  recap.forEach((item,i)=>{
+    const rp=ease.spring(seg(t,s+item.delay,s+item.delay+0.5));if(rp<=0)return;
+    const ry=CY-60+i*90;
+    c.save();c.globalAlpha=rp;c.translate(0,(1-rp)*20);
+    c.font='36px serif';c.textAlign='left';c.textBaseline='middle';c.fillText(item.icon,CX-650,ry);
+    c.font='500 24px "JetBrains Mono",monospace';c.fillStyle=item.color;c.fillText(item.text,CX-590,ry);c.restore();
+  });
+  const na=ease.out(seg(t,s+3,s+3.8));
+  if(na>0){c.save();c.globalAlpha=na;c.font='bold 48px "JetBrains Mono",monospace';c.fillStyle=REACT;c.textAlign='center';c.textBaseline='middle';c.shadowColor=REACT;c.shadowBlur=20;c.fillText("Next up: State — A Component's Memory  →",CX,CY+380);c.shadowBlur=0;c.restore();}
+}
+
+// S6: Outro
+function drawScene6(c,t){
+  const s=161;c.fillStyle=BG;c.fillRect(0,0,W,H);
+  const g=c.createRadialGradient(CX,CY,50,CX,CY,600);g.addColorStop(0,'rgba(97,218,251,0.15)');g.addColorStop(1,'transparent');c.fillStyle=g;c.fillRect(0,0,W,H);
+  const a=ease.out(seg(t,s,s+0.5));drawReactLogo(c,CX,CY-120,90,a,t);
+  c.save();c.globalAlpha=a;c.font='bold 100px "JetBrains Mono",monospace';c.textAlign='center';c.textBaseline='middle';c.shadowColor=REACT;c.shadowBlur=30;c.fillStyle=TEXT;c.fillText('Run the Docs',CX,CY+40);c.shadowBlur=0;c.font='400 34px "JetBrains Mono",monospace';c.fillStyle='#64748b';c.fillText('Technical docs. Made watchable.',CX,CY+115);c.font='500 24px "JetBrains Mono",monospace';c.fillStyle=REACT;c.fillText('react  ·  ep 5  ·  props',CX,CY+175);c.restore();
+}
+
+const ST=[0,8.68,61.09,99.77,143.36,161];
+const SF=[drawScene1,drawScene2,drawScene3,drawScene4,drawScene5,drawScene6];
+window.renderFrame=function(fi){
+  const t=fi/30,c=document.getElementById('c').getContext('2d');c.clearRect(0,0,W,H);
+  let si=0;for(let i=1;i<ST.length;i++){if(t>=ST[i])si=i;else break;}
+  SF[si](c,t);
+  for(let i=1;i<ST.length;i++){const xf=ST[i];if(t>=xf&&t<xf+0.4){const ov=seg(t,xf,xf+0.4);c.globalAlpha=ov;c.fillStyle=BG;c.fillRect(0,0,W,H);c.globalAlpha=1;SF[i](c,t);break;}}
+  drawCaption(c,t);
+  if(t>TOTAL_DURATION-1.5){c.globalAlpha=seg(t,TOTAL_DURATION-1,TOTAL_DURATION);c.fillStyle='#000';c.fillRect(0,0,W,H);c.globalAlpha=1;}
+};
+window.setTiming=function(s,d){TIMING=s;TOTAL_DURATION=d;};
+</script>
+</body>
+</html>

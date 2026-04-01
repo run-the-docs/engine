@@ -1,0 +1,169 @@
+{
+  "total_voice_duration": 160.781,
+  "total_duration": 165.161,
+  "total_frames_30fps": 4954,
+  "sample_rate": 24000,
+  "segments": [
+    {
+      "index": 0,
+      "text": "React components communicate through props. Parents pass data down to children \u2014 that's the flow.",
+      "start": 2.0,
+      "end": 8.336,
+      "duration": 6.336
+    },
+    {
+      "index": 1,
+      "text": "You already know props. Every HTML attribute is a prop: className, src, alt, width, height.",
+      "start": 8.716,
+      "end": 16.225,
+      "duration": 7.509
+    },
+    {
+      "index": 2,
+      "text": "But your custom components can accept any props you define. That's what makes them configurable.",
+      "start": 16.605,
+      "end": 22.643,
+      "duration": 6.037
+    },
+    {
+      "index": 3,
+      "text": "Passing props happens in two steps. Step one: pass them from the parent. Step two: read them in the child.",
+      "start": 23.023,
+      "end": 30.105,
+      "duration": 7.083
+    },
+    {
+      "index": 4,
+      "text": "In the parent: Avatar, person equals open brace, the object, close brace, size equals open brace, 100, close brace.",
+      "start": 30.485,
+      "end": 39.424,
+      "duration": 8.939
+    },
+    {
+      "index": 5,
+      "text": "In the child: function Avatar, open paren, open brace, person comma size, close brace, close paren.",
+      "start": 39.804,
+      "end": 47.441,
+      "duration": 7.637
+    },
+    {
+      "index": 6,
+      "text": "That's destructuring. You're unpacking the props object into named variables.",
+      "start": 47.821,
+      "end": 52.664,
+      "duration": 4.843
+    },
+    {
+      "index": 7,
+      "text": "You can also write it as function Avatar props, then use props dot person and props dot size. Same result.",
+      "start": 53.044,
+      "end": 60.703,
+      "duration": 7.659
+    },
+    {
+      "index": 8,
+      "text": "Props are like function arguments. React components are functions, and props are the single argument they receive.",
+      "start": 61.083,
+      "end": 68.357,
+      "duration": 7.275
+    },
+    {
+      "index": 9,
+      "text": "Default values are easy. size equals 100 in the destructuring means: if no size prop is passed, use 100.",
+      "start": 68.737,
+      "end": 77.377,
+      "duration": 8.64
+    },
+    {
+      "index": 10,
+      "text": "One catch: null and zero are not missing. Default values only kick in for undefined or absent props.",
+      "start": 77.757,
+      "end": 85.16,
+      "duration": 7.403
+    },
+    {
+      "index": 11,
+      "text": "Sometimes you forward all props from parent to child. The spread syntax does that: Avatar, dot dot dot props.",
+      "start": 85.54,
+      "end": 93.391,
+      "duration": 7.851
+    },
+    {
+      "index": 12,
+      "text": "But use spread sparingly. If you use it everywhere, your components are probably too tangled.",
+      "start": 93.771,
+      "end": 99.381,
+      "duration": 5.611
+    },
+    {
+      "index": 13,
+      "text": "Now the powerful one: children. When you nest JSX inside a component, it arrives as a prop called children.",
+      "start": 99.761,
+      "end": 107.356,
+      "duration": 7.595
+    },
+    {
+      "index": 14,
+      "text": "Card, open angle bracket, Avatar, close. Card receives Avatar as its children prop.",
+      "start": 107.736,
+      "end": 114.157,
+      "duration": 6.421
+    },
+    {
+      "index": 15,
+      "text": "The Card component renders open brace children close brace inside a wrapper div. It doesn't need to know what's inside.",
+      "start": 114.537,
+      "end": 122.431,
+      "duration": 7.893
+    },
+    {
+      "index": 16,
+      "text": "Think of children as a slot. The parent fills it, the child renders it. Panels, grids, layouts \u2014 all use this pattern.",
+      "start": 122.811,
+      "end": 130.619,
+      "duration": 7.808
+    },
+    {
+      "index": 17,
+      "text": "Props are read-only. A component never modifies its own props. It reads them and renders accordingly.",
+      "start": 130.999,
+      "end": 138.167,
+      "duration": 7.168
+    },
+    {
+      "index": 18,
+      "text": "If something needs to change over time, that's state \u2014 the next topic.",
+      "start": 138.547,
+      "end": 143.048,
+      "duration": 4.501
+    },
+    {
+      "index": 19,
+      "text": "Let's recap. Props flow from parent to child \u2014 one direction only.",
+      "start": 143.428,
+      "end": 148.121,
+      "duration": 4.693
+    },
+    {
+      "index": 20,
+      "text": "Destructure them in the function signature. Set defaults with equals.",
+      "start": 148.501,
+      "end": 153.216,
+      "duration": 4.715
+    },
+    {
+      "index": 21,
+      "text": "Use children for flexible wrappers. Never mutate props.",
+      "start": 153.596,
+      "end": 157.457,
+      "duration": 3.861
+    },
+    {
+      "index": 22,
+      "text": "Next up: state \u2014 a component's memory.",
+      "start": 157.837,
+      "end": 160.781,
+      "duration": 2.944
+    }
+  ]
+}
