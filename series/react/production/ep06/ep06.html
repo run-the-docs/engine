@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#0d0d1a;width:1920px;height:1080px;overflow:hidden;}canvas{display:block;}</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+const W=1920,H=1080,CX=960,CY=540;
+const BG='#0d0d1a',REACT='#61dafb',TEXT='#f8fafc',CODE_BG='#0d1117';
+const GREEN='#22c55e',YELLOW='#eab308',RED='#ef4444',PURPLE='#a78bfa',ORANGE='#f97316';
+let TIMING=[{"index": 0, "text": "Components need to remember things. The current input value, which image is showing, what's in the cart. That's state.", "start": 2.0, "end": 9.445}, {"index": 1, "text": "Regular variables don't work. When React re-renders a component, local variables are created fresh every time.", "start": 9.825, "end": 17.591}, {"index": 2, "text": "Two problems: local variables don't persist between renders, and changing them doesn't trigger a re-render.", "start": 17.971, "end": 24.883}, {"index": 3, "text": "You need two things: a way to keep data between renders, and a way to tell React to render again.", "start": 25.263, "end": 31.641}, {"index": 4, "text": "That's what useState gives you. Import it from React: import useState from react.", "start": 32.021, "end": 37.312}, {"index": 5, "text": "Call it like this: const, open bracket, index comma setIndex, close bracket, equals useState, open paren, zero, close paren.", "start": 37.692, "end": 47.057}, {"index": 6, "text": "useState returns an array with exactly two items. The current value, and a function to update it.", "start": 47.437, "end": 54.008}, {"index": 7, "text": "The square brackets are array destructuring. You're naming the two items: index and setIndex.", "start": 54.388, "end": 60.831}, {"index": 8, "text": "When you call setIndex, React stores the new value and re-renders the component with fresh data.", "start": 61.211, "end": 67.461}, {"index": 9, "text": "That's the key difference. Regular variables reset on re-render. State persists.", "start": 67.841, "end": 73.196}, {"index": 10, "text": "You can have multiple state variables. Each useState call is independent.", "start": 73.576, "end": 78.632}, {"index": 11, "text": "const index, setIndex equals useState zero. const showMore, setShowMore equals useState false. Totally fine.", "start": 79.012, "end": 87.588}, {"index": 12, "text": "Hooks are special functions that start with use. useState is a Hook. There are others: useEffect, useContext, useRef.", "start": 87.968, "end": 96.245}, {"index": 13, "text": "One important rule: only call Hooks at the top level of your component. Never inside loops, conditions, or nested functions.", "start": 96.625, "end": 105.436}, {"index": 14, "text": "Why? React relies on the order of Hook calls to know which state belongs to which useState call.", "start": 105.816, "end": 111.725}, {"index": 15, "text": "State is local to the component. If you render the same component twice, each copy gets its own state.", "start": 112.105, "end": 118.911}, {"index": 16, "text": "Changing state in one instance doesn't affect the other. They're completely independent.", "start": 119.291, "end": 124.837}, {"index": 17, "text": "Let's recap. State is a component's memory \u2014 it persists between renders.", "start": 125.217, "end": 130.316}, {"index": 18, "text": "useState returns a value and a setter. Calling the setter triggers a re-render.", "start": 130.696, "end": 135.965}, {"index": 19, "text": "You can have multiple state variables. Each is independent.", "start": 136.345, "end": 140.505}, {"index": 20, "text": "Hooks must be called at the top level. State is local to each component instance.", "start": 140.885, "end": 146.453}, {"index": 21, "text": "Next up: responding to events.", "start": 146.833, "end": 149.095}];let TOTAL_DURATION=153.475;
+const ease={out:t=>1-Math.pow(1-t,3),spring:t=>{const c=(2*Math.PI)/2.5;return t===0?0:t===1?1:Math.pow(2,-10*t)*Math.sin((t*10-0.75)*c)+1;}};
+function seg(t,s,e){return Math.max(0,Math.min(1,(t-s)/(e-s)));}
+function roundRect(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.quadraticCurveTo(x+w,y,x+w,y+r);c.lineTo(x+w,y+h-r);c.quadraticCurveTo(x+w,y+h,x+w-r,y+h);c.lineTo(x+r,y+h);c.quadraticCurveTo(x,y+h,x,y+h-r);c.lineTo(x,y+r);c.quadraticCurveTo(x,y,x+r,y);c.closePath();}
+function drawGrid(c){c.strokeStyle='rgba(97,218,251,0.03)';c.lineWidth=1;for(let x=0;x<W;x+=80){c.beginPath();c.moveTo(x,0);c.lineTo(x,H);c.stroke();}for(let y=0;y<H;y+=80){c.beginPath();c.moveTo(0,y);c.lineTo(W,y);c.stroke();}}
+function drawReactLogo(c,cx,cy,r,a,t){if(a<=0)return;c.save();c.globalAlpha=a;c.strokeStyle=REACT;c.lineWidth=r*0.06;c.shadowColor=REACT;c.shadowBlur=18*a;for(let i=0;i<3;i++){c.save();c.translate(cx,cy);c.rotate(i*Math.PI/3+t*0.4);c.beginPath();c.ellipse(0,0,r,r*0.38,0,0,Math.PI*2);c.stroke();c.restore();}c.fillStyle=REACT;c.shadowBlur=0;c.beginPath();c.arc(cx,cy,r*0.18,0,Math.PI*2);c.fill();c.restore();}
+function drawCaption(c,t){let txt='';for(const s of TIMING){if(t>=s.start-0.1&&t<=s.end+0.3){txt=s.text;break;}}if(!txt)return;c.save();c.font='500 20px "JetBrains Mono",monospace';const tw=c.measureText(txt).width,pw=Math.min(tw+48,W-100);c.globalAlpha=0.9;c.fillStyle='rgba(0,0,0,0.85)';roundRect(c,CX-pw/2,968,pw,44,22);c.fill();c.globalAlpha=1;c.fillStyle=TEXT;c.textAlign='center';c.textBaseline='middle';let d=txt;while(c.measureText(d).width>pw-48&&d.length>10)d=d.slice(0,-1);if(d!==txt)d+='…';c.fillText(d,CX,990);c.restore();}
+function drawFileBox(c,x,y,w,h,name,color,a){c.save();c.globalAlpha=a;c.fillStyle=CODE_BG;roundRect(c,x,y,w,h,12);c.fill();c.strokeStyle=color+'88';c.lineWidth=2;c.stroke();c.fillStyle=color+'33';roundRect(c,x,y-30,Math.min(200,name.length*14),30,6);c.fill();c.font='500 16px "JetBrains Mono",monospace';c.fillStyle=color;c.textAlign='left';c.textBaseline='middle';c.fillText(name,x+12,y-15);c.restore();}
+
+// S1: Hook
+function drawScene1(c,t){
+  c.fillStyle=BG;c.fillRect(0,0,W,H);drawGrid(c);
+  const lp=ease.spring(seg(t,2,3));drawReactLogo(c,CX,CY-110,130*lp,lp,t);
+  const ta=ease.out(seg(t,2.5,3.5));
+  if(ta>0){c.save();c.globalAlpha=ta;c.font='bold 110px "JetBrains Mono",monospace';c.fillStyle=PURPLE;c.textAlign='center';c.textBaseline='middle';c.shadowColor=PURPLE;c.shadowBlur=20;c.fillText('State',CX,CY+80);c.shadowBlur=0;c.restore();}
+  const sa=ease.out(seg(t,3.3,4.1));
+  if(sa>0){c.save();c.globalAlpha=sa;c.font='500 48px "JetBrains Mono",monospace';c.fillStyle=TEXT;c.textAlign='center';c.textBaseline='middle';c.fillText("A Component's Memory",CX,CY+210);c.restore();}
+  const ma=ease.out(seg(t,4.1,5));
+  if(ma>0){c.save();c.globalAlpha=ma;c.font='400 28px "JetBrains Mono",monospace';c.fillStyle='#64748b';c.textAlign='center';c.textBaseline='middle';c.fillText('react.dev/learn  ·  Episode 6',CX,CY+270);c.restore();}
+}
+
+// S2: Why vars fail (9–32s)
+function drawScene2(c,t){
+  const s=9.78;
+  c.fillStyle=BG;c.fillRect(0,0,W,H);drawGrid(c);
+  c.save();c.globalAlpha=ease.out(seg(t,s,s+0.4));c.font='600 42px "JetBrains Mono",monospace';c.fillStyle=RED;c.textAlign='center';c.textBaseline='middle';c.fillText('Why Regular Variables Fail',CX,100);c.restore();
+
+  // Problem 1
+  const p1=ease.spring(seg(t,s+0.5,s+1.5));
+  if(p1>0){
+    c.save();c.globalAlpha=p1;
+    c.fillStyle='rgba(239,68,68,0.06)';roundRect(c,100,200,1720,200,16);c.fill();
+    c.strokeStyle=RED+'66';c.lineWidth=2;c.stroke();
+    c.font='48px serif';c.textAlign='left';c.textBaseline='middle';c.fillText('❌',140,280);
+    c.font='bold 30px "JetBrains Mono",monospace';c.fillStyle=RED;c.fillText("Don't persist between renders",210,260);
+    c.font='400 24px "JetBrains Mono",monospace';c.fillStyle='#94a3b8';c.fillText('let index = 0;  // reset to 0 every render!',210,320);
+    c.restore();
+  }
+
+  // Problem 2
+  const p2=ease.spring(seg(t,18,19));
+  if(p2>0){
+    c.save();c.globalAlpha=p2;
+    c.fillStyle='rgba(239,68,68,0.06)';roundRect(c,100,450,1720,200,16);c.fill();
+    c.strokeStyle=RED+'66';c.lineWidth=2;c.stroke();
+    c.font='48px serif';c.textAlign='left';c.textBaseline='middle';c.fillText('❌',140,530);
+    c.font='bold 30px "JetBrains Mono",monospace';c.fillStyle=RED;c.fillText("Don't trigger re-renders",210,510);
+    c.font='400 24px "JetBrains Mono",monospace';c.fillStyle='#94a3b8';c.fillText('index = index + 1;  // React doesn\'t know to update!',210,570);
+    c.restore();
+  }
+
+  // Solution teaser
+  const solA=ease.out(seg(t,25.3,26.3));
+  if(solA>0){c.save();c.globalAlpha=solA;c.fillStyle='rgba(34,197,94,0.06)';roundRect(c,200,720,1520,120,12);c.fill();c.strokeStyle=GREEN+'66';c.lineWidth=2;c.stroke();c.font='bold 30px "JetBrains Mono",monospace';c.fillStyle=GREEN;c.textAlign='center';c.textBaseline='middle';c.fillText('✅  You need: persist data + trigger re-render = useState',CX,780);c.restore();}
+}
+
+// S3: useState (32–73s)
+function drawScene3(c,t){
+  const s=31.96;
+  c.fillStyle=BG;c.fillRect(0,0,W,H);drawGrid(c);
+  c.save();c.globalAlpha=ease.out(seg(t,s,s+0.4));c.font='600 42px "JetBrains Mono",monospace';c.fillStyle=REACT;c.textAlign='center';c.textBaseline='middle';c.fillText('useState — The State Hook',CX,100);c.restore();
+
+  // Import line
+  const impP=ease.out(seg(t,s+0.5,s+1.5));
+  if(impP>0){
+    c.save();c.globalAlpha=impP;
+    c.fillStyle=CODE_BG;roundRect(c,300,170,1320,60,8);c.fill();
+    c.font='500 28px "JetBrains Mono",monospace';c.fillStyle=REACT;c.textAlign='center';c.textBaseline='middle';
+    c.fillText("import { useState } from 'react';",CX,200);
+    c.restore();
+  }
+
+  // Big destructuring visual
+  const dp=ease.spring(seg(t,37.7,39));
+  if(dp>0){
+    c.save();c.globalAlpha=dp;
+    drawFileBox(c,150,280,1620,300,'Array Destructuring',PURPLE,dp);
+    c.font='500 32px "JetBrains Mono",monospace';c.textAlign='left';c.textBaseline='top';
+    c.fillStyle='#c792ea';c.fillText('const [',180,310);
+    c.fillStyle=YELLOW;c.fillText('index',320,310);
+    c.fillStyle=TEXT;c.fillText(', ',440,310);
+    c.fillStyle=GREEN;c.fillText('setIndex',490,310);
+    c.fillStyle='#c792ea';c.fillText('] = useState(',700,310);
+    c.fillStyle=ORANGE;c.fillText('0',1020,310);
+    c.fillStyle='#c792ea';c.fillText(');',1050,310);
+
+    // Labels
+    c.font='500 22px "JetBrains Mono",monospace';
+    c.fillStyle=YELLOW;c.fillText('↑ current value',280,380);
+    c.fillStyle=GREEN;c.fillText('↑ setter function',480,380);
+    c.fillStyle=ORANGE;c.fillText('↑ initial value',980,380);
+
+    // Usage
+    c.font='400 26px "JetBrains Mono",monospace';c.fillStyle='#94a3b8';
+    c.fillText('// In event handler:',180,440);
+    c.fillStyle=GREEN;c.fillText('setIndex(index + 1);',180,480);
+    c.fillStyle='#64748b';c.fillText('// → stores new value + triggers re-render',580,480);
+    c.restore();
+  }
+
+  // Key difference
+  const kdA=ease.out(seg(t,67.8,68.8));
+  if(kdA>0){c.save();c.globalAlpha=kdA;
+    c.fillStyle='rgba(97,218,251,0.06)';roundRect(c,200,630,1520,180,12);c.fill();
+    c.strokeStyle=REACT+'44';c.lineWidth=2;c.stroke();
+    c.font='bold 32px "JetBrains Mono",monospace';c.fillStyle=RED;c.textAlign='center';c.textBaseline='middle';
+    c.fillText('let index = 0    →  resets every render',CX,680);
+    c.font='bold 32px "JetBrains Mono",monospace';c.fillStyle=GREEN;
+    c.fillText('useState(0)      →  persists between renders',CX,750);
+    c.restore();
+  }
+}
+
+// S4: Multiple state + Hook rules (73–118s)
+function drawScene4(c,t){
+  const s=73.56;
+  c.fillStyle=BG;c.fillRect(0,0,W,H);drawGrid(c);
+  c.save();c.globalAlpha=ease.out(seg(t,s,s+0.4));c.font='600 42px "JetBrains Mono",monospace';c.fillStyle=YELLOW;c.textAlign='center';c.textBaseline='middle';c.fillText('Multiple State + Hook Rules',CX,100);c.restore();
+
+  // Multiple state example
+  const msP=ease.out(seg(t,s+0.5,s+1.5));
+  if(msP>0){
+    drawFileBox(c,100,170,800,220,'Multiple State Vars',GREEN,msP);
+    c.save();c.globalAlpha=msP;c.font='500 24px "JetBrains Mono",monospace';c.textAlign='left';c.textBaseline='top';
+    c.fillStyle=YELLOW;c.fillText('const [index, setIndex] = useState(0);',130,200);
+    c.fillStyle=GREEN;c.fillText('const [showMore, setShowMore] = useState(false);',130,240);
+    c.font='400 20px "JetBrains Mono",monospace';c.fillStyle='#64748b';
+    c.fillText('Each useState call is independent',130,310);
+    c.restore();
+  }
+
+  // Hook rules
+  const rules=[
+    {icon:'🪝',label:'Hooks start with "use"',desc:'useState, useEffect, useContext, useRef...',color:REACT,delay:0},
+    {icon:'⬆️',label:'Call at top level only',desc:'Never in loops, conditions, or nested functions',color:RED,delay:0.5},
+    {icon:'🔢',label:'Order matters',desc:'React tracks Hooks by call order — don\'t break the sequence',color:YELLOW,delay:1.0},
+  ];
+  rules.forEach((r,i)=>{
+    const rp=ease.spring(seg(t,88+r.delay,89+r.delay));
+    if(rp<=0)return;
+    const ry=440+i*170;
+    c.save();c.globalAlpha=rp;c.translate(0,(1-rp)*20);
+    c.fillStyle='rgba(97,218,251,0.04)';roundRect(c,200,ry,1520,130,12);c.fill();
+    c.strokeStyle=r.color+'55';c.lineWidth=2;c.stroke();
+    c.fillStyle=r.color;roundRect(c,200,ry,5,130,2);c.fill();
+    c.font='40px serif';c.textAlign='left';c.textBaseline='middle';c.fillText(r.icon,230,ry+40);
+    c.font='bold 28px "JetBrains Mono",monospace';c.fillStyle=r.color;c.fillText(r.label,290,ry+35);
+    c.font='400 22px "JetBrains Mono",monospace';c.fillStyle='#94a3b8';c.fillText(r.desc,290,ry+85);
+    c.restore();
+  });
+}
+
+// S5: State is local (112–125s)
+function drawScene5(c,t){
+  const s=112.08;
+  c.fillStyle=BG;c.fillRect(0,0,W,H);drawGrid(c);
+  c.save();c.globalAlpha=ease.out(seg(t,s,s+0.4));c.font='600 42px "JetBrains Mono",monospace';c.fillStyle=PURPLE;c.textAlign='center';c.textBaseline='middle';c.fillText('State is Local & Private',CX,100);c.restore();
+
+  // Two component instances
+  const i1=ease.spring(seg(t,s+0.5,s+1.5));
+  if(i1>0){
+    // Instance 1
+    c.save();c.globalAlpha=i1;
+    c.fillStyle='rgba(168,85,247,0.08)';roundRect(c,200,220,700,500,16);c.fill();
+    c.strokeStyle=PURPLE+'66';c.lineWidth=3;c.stroke();
+    c.font='600 28px "JetBrains Mono",monospace';c.fillStyle=PURPLE;c.textAlign='center';c.textBaseline='middle';
+    c.fillText('<Gallery />  #1',550,270);
+    c.font='500 24px "JetBrains Mono",monospace';c.fillStyle=YELLOW;c.textAlign='left';
+    c.fillText('index: 3',280,360);c.fillText('showMore: true',280,410);
+    c.font='80px serif';c.textAlign='center';c.fillText('🖼️',550,560);
+    c.restore();
+
+    // Instance 2
+    c.save();c.globalAlpha=i1;
+    c.fillStyle='rgba(168,85,247,0.08)';roundRect(c,1020,220,700,500,16);c.fill();
+    c.strokeStyle=PURPLE+'66';c.lineWidth=3;c.stroke();
+    c.font='600 28px "JetBrains Mono",monospace';c.fillStyle=PURPLE;c.textAlign='center';c.textBaseline='middle';
+    c.fillText('<Gallery />  #2',1370,270);
+    c.font='500 24px "JetBrains Mono",monospace';c.fillStyle=YELLOW;c.textAlign='left';
+    c.fillText('index: 0',1100,360);c.fillText('showMore: false',1100,410);
+    c.font='80px serif';c.textAlign='center';c.fillText('🗿',1370,560);
+    c.restore();
+  }
+
+  const noteA=ease.out(seg(t,119.3,120.3));
+  if(noteA>0){c.save();c.globalAlpha=noteA;c.font='500 28px "JetBrains Mono",monospace';c.fillStyle='#94a3b8';c.textAlign='center';c.textBaseline='middle';c.fillText('Each instance has its own state — completely independent',CX,800);c.restore();}
+}
+
+// S6: Recap (125–149s)
+function drawScene6(c,t){
+  const s=125.16;
+  c.fillStyle=BG;c.fillRect(0,0,W,H);
+  const bg=c.createRadialGradient(CX,CY,50,CX,CY,700);bg.addColorStop(0,'rgba(97,218,251,0.08)');bg.addColorStop(1,'transparent');c.fillStyle=bg;c.fillRect(0,0,W,H);drawGrid(c);
+  drawReactLogo(c,CX,CY-280,60,ease.out(seg(t,s,s+0.6)),t);
+  c.save();c.globalAlpha=ease.out(seg(t,s,s+0.5));c.font='600 38px "JetBrains Mono",monospace';c.fillStyle=TEXT;c.textAlign='center';c.textBaseline='middle';c.fillText("Here's what you learned",CX,CY-170);c.restore();
+
+  const recap=[
+    {icon:'🧠',text:"State = component memory that persists between renders",color:PURPLE,delay:0.4},
+    {icon:'📦',text:"useState returns [value, setter] — setter triggers re-render",color:REACT,delay:0.8},
+    {icon:'🔢',text:"Multiple useState calls = multiple independent state vars",color:YELLOW,delay:1.2},
+    {icon:'🪝',text:"Hooks: top level only, never inside loops or conditions",color:RED,delay:1.6},
+    {icon:'🔒',text:"State is local — each component instance owns its own",color:GREEN,delay:2.0},
+  ];
+  recap.forEach((item,i)=>{
+    const rp=ease.spring(seg(t,s+item.delay,s+item.delay+0.5));if(rp<=0)return;
+    const ry=CY-60+i*90;
+    c.save();c.globalAlpha=rp;c.translate(0,(1-rp)*20);
+    c.font='36px serif';c.textAlign='left';c.textBaseline='middle';c.fillText(item.icon,CX-650,ry);
+    c.font='500 24px "JetBrains Mono",monospace';c.fillStyle=item.color;c.fillText(item.text,CX-590,ry);c.restore();
+  });
+  const na=ease.out(seg(t,s+3,s+3.8));
+  if(na>0){c.save();c.globalAlpha=na;c.font='bold 48px "JetBrains Mono",monospace';c.fillStyle=REACT;c.textAlign='center';c.textBaseline='middle';c.shadowColor=REACT;c.shadowBlur=20;c.fillText('Next up: Responding to Events  →',CX,CY+380);c.shadowBlur=0;c.restore();}
+}
+
+// S7: Outro
+function drawScene7(c,t){
+  const s=149.5;c.fillStyle=BG;c.fillRect(0,0,W,H);
+  const g=c.createRadialGradient(CX,CY,50,CX,CY,600);g.addColorStop(0,'rgba(97,218,251,0.15)');g.addColorStop(1,'transparent');c.fillStyle=g;c.fillRect(0,0,W,H);
+  const a=ease.out(seg(t,s,s+0.5));drawReactLogo(c,CX,CY-120,90,a,t);
+  c.save();c.globalAlpha=a;c.font='bold 100px "JetBrains Mono",monospace';c.textAlign='center';c.textBaseline='middle';c.shadowColor=REACT;c.shadowBlur=30;c.fillStyle=TEXT;c.fillText('Run the Docs',CX,CY+40);c.shadowBlur=0;c.font='400 34px "JetBrains Mono",monospace';c.fillStyle='#64748b';c.fillText('Technical docs. Made watchable.',CX,CY+115);c.font='500 24px "JetBrains Mono",monospace';c.fillStyle=REACT;c.fillText('react  ·  ep 6  ·  state',CX,CY+175);c.restore();
+}
+
+const ST=[0,9.78,31.96,73.56,112.08,125.16,149.5];
+const SF=[drawScene1,drawScene2,drawScene3,drawScene4,drawScene5,drawScene6,drawScene7];
+window.renderFrame=function(fi){
+  const t=fi/30,c=document.getElementById('c').getContext('2d');c.clearRect(0,0,W,H);
+  let si=0;for(let i=1;i<ST.length;i++){if(t>=ST[i])si=i;else break;}
+  SF[si](c,t);
+  for(let i=1;i<ST.length;i++){const xf=ST[i];if(t>=xf&&t<xf+0.4){const ov=seg(t,xf,xf+0.4);c.globalAlpha=ov;c.fillStyle=BG;c.fillRect(0,0,W,H);c.globalAlpha=1;SF[i](c,t);break;}}
+  drawCaption(c,t);
+  if(t>TOTAL_DURATION-1.5){c.globalAlpha=seg(t,TOTAL_DURATION-1,TOTAL_DURATION);c.fillStyle='#000';c.fillRect(0,0,W,H);c.globalAlpha=1;}
+};
+window.setTiming=function(s,d){TIMING=s;TOTAL_DURATION=d;};
+</script>
+</body>
+</html>

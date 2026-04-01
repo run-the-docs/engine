@@ -1,0 +1,87 @@
+1
+00:00:02,000 --> 00:00:09,445
+Components need to remember things. The current input value, which image is showing, what's in the cart. That's state.
+
+2
+00:00:09,824 --> 00:00:17,591
+Regular variables don't work. When React re-renders a component, local variables are created fresh every time.
+
+3
+00:00:17,971 --> 00:00:24,882
+Two problems: local variables don't persist between renders, and changing them doesn't trigger a re-render.
+
+4
+00:00:25,263 --> 00:00:31,640
+You need two things: a way to keep data between renders, and a way to tell React to render again.
+
+5
+00:00:32,021 --> 00:00:37,311
+That's what useState gives you. Import it from React: import useState from react.
+
+6
+00:00:37,692 --> 00:00:47,057
+Call it like this: const, open bracket, index comma setIndex, close bracket, equals useState, open paren, zero, close paren.
+
+7
+00:00:47,436 --> 00:00:54,008
+useState returns an array with exactly two items. The current value, and a function to update it.
+
+8
+00:00:54,387 --> 00:01:00,831
+The square brackets are array destructuring. You're naming the two items: index and setIndex.
+
+9
+00:01:01,210 --> 00:01:07,460
+When you call setIndex, React stores the new value and re-renders the component with fresh data.
+
+10
+00:01:07,840 --> 00:01:13,195
+That's the key difference. Regular variables reset on re-render. State persists.
+
+11
+00:01:13,575 --> 00:01:18,632
+You can have multiple state variables. Each useState call is independent.
+
+12
+00:01:19,012 --> 00:01:27,587
+const index, setIndex equals useState zero. const showMore, setShowMore equals useState false. Totally fine.
+
+13
+00:01:27,968 --> 00:01:36,245
+Hooks are special functions that start with use. useState is a Hook. There are others: useEffect, useContext, useRef.
+
+14
+00:01:36,625 --> 00:01:45,436
+One important rule: only call Hooks at the top level of your component. Never inside loops, conditions, or nested functions.
+
+15
+00:01:45,816 --> 00:01:51,724
+Why? React relies on the order of Hook calls to know which state belongs to which useState call.
+
+16
+00:01:52,105 --> 00:01:58,911
+State is local to the component. If you render the same component twice, each copy gets its own state.
+
+17
+00:01:59,290 --> 00:02:04,837
+Changing state in one instance doesn't affect the other. They're completely independent.
+
+18
+00:02:05,216 --> 00:02:10,316
+Let's recap. State is a component's memory — it persists between renders.
+
+19
+00:02:10,695 --> 00:02:15,965
+useState returns a value and a setter. Calling the setter triggers a re-render.
+
+20
+00:02:16,344 --> 00:02:20,504
+You can have multiple state variables. Each is independent.
+
+21
+00:02:20,884 --> 00:02:26,453
+Hooks must be called at the top level. State is local to each component instance.
+
+22
+00:02:26,832 --> 00:02:29,094
+Next up: responding to events.
