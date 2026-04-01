@@ -1,0 +1,99 @@
+1
+00:00:02,000 --> 00:00:09,019
+Components are powerful because they're reusable. But as your app grows, you need to split them across files.
+
+2
+00:00:09,398 --> 00:00:16,012
+Right now, everything lives in one file — the root component file. Usually called App.js.
+
+3
+00:00:16,391 --> 00:00:21,426
+App.js is where your app starts. It's the top of the component tree.
+
+4
+00:00:21,806 --> 00:00:27,161
+But putting every component in one file gets messy fast. Time to split them up.
+
+5
+00:00:27,541 --> 00:00:31,167
+Moving a component to its own file takes three steps.
+
+6
+00:00:31,547 --> 00:00:39,228
+Step one: create a new file. Step two: export the component from that file. Step three: import it where you need it.
+
+7
+00:00:39,607 --> 00:00:43,896
+There are two ways to export: default exports and named exports.
+
+8
+00:00:44,276 --> 00:00:49,481
+A default export uses the keyword default. A file can only have one.
+
+9
+00:00:49,860 --> 00:00:55,280
+Export default function Gallery — that makes Gallery the main thing this file provides.
+
+10
+00:00:55,659 --> 00:01:02,380
+To import a default export, write import Gallery from Gallery.js. No curly braces.
+
+11
+00:01:02,759 --> 00:01:09,799
+Here's the key: with default imports, you can rename freely. Import Banana from Gallery.js works.
+
+12
+00:01:10,180 --> 00:01:15,769
+Named exports are different. No default keyword. Just export function Profile.
+
+13
+00:01:16,149 --> 00:01:24,106
+To import a named export, you must use curly braces: import Profile in curly braces from Gallery.js.
+
+14
+00:01:24,486 --> 00:01:30,140
+With named imports, the name must match exactly. That's why they're called named imports.
+
+15
+00:01:30,519 --> 00:01:37,581
+So when do you use each? Default exports for the main component. Named exports for everything else in the file.
+
+16
+00:01:37,960 --> 00:01:45,576
+A single file can mix both. Gallery.js can have a default Gallery export and a named Profile export.
+
+17
+00:01:45,956 --> 00:01:55,173
+App.js then imports both: import Gallery from Gallery.js, and import Profile in curly braces from Gallery.js.
+
+18
+00:01:55,552 --> 00:02:02,016
+One rule: a file can have at most one default export, but as many named exports as you want.
+
+19
+00:02:02,397 --> 00:02:08,540
+Some teams pick one style and stick with it. Either all default, or all named. Both work.
+
+20
+00:02:08,920 --> 00:02:16,110
+The important thing: always give your components meaningful names. No anonymous arrow functions as exports.
+
+21
+00:02:16,491 --> 00:02:21,995
+Let's recap. Root component file: where your app starts, usually App.js.
+
+22
+00:02:22,375 --> 00:02:26,919
+Three steps to move a component: create file, export, import.
+
+23
+00:02:27,299 --> 00:02:32,120
+Default exports: one per file, import without braces, can rename.
+
+24
+00:02:32,500 --> 00:02:37,747
+Named exports: unlimited per file, import with braces, name must match.
+
+25
+00:02:38,127 --> 00:02:41,135
+Next up: writing markup with JSX.

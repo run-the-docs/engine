@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0d0d1a; width: 1920px; height: 1080px; overflow: hidden; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+const W = 1920, H = 1080, CX = 960, CY = 540;
+
+const BG     = '#0d0d1a';
+const REACT  = '#61dafb';
+const TEXT   = '#f8fafc';
+const CODE_BG= '#0d1117';
+const GREEN  = '#22c55e';
+const YELLOW = '#eab308';
+const RED    = '#ef4444';
+const SUBTLE = '#334155';
+const PURPLE = '#a78bfa';
+const ORANGE = '#f97316';
+
+let TIMING = [{"index": 0, "text": "Components are powerful because they're reusable. But as your app grows, you need to split them across files.", "start": 2.0, "end": 9.019}, {"index": 1, "text": "Right now, everything lives in one file \u2014 the root component file. Usually called App.js.", "start": 9.399, "end": 16.012}, {"index": 2, "text": "App.js is where your app starts. It's the top of the component tree.", "start": 16.392, "end": 21.427}, {"index": 3, "text": "But putting every component in one file gets messy fast. Time to split them up.", "start": 21.807, "end": 27.161}, {"index": 4, "text": "Moving a component to its own file takes three steps.", "start": 27.541, "end": 31.168}, {"index": 5, "text": "Step one: create a new file. Step two: export the component from that file. Step three: import it where you need it.", "start": 31.548, "end": 39.228}, {"index": 6, "text": "There are two ways to export: default exports and named exports.", "start": 39.608, "end": 43.896}, {"index": 7, "text": "A default export uses the keyword default. A file can only have one.", "start": 44.276, "end": 49.481}, {"index": 8, "text": "Export default function Gallery \u2014 that makes Gallery the main thing this file provides.", "start": 49.861, "end": 55.28}, {"index": 9, "text": "To import a default export, write import Gallery from Gallery.js. No curly braces.", "start": 55.66, "end": 62.38}, {"index": 10, "text": "Here's the key: with default imports, you can rename freely. Import Banana from Gallery.js works.", "start": 62.76, "end": 69.8}, {"index": 11, "text": "Named exports are different. No default keyword. Just export function Profile.", "start": 70.18, "end": 75.769}, {"index": 12, "text": "To import a named export, you must use curly braces: import Profile in curly braces from Gallery.js.", "start": 76.149, "end": 84.107}, {"index": 13, "text": "With named imports, the name must match exactly. That's why they're called named imports.", "start": 84.487, "end": 90.14}, {"index": 14, "text": "So when do you use each? Default exports for the main component. Named exports for everything else in the file.", "start": 90.52, "end": 97.581}, {"index": 15, "text": "A single file can mix both. Gallery.js can have a default Gallery export and a named Profile export.", "start": 97.961, "end": 105.577}, {"index": 16, "text": "App.js then imports both: import Gallery from Gallery.js, and import Profile in curly braces from Gallery.js.", "start": 105.957, "end": 115.173}, {"index": 17, "text": "One rule: a file can have at most one default export, but as many named exports as you want.", "start": 115.553, "end": 122.017}, {"index": 18, "text": "Some teams pick one style and stick with it. Either all default, or all named. Both work.", "start": 122.397, "end": 128.541}, {"index": 19, "text": "The important thing: always give your components meaningful names. No anonymous arrow functions as exports.", "start": 128.921, "end": 136.111}, {"index": 20, "text": "Let's recap. Root component file: where your app starts, usually App.js.", "start": 136.491, "end": 141.995}, {"index": 21, "text": "Three steps to move a component: create file, export, import.", "start": 142.375, "end": 146.919}, {"index": 22, "text": "Default exports: one per file, import without braces, can rename.", "start": 147.299, "end": 152.12}, {"index": 23, "text": "Named exports: unlimited per file, import with braces, name must match.", "start": 152.5, "end": 157.748}, {"index": 24, "text": "Next up: writing markup with JSX.", "start": 158.128, "end": 161.136}];
+let TOTAL_DURATION = 165.516;
+
+const ease = {
+  out:    t => 1 - Math.pow(1-t, 3),
+  inOut:  t => t < 0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2,
+  spring: t => { const c4=(2*Math.PI)/2.5; return t===0?0:t===1?1:Math.pow(2,-10*t)*Math.sin((t*10-0.75)*c4)+1; },
+};
+
+function seg(t, start, end) { return Math.max(0, Math.min(1, (t-start)/(end-start))); }
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
+}
+
+function drawGrid(ctx) {
+  ctx.strokeStyle = 'rgba(97,218,251,0.03)'; ctx.lineWidth = 1;
+  for (let x=0;x<W;x+=80) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+  for (let y=0;y<H;y+=80) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+}
+
+function drawReactLogo(ctx, cx, cy, r, alpha, t) {
+  if (alpha<=0) return;
+  ctx.save(); ctx.globalAlpha=alpha;
+  ctx.strokeStyle=REACT; ctx.lineWidth=r*0.06;
+  ctx.shadowColor=REACT; ctx.shadowBlur=18*alpha;
+  for (let i=0;i<3;i++) {
+    ctx.save(); ctx.translate(cx,cy); ctx.rotate(i*Math.PI/3+t*0.4);
+    ctx.beginPath(); ctx.ellipse(0,0,r,r*0.38,0,0,Math.PI*2); ctx.stroke(); ctx.restore();
+  }
+  ctx.fillStyle=REACT; ctx.shadowBlur=0;
+  ctx.beginPath(); ctx.arc(cx,cy,r*0.18,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+
+function drawCaption(ctx, t) {
+  let activeText = '';
+  for (const s of TIMING) {
+    if (t >= s.start-0.1 && t <= s.end+0.3) { activeText=s.text; break; }
+  }
+  if (!activeText) return;
+  ctx.save();
+  ctx.font='500 20px "JetBrains Mono", monospace';
+  const tw=ctx.measureText(activeText).width;
+  const pw=Math.min(tw+48,W-100);
+  ctx.globalAlpha=0.9; ctx.fillStyle='rgba(0,0,0,0.85)';
+  roundRect(ctx,CX-pw/2,968,pw,44,22); ctx.fill();
+  ctx.globalAlpha=1; ctx.fillStyle=TEXT;
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  let d=activeText;
+  while(ctx.measureText(d).width>pw-48&&d.length>10) d=d.slice(0,-1);
+  if(d!==activeText) d+='…';
+  ctx.fillText(d,CX,990); ctx.restore();
+}
+
+function drawFileBox(ctx, x, y, w, h, filename, color, alpha) {
+  ctx.save(); ctx.globalAlpha=alpha;
+  ctx.fillStyle=CODE_BG; roundRect(ctx,x,y,w,h,12); ctx.fill();
+  ctx.strokeStyle=color+'88'; ctx.lineWidth=2; ctx.stroke();
+  // File tab
+  ctx.fillStyle=color+'33'; roundRect(ctx,x,y-30,180,30,6); ctx.fill();
+  ctx.font='500 16px "JetBrains Mono", monospace';
+  ctx.fillStyle=color; ctx.textAlign='left'; ctx.textBaseline='middle';
+  ctx.fillText(filename, x+12, y-15);
+  ctx.restore();
+}
+
+// ============================================================
+// SCENE 1: Hook (0–9s)
+// ============================================================
+function drawScene1(ctx, t) {
+  ctx.fillStyle=BG; ctx.fillRect(0,0,W,H); drawGrid(ctx);
+  const logoP=ease.spring(seg(t,2.0,3.0));
+  drawReactLogo(ctx,CX,CY-110,130*logoP,logoP,t);
+  const word='Imports & Exports';
+  ctx.font='bold 100px "JetBrains Mono", monospace';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  const titleA=ease.out(seg(t,2.5,3.5));
+  if(titleA>0){
+    ctx.save(); ctx.globalAlpha=titleA;
+    ctx.fillStyle=REACT; ctx.shadowColor=REACT; ctx.shadowBlur=20*titleA;
+    ctx.fillText(word,CX,CY+90); ctx.shadowBlur=0; ctx.restore();
+  }
+  const subA=ease.out(seg(t,3.3,4.1));
+  if(subA>0){
+    ctx.save(); ctx.globalAlpha=subA;
+    ctx.font='500 48px "JetBrains Mono", monospace'; ctx.fillStyle=TEXT;
+    ctx.fillText('Splitting Components Across Files',CX,CY+200); ctx.restore();
+  }
+  const metaA=ease.out(seg(t,4.1,5.0));
+  if(metaA>0){
+    ctx.save(); ctx.globalAlpha=metaA;
+    ctx.font='400 28px "JetBrains Mono", monospace'; ctx.fillStyle='#64748b';
+    ctx.fillText('react.dev/learn  ·  Episode 2',CX,CY+270); ctx.restore();
+  }
+}
+
+// ============================================================
+// SCENE 2: Root Component File (9–27.5s)
+// ============================================================
+function drawScene2(ctx, t) {
+  const s=9.38;
+  ctx.fillStyle=BG; ctx.fillRect(0,0,W,H); drawGrid(ctx);
+  const titleA=ease.out(seg(t,s,s+0.4));
+  ctx.save(); ctx.globalAlpha=titleA;
+  ctx.font='600 42px "JetBrains Mono", monospace'; ctx.fillStyle=REACT;
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('The Root Component File',CX,100); ctx.restore();
+
+  // Big App.js file with everything crammed in
+  const fileP=ease.spring(seg(t,s+0.5,s+1.5));
+  if(fileP>0){
+    drawFileBox(ctx,CX-400,180,800,700,'App.js',REACT,fileP);
+    ctx.save(); ctx.globalAlpha=fileP;
+    ctx.font='400 24px "JetBrains Mono", monospace'; ctx.textAlign='left'; ctx.textBaseline='top';
+    const lines=[
+      {t:'function Profile() {',c:'#c792ea'},
+      {t:'  return <img src="..." />;',c:'#89ddff'},
+      {t:'}',c:'#c792ea'},
+      {t:'',c:TEXT},
+      {t:'function Gallery() {',c:'#c792ea'},
+      {t:'  return (',c:TEXT},
+      {t:'    <section>',c:'#89ddff'},
+      {t:'      <h1>Scientists</h1>',c:TEXT},
+      {t:'      <Profile />',c:PURPLE},
+      {t:'      <Profile />',c:PURPLE},
+      {t:'      <Profile />',c:PURPLE},
+      {t:'    </section>',c:'#89ddff'},
+      {t:'  );',c:TEXT},
+      {t:'}',c:'#c792ea'},
+      {t:'',c:TEXT},
+      {t:'export default function App() {',c:'#c3e88d'},
+      {t:'  return <Gallery />;',c:REACT},
+      {t:'}',c:'#c792ea'},
+    ];
+    lines.forEach((line,i) => {
+      const lp=ease.out(seg(t,s+0.8+i*0.06,s+1.2+i*0.06));
+      ctx.globalAlpha=fileP*lp; ctx.fillStyle=line.c;
+      ctx.fillText(line.t,CX-370,210+i*36);
+    });
+    ctx.restore();
+  }
+
+  // "Gets messy" warning
+  const messyA=ease.out(seg(t,21.8,22.5));
+  if(messyA>0){
+    ctx.save(); ctx.globalAlpha=messyA;
+    ctx.fillStyle='rgba(239,68,68,0.08)';
+    roundRect(ctx,CX-380,900,760,60,12); ctx.fill();
+    ctx.strokeStyle=RED+'66'; ctx.lineWidth=2; ctx.stroke();
+    ctx.font='500 24px "JetBrains Mono", monospace'; ctx.fillStyle=RED;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('⚠️  One file = gets messy fast',CX,930); ctx.restore();
+  }
+}
+
+// ============================================================
+// SCENE 3: Three Steps (27.5–39.6s)
+// ============================================================
+function drawScene3(ctx, t) {
+  const s=27.54;
+  ctx.fillStyle=BG; ctx.fillRect(0,0,W,H); drawGrid(ctx);
+  const titleA=ease.out(seg(t,s,s+0.4));
+  ctx.save(); ctx.globalAlpha=titleA;
+  ctx.font='600 42px "JetBrains Mono", monospace'; ctx.fillStyle=REACT;
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('Three Steps to Move a Component',CX,120); ctx.restore();
+
+  const steps=[
+    {icon:'📄',label:'1. Create',desc:'Make a new .js file for the component',color:GREEN,delay:0},
+    {icon:'📤',label:'2. Export',desc:'export default function or export function',color:REACT,delay:0.5},
+    {icon:'📥',label:'3. Import',desc:'import Component from \'./Component.js\'',color:YELLOW,delay:1.0},
+  ];
+  steps.forEach((step,i) => {
+    const sp=ease.spring(seg(t,s+0.5+step.delay,s+1.3+step.delay));
+    if(sp<=0) return;
+    const sy=260+i*240;
+    ctx.save(); ctx.globalAlpha=sp; ctx.translate(0,(1-sp)*30);
+    ctx.fillStyle='rgba(97,218,251,0.04)';
+    roundRect(ctx,200,sy,1520,180,16); ctx.fill();
+    ctx.strokeStyle=step.color+'77'; ctx.lineWidth=2; ctx.stroke();
+    ctx.fillStyle=step.color; roundRect(ctx,200,sy,6,180,3); ctx.fill();
+    ctx.font='60px serif'; ctx.textAlign='left'; ctx.textBaseline='middle';
+    ctx.fillText(step.icon,240,sy+55);
+    ctx.font='bold 38px "JetBrains Mono", monospace'; ctx.fillStyle=step.color;
+    ctx.fillText(step.label,330,sy+45);
+    ctx.font='400 26px "JetBrains Mono", monospace'; ctx.fillStyle='#94a3b8';
+    ctx.fillText(step.desc,330,sy+110);
+    ctx.restore();
+  });
+
+  // Arrow flow
+  const arrowA=ease.out(seg(t,s+2.5,s+3.5));
+  if(arrowA>0){
+    ctx.save(); ctx.globalAlpha=arrowA;
+    ctx.strokeStyle=REACT+'88'; ctx.lineWidth=3;
+    ctx.setLineDash([8,8]);
+    ctx.beginPath(); ctx.moveTo(CX,440+10); ctx.lineTo(CX,500-10); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(CX,680+10); ctx.lineTo(CX,740-10); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+  }
+}
+
+// ============================================================
+// SCENE 4: Default Exports (39.6–62.8s)
+// ============================================================
+function drawScene4(ctx, t) {
+  const s=39.56;
+  ctx.fillStyle=BG; ctx.fillRect(0,0,W,H); drawGrid(ctx);
+  const titleA=ease.out(seg(t,s,s+0.4));
+  ctx.save(); ctx.globalAlpha=titleA;
+  ctx.font='600 42px "JetBrains Mono", monospace'; ctx.fillStyle=GREEN;
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('Default Exports',CX,100); ctx.restore();
+
+  // Gallery.js file
+  const file1P=ease.out(seg(t,s+0.5,s+1.2));
+  if(file1P>0){
+    drawFileBox(ctx,100,170,800,400,'Gallery.js',GREEN,file1P);
+    ctx.save(); ctx.globalAlpha=file1P;
+    ctx.font='500 26px "JetBrains Mono", monospace'; ctx.textAlign='left'; ctx.textBaseline='top';
+    const lines=[
+      {t:'export default function Gallery() {',c:'#c3e88d'},
+      {t:'  return (',c:TEXT},
+      {t:'    <section>',c:'#89ddff'},
+      {t:'      <h1>Scientists</h1>',c:TEXT},
+      {t:'      <Profile />',c:PURPLE},
+      {t:'    </section>',c:'#89ddff'},
+      {t:'  );',c:TEXT},
+      {t:'}',c:'#c3e88d'},
+    ];
+    lines.forEach((l,i) => { ctx.fillStyle=l.c; ctx.fillText(l.t,130,200+i*42); });
+    ctx.restore();
+  }
+
+  // App.js file
+  const file2P=ease.out(seg(t,s+1.5,s+2.2));
+  if(file2P>0){
+    drawFileBox(ctx,1020,170,800,250,'App.js',REACT,file2P);
+    ctx.save(); ctx.globalAlpha=file2P;
+    ctx.font='500 26px "JetBrains Mono", monospace'; ctx.textAlign='left'; ctx.textBaseline='top';
+    ctx.fillStyle=REACT; ctx.fillText("import Gallery from './Gallery.js';",1050,200);
+    ctx.fillStyle=TEXT; ctx.fillText('',1050,242);
+    ctx.fillStyle='#c3e88d'; ctx.fillText('export default function App() {',1050,284);
+    ctx.fillStyle=REACT; ctx.fillText('  return <Gallery />;',1050,326);
+    ctx.fillStyle='#c3e88d'; ctx.fillText('}',1050,368);
+    ctx.restore();
+  }
+
+  // Arrow between files
+  const arrowP=ease.out(seg(t,s+2.5,s+3.5));
+  if(arrowP>0){
+    ctx.save(); ctx.globalAlpha=arrowP;
+    ctx.strokeStyle=GREEN; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(900,370); ctx.lineTo(1020,300); ctx.stroke();
+    ctx.fillStyle=GREEN; ctx.beginPath();
+    ctx.moveTo(1020,300); ctx.lineTo(1005,296); ctx.lineTo(1005,304); ctx.closePath(); ctx.fill();
+    ctx.font='500 22px "JetBrains Mono", monospace'; ctx.fillStyle=GREEN;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('import',960,310); ctx.restore();
+  }
+
+  // Rename highlight
+  const renameA=ease.out(seg(t,62.8,63.5));
+  if(renameA>0){
+    ctx.save(); ctx.globalAlpha=renameA;
+    ctx.fillStyle='rgba(234,179,8,0.08)';
+    roundRect(ctx,100,620,1720,120,12); ctx.fill();
+    ctx.strokeStyle=YELLOW+'66'; ctx.lineWidth=2; ctx.stroke();
+    ctx.font='500 28px "JetBrains Mono", monospace'; ctx.fillStyle=YELLOW;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('🍌  import Banana from \'./Gallery.js\'  — still works!  Default = any name.',CX,680);
+    ctx.restore();
+  }
+
+  // Key rule box
+  const ruleA=ease.out(seg(t,s+4.0,s+5.0));
+  if(ruleA>0){
+    ctx.save(); ctx.globalAlpha=ruleA;
+    ctx.fillStyle='rgba(34,197,94,0.08)';
+    roundRect(ctx,100,780,1720,120,12); ctx.fill();
+    ctx.strokeStyle=GREEN+'66'; ctx.lineWidth=2; ctx.stroke();
+    ctx.font='500 28px "JetBrains Mono", monospace'; ctx.fillStyle=GREEN;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('✅  No curly braces  ·  One per file  ·  Can rename on import',CX,840);
+    ctx.restore();
+  }
+}
+
+// ============================================================
+// SCENE 5: Named Exports (70.2–90.5s)
+// ============================================================
+function drawScene5(ctx, t) {
+  const s=70.17;
+  ctx.fillStyle=BG; ctx.fillRect(0,0,W,H); drawGrid(ctx);
+  const titleA=ease.out(seg(t,s,s+0.4));
+  ctx.save(); ctx.globalAlpha=titleA;
+  ctx.font='600 42px "JetBrains Mono", monospace'; ctx.fillStyle=ORANGE;
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('Named Exports',CX,100); ctx.restore();
+
+  // Gallery.js with named export
+  const file1P=ease.out(seg(t,s+0.5,s+1.2));
+  if(file1P>0){
+    drawFileBox(ctx,100,170,800,280,'Gallery.js',ORANGE,file1P);
+    ctx.save(); ctx.globalAlpha=file1P;
+    ctx.font='500 26px "JetBrains Mono", monospace'; ctx.textAlign='left'; ctx.textBaseline='top';
+    ctx.fillStyle=ORANGE; ctx.fillText('export function Profile() {',130,200);
+    ctx.fillStyle=TEXT; ctx.fillText('  return <img src="..." />;',130,242);
+    ctx.fillStyle=ORANGE; ctx.fillText('}',130,284);
+    ctx.restore();
+  }
+
+  // App.js with curly braces
+  const file2P=ease.out(seg(t,s+1.5,s+2.2));
+  if(file2P>0){
+    drawFileBox(ctx,1020,170,800,200,'App.js',REACT,file2P);
+    ctx.save(); ctx.globalAlpha=file2P;
+    ctx.font='500 26px "JetBrains Mono", monospace'; ctx.textAlign='left'; ctx.textBaseline='top';
+    ctx.fillStyle=ORANGE; ctx.fillText("import { Profile } from './Gallery.js';",1050,200);
+    ctx.fillStyle=TEXT; ctx.fillText('',1050,242);
+    ctx.fillStyle=REACT; ctx.fillText('return <Profile />;',1050,284);
+    ctx.restore();
+  }
+
+  // Curly braces highlight
+  const braceA=ease.spring(seg(t,s+3.0,s+4.0));
+  if(braceA>0){
+    ctx.save(); ctx.globalAlpha=braceA;
+    ctx.font='bold 120px "JetBrains Mono", monospace'; ctx.fillStyle=ORANGE;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.shadowColor=ORANGE; ctx.shadowBlur=20;
+    ctx.fillText('{ }',CX,600); ctx.shadowBlur=0;
+    ctx.font='500 32px "JetBrains Mono", monospace'; ctx.fillStyle=TEXT;
+    ctx.fillText('Curly braces required  ·  Name must match exactly',CX,700);
+    ctx.restore();
+  }
+
+  // Comparison table
+  const tableA=ease.out(seg(t,s+5.0,s+6.0));
+  if(tableA>0){
+    ctx.save(); ctx.globalAlpha=tableA;
+    const ty=780;
+    // Default column
+    ctx.fillStyle='rgba(34,197,94,0.08)';
+    roundRect(ctx,200,ty,700,120,12); ctx.fill();
+    ctx.strokeStyle=GREEN+'44'; ctx.lineWidth=1; ctx.stroke();
+    ctx.font='600 22px "JetBrains Mono", monospace'; ctx.fillStyle=GREEN;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('Default Export',550,ty+25);
+    ctx.font='400 20px "JetBrains Mono", monospace'; ctx.fillStyle='#94a3b8';
+    ctx.fillText('import Gallery from \'./Gallery.js\'',550,ty+60);
+    ctx.fillText('No braces · Can rename · One per file',550,ty+90);
+
+    // Named column
+    ctx.fillStyle='rgba(249,115,22,0.08)';
+    roundRect(ctx,1020,ty,700,120,12); ctx.fill();
+    ctx.strokeStyle=ORANGE+'44'; ctx.lineWidth=1; ctx.stroke();
+    ctx.font='600 22px "JetBrains Mono", monospace'; ctx.fillStyle=ORANGE;
+    ctx.fillText('Named Export',1370,ty+25);
+    ctx.font='400 20px "JetBrains Mono", monospace'; ctx.fillStyle='#94a3b8';
+    ctx.fillText('import { Profile } from \'./Gallery.js\'',1370,ty+60);
+    ctx.fillText('Braces required · Name must match · Unlimited',1370,ty+90);
+    ctx.restore();
+  }
+}
+
+// ============================================================
+// SCENE 6: Mixing Both (90.5–128.5s)
+// ============================================================
+function drawScene6(ctx, t) {
+  const s=90.46;
+  ctx.fillStyle=BG; ctx.fillRect(0,0,W,H); drawGrid(ctx);
+  const titleA=ease.out(seg(t,s,s+0.4));
+  ctx.save(); ctx.globalAlpha=titleA;
+  ctx.font='600 42px "JetBrains Mono", monospace'; ctx.fillStyle=REACT;
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('Mixing Default + Named in One File',CX,100); ctx.restore();
+
+  // Gallery.js with both
+  const file1P=ease.out(seg(t,s+0.5,s+1.5));
+  if(file1P>0){
+    drawFileBox(ctx,100,170,800,440,'Gallery.js',REACT,file1P);
+    ctx.save(); ctx.globalAlpha=file1P;
+    ctx.font='500 24px "JetBrains Mono", monospace'; ctx.textAlign='left'; ctx.textBaseline='top';
+    // Named export
+    ctx.fillStyle=ORANGE; ctx.fillText('export function Profile() {',130,200);
+    ctx.fillStyle='#94a3b8'; ctx.fillText('  return <img ... />;',130,236);
+    ctx.fillStyle=ORANGE; ctx.fillText('}',130,272);
+    ctx.fillStyle=TEXT; ctx.fillText('',130,308);
+    // Default export
+    ctx.fillStyle=GREEN; ctx.fillText('export default function Gallery() {',130,344);
+    ctx.fillStyle='#94a3b8'; ctx.fillText('  return (',130,380);
+    ctx.fillText('    <section>',130,416);
+    ctx.fillText('      <Profile /> <Profile />',130,452);
+    ctx.fillText('    </section>',130,488);
+    ctx.fillText('  );',130,524);
+    ctx.fillStyle=GREEN; ctx.fillText('}',130,560);
+    ctx.restore();
+
+    // Labels
+    ctx.save(); ctx.globalAlpha=file1P;
+    ctx.font='600 18px "JetBrains Mono", monospace';
+    ctx.fillStyle=ORANGE; ctx.textAlign='right';
+    ctx.fillText('NAMED ←',880,214);
+    ctx.fillStyle=GREEN;
+    ctx.fillText('DEFAULT ←',880,358);
+    ctx.restore();
+  }
+
+  // App.js importing both
+  const file2P=ease.out(seg(t,s+2.0,s+3.0));
+  if(file2P>0){
+    drawFileBox(ctx,1020,170,800,300,'App.js',REACT,file2P);
+    ctx.save(); ctx.globalAlpha=file2P;
+    ctx.font='500 24px "JetBrains Mono", monospace'; ctx.textAlign='left'; ctx.textBaseline='top';
+    ctx.fillStyle=GREEN; ctx.fillText("import Gallery from './Gallery.js';",1050,200);
+    ctx.fillStyle=ORANGE; ctx.fillText("import { Profile } from './Gallery.js';",1050,240);
+    ctx.fillStyle=TEXT; ctx.fillText('',1050,280);
+    ctx.fillStyle='#c3e88d'; ctx.fillText('export default function App() {',1050,320);
+    ctx.fillStyle=REACT; ctx.fillText('  return <Profile />;',1050,360);
+    ctx.fillStyle='#c3e88d'; ctx.fillText('}',1050,400);
+    ctx.restore();
+  }
+
+  // Rule box
+  const ruleA=ease.out(seg(t,s+4.0,s+5.0));
+  if(ruleA>0){
+    ctx.save(); ctx.globalAlpha=ruleA;
+    ctx.fillStyle='rgba(97,218,251,0.06)';
+    roundRect(ctx,100,680,1720,180,12); ctx.fill();
+    ctx.strokeStyle=REACT+'44'; ctx.lineWidth=2; ctx.stroke();
+    ctx.font='bold 30px "JetBrains Mono", monospace'; ctx.fillStyle=REACT;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('One default export per file',CX,720);
+    ctx.font='400 26px "JetBrains Mono", monospace'; ctx.fillStyle='#94a3b8';
+    ctx.fillText('As many named exports as you want',CX,770);
+    ctx.font='400 22px "JetBrains Mono", monospace'; ctx.fillStyle='#64748b';
+    ctx.fillText('Some teams pick one style: all default or all named. Both work.',CX,820);
+    ctx.restore();
+  }
+}
+
+// ============================================================
+// SCENE 7: Recap (136.5–161s)
+// ============================================================
+function drawScene7(ctx, t) {
+  const s=136.48;
+  ctx.fillStyle=BG; ctx.fillRect(0,0,W,H);
+  const bgGlow=ctx.createRadialGradient(CX,CY,50,CX,CY,700);
+  bgGlow.addColorStop(0,'rgba(97,218,251,0.08)'); bgGlow.addColorStop(1,'transparent');
+  ctx.fillStyle=bgGlow; ctx.fillRect(0,0,W,H); drawGrid(ctx);
+
+  const bgA=ease.out(seg(t,s,s+0.6));
+  drawReactLogo(ctx,CX,CY-280,60,bgA,t);
+
+  const titleA=ease.out(seg(t,s,s+0.5));
+  ctx.save(); ctx.globalAlpha=titleA;
+  ctx.font='600 38px "JetBrains Mono", monospace'; ctx.fillStyle=TEXT;
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText("Here's what you learned",CX,CY-170); ctx.restore();
+
+  const recap=[
+    {icon:'📁',text:'Root component file: App.js — where your app starts',color:REACT,delay:0.4},
+    {icon:'🔢',text:'Three steps: create file, export, import',color:GREEN,delay:0.8},
+    {icon:'📤',text:'Default: one per file, no braces, can rename',color:GREEN,delay:1.2},
+    {icon:'📥',text:'Named: unlimited, curly braces, name must match',color:ORANGE,delay:1.6},
+    {icon:'🔀',text:'Mix both in one file — or pick one team style',color:PURPLE,delay:2.0},
+  ];
+  recap.forEach((item,i) => {
+    const rp=ease.spring(seg(t,s+item.delay,s+item.delay+0.5));
+    if(rp<=0) return;
+    const ry=CY-60+i*90;
+    ctx.save(); ctx.globalAlpha=rp; ctx.translate(0,(1-rp)*20);
+    ctx.font='36px serif'; ctx.textAlign='left'; ctx.textBaseline='middle';
+    ctx.fillText(item.icon,CX-650,ry);
+    ctx.font='500 26px "JetBrains Mono", monospace'; ctx.fillStyle=item.color;
+    ctx.fillText(item.text,CX-590,ry); ctx.restore();
+  });
+
+  const nextA=ease.out(seg(t,s+3.0,s+3.8));
+  if(nextA>0){
+    ctx.save(); ctx.globalAlpha=nextA;
+    ctx.font='bold 48px "JetBrains Mono", monospace'; ctx.fillStyle=REACT;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.shadowColor=REACT; ctx.shadowBlur=20;
+    ctx.fillText('Next up: Writing Markup with JSX  →',CX,CY+380);
+    ctx.shadowBlur=0; ctx.restore();
+  }
+}
+
+// ============================================================
+// SCENE 8: Outro (161–165.5s)
+// ============================================================
+function drawScene8(ctx, t) {
+  const s=161.5;
+  ctx.fillStyle=BG; ctx.fillRect(0,0,W,H);
+  const glow=ctx.createRadialGradient(CX,CY,50,CX,CY,600);
+  glow.addColorStop(0,'rgba(97,218,251,0.15)'); glow.addColorStop(1,'transparent');
+  ctx.fillStyle=glow; ctx.fillRect(0,0,W,H);
+  const bgA=ease.out(seg(t,s,s+0.5));
+  drawReactLogo(ctx,CX,CY-120,90,bgA,t);
+  ctx.save(); ctx.globalAlpha=bgA;
+  ctx.font='bold 100px "JetBrains Mono", monospace'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.shadowColor=REACT; ctx.shadowBlur=30; ctx.fillStyle=TEXT;
+  ctx.fillText('Run the Docs',CX,CY+40); ctx.shadowBlur=0;
+  ctx.font='400 34px "JetBrains Mono", monospace'; ctx.fillStyle='#64748b';
+  ctx.fillText('Technical docs. Made watchable.',CX,CY+115);
+  ctx.font='500 24px "JetBrains Mono", monospace'; ctx.fillStyle=REACT;
+  ctx.fillText('react  ·  ep 2  ·  imports & exports',CX,CY+175);
+  ctx.restore();
+}
+
+// ============================================================
+// Scene routing
+// ============================================================
+const SCENE_TIMES=[0,9.38,27.54,39.56,70.17,90.46,136.48,161.5];
+const SCENE_FNS=[drawScene1,drawScene2,drawScene3,drawScene4,drawScene5,drawScene6,drawScene7,drawScene8];
+
+window.renderFrame = function(frameIndex) {
+  const t=frameIndex/30;
+  const ctx=document.getElementById('c').getContext('2d');
+  ctx.clearRect(0,0,W,H);
+  let si=0;
+  for(let i=1;i<SCENE_TIMES.length;i++){if(t>=SCENE_TIMES[i])si=i;else break;}
+  SCENE_FNS[si](ctx,t);
+  for(let i=1;i<SCENE_TIMES.length;i++){
+    const xf=SCENE_TIMES[i];
+    if(t>=xf&&t<xf+0.4){
+      const ov=seg(t,xf,xf+0.4);
+      ctx.globalAlpha=ov;ctx.fillStyle=BG;ctx.fillRect(0,0,W,H);ctx.globalAlpha=1;
+      SCENE_FNS[i](ctx,t); break;
+    }
+  }
+  drawCaption(ctx,t);
+  if(t>TOTAL_DURATION-1.5){
+    ctx.globalAlpha=seg(t,TOTAL_DURATION-1.0,TOTAL_DURATION);
+    ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);ctx.globalAlpha=1;
+  }
+};
+
+window.setTiming=function(segments,totalDuration){TIMING=segments;TOTAL_DURATION=totalDuration;};
+</script>
+</body>
+</html>

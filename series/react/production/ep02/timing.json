@@ -1,0 +1,183 @@
+{
+  "total_voice_duration": 161.136,
+  "total_duration": 165.516,
+  "total_frames_30fps": 4965,
+  "sample_rate": 24000,
+  "segments": [
+    {
+      "index": 0,
+      "text": "Components are powerful because they're reusable. But as your app grows, you need to split them across files.",
+      "start": 2.0,
+      "end": 9.019,
+      "duration": 7.019
+    },
+    {
+      "index": 1,
+      "text": "Right now, everything lives in one file \u2014 the root component file. Usually called App.js.",
+      "start": 9.399,
+      "end": 16.012,
+      "duration": 6.613
+    },
+    {
+      "index": 2,
+      "text": "App.js is where your app starts. It's the top of the component tree.",
+      "start": 16.392,
+      "end": 21.427,
+      "duration": 5.035
+    },
+    {
+      "index": 3,
+      "text": "But putting every component in one file gets messy fast. Time to split them up.",
+      "start": 21.807,
+      "end": 27.161,
+      "duration": 5.355
+    },
+    {
+      "index": 4,
+      "text": "Moving a component to its own file takes three steps.",
+      "start": 27.541,
+      "end": 31.168,
+      "duration": 3.627
+    },
+    {
+      "index": 5,
+      "text": "Step one: create a new file. Step two: export the component from that file. Step three: import it where you need it.",
+      "start": 31.548,
+      "end": 39.228,
+      "duration": 7.68
+    },
+    {
+      "index": 6,
+      "text": "There are two ways to export: default exports and named exports.",
+      "start": 39.608,
+      "end": 43.896,
+      "duration": 4.288
+    },
+    {
+      "index": 7,
+      "text": "A default export uses the keyword default. A file can only have one.",
+      "start": 44.276,
+      "end": 49.481,
+      "duration": 5.205
+    },
+    {
+      "index": 8,
+      "text": "Export default function Gallery \u2014 that makes Gallery the main thing this file provides.",
+      "start": 49.861,
+      "end": 55.28,
+      "duration": 5.419
+    },
+    {
+      "index": 9,
+      "text": "To import a default export, write import Gallery from Gallery.js. No curly braces.",
+      "start": 55.66,
+      "end": 62.38,
+      "duration": 6.72
+    },
+    {
+      "index": 10,
+      "text": "Here's the key: with default imports, you can rename freely. Import Banana from Gallery.js works.",
+      "start": 62.76,
+      "end": 69.8,
+      "duration": 7.04
+    },
+    {
+      "index": 11,
+      "text": "Named exports are different. No default keyword. Just export function Profile.",
+      "start": 70.18,
+      "end": 75.769,
+      "duration": 5.589
+    },
+    {
+      "index": 12,
+      "text": "To import a named export, you must use curly braces: import Profile in curly braces from Gallery.js.",
+      "start": 76.149,
+      "end": 84.107,
+      "duration": 7.957
+    },
+    {
+      "index": 13,
+      "text": "With named imports, the name must match exactly. That's why they're called named imports.",
+      "start": 84.487,
+      "end": 90.14,
+      "duration": 5.653
+    },
+    {
+      "index": 14,
+      "text": "So when do you use each? Default exports for the main component. Named exports for everything else in the file.",
+      "start": 90.52,
+      "end": 97.581,
+      "duration": 7.061
+    },
+    {
+      "index": 15,
+      "text": "A single file can mix both. Gallery.js can have a default Gallery export and a named Profile export.",
+      "start": 97.961,
+      "end": 105.577,
+      "duration": 7.616
+    },
+    {
+      "index": 16,
+      "text": "App.js then imports both: import Gallery from Gallery.js, and import Profile in curly braces from Gallery.js.",
+      "start": 105.957,
+      "end": 115.173,
+      "duration": 9.216
+    },
+    {
+      "index": 17,
+      "text": "One rule: a file can have at most one default export, but as many named exports as you want.",
+      "start": 115.553,
+      "end": 122.017,
+      "duration": 6.464
+    },
+    {
+      "index": 18,
+      "text": "Some teams pick one style and stick with it. Either all default, or all named. Both work.",
+      "start": 122.397,
+      "end": 128.541,
+      "duration": 6.144
+    },
+    {
+      "index": 19,
+      "text": "The important thing: always give your components meaningful names. No anonymous arrow functions as exports.",
+      "start": 128.921,
+      "end": 136.111,
+      "duration": 7.189
+    },
+    {
+      "index": 20,
+      "text": "Let's recap. Root component file: where your app starts, usually App.js.",
+      "start": 136.491,
+      "end": 141.995,
+      "duration": 5.504
+    },
+    {
+      "index": 21,
+      "text": "Three steps to move a component: create file, export, import.",
+      "start": 142.375,
+      "end": 146.919,
+      "duration": 4.544
+    },
+    {
+      "index": 22,
+      "text": "Default exports: one per file, import without braces, can rename.",
+      "start": 147.299,
+      "end": 152.12,
+      "duration": 4.821
+    },
+    {
+      "index": 23,
+      "text": "Named exports: unlimited per file, import with braces, name must match.",
+      "start": 152.5,
+      "end": 157.748,
+      "duration": 5.248
+    },
+    {
+      "index": 24,
+      "text": "Next up: writing markup with JSX.",
+      "start": 158.128,
+      "end": 161.136,
+      "duration": 3.008
+    }
+  ]
+}
