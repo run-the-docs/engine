@@ -1,0 +1,141 @@
+{
+  "total_voice_duration": 143.091,
+  "total_duration": 147.471,
+  "total_frames_30fps": 4424,
+  "sample_rate": 24000,
+  "segments": [
+    {
+      "index": 0,
+      "text": "React lets you respond to user interactions: clicks, hovers, form inputs. That's event handling.",
+      "start": 2.0,
+      "end": 8.549,
+      "duration": 6.549
+    },
+    {
+      "index": 1,
+      "text": "Three steps. Define a function inside your component. Add your logic. Pass it to the JSX element.",
+      "start": 8.929,
+      "end": 16.012,
+      "duration": 7.083
+    },
+    {
+      "index": 2,
+      "text": "onClick equals open brace, handleClick, close brace. That tells React: call this function when the button is clicked.",
+      "start": 16.392,
+      "end": 24.136,
+      "duration": 7.744
+    },
+    {
+      "index": 3,
+      "text": "By convention, name handlers as handle plus the event name. handleClick, handleMouseEnter, handleSubmit.",
+      "start": 24.516,
+      "end": 32.089,
+      "duration": 7.573
+    },
+    {
+      "index": 4,
+      "text": "You can also define handlers inline. onClick equals arrow function, alert, hello. Works the same.",
+      "start": 32.469,
+      "end": 39.488,
+      "duration": 7.019
+    },
+    {
+      "index": 5,
+      "text": "Critical mistake: don't call the function. onClick equals handleClick \u2014 correct. onClick equals handleClick parentheses \u2014 wrong.",
+      "start": 39.868,
+      "end": 48.487,
+      "duration": 8.619
+    },
+    {
+      "index": 6,
+      "text": "With parentheses, the function fires immediately during render, not on click. Pass the function, don't call it.",
+      "start": 48.867,
+      "end": 56.035,
+      "duration": 7.168
+    },
+    {
+      "index": 7,
+      "text": "Event handlers have access to the component's props. They're defined inside the component, so they can read everything.",
+      "start": 56.415,
+      "end": 63.903,
+      "duration": 7.488
+    },
+    {
+      "index": 8,
+      "text": "You can pass event handlers as props too. Parent passes onClick to a Button component. The Button attaches it to the real button.",
+      "start": 64.283,
+      "end": 73.051,
+      "duration": 8.768
+    },
+    {
+      "index": 9,
+      "text": "This is how design systems work. A generic Button component handles styling. The parent decides what happens on click.",
+      "start": 73.431,
+      "end": 81.452,
+      "duration": 8.021
+    },
+    {
+      "index": 10,
+      "text": "Name your handler props starting with on. onPlay, onClick, onSubmit. The handler function starts with handle.",
+      "start": 81.832,
+      "end": 88.957,
+      "duration": 7.125
+    },
+    {
+      "index": 11,
+      "text": "Events propagate up the tree. A click on a button inside a div triggers both the button's and the div's onClick.",
+      "start": 89.337,
+      "end": 97.081,
+      "duration": 7.744
+    },
+    {
+      "index": 12,
+      "text": "This is called bubbling. The event fires on the target, then moves up to each parent.",
+      "start": 97.461,
+      "end": 102.944,
+      "duration": 5.483
+    },
+    {
+      "index": 13,
+      "text": "To stop propagation, call e dot stopPropagation in your handler. The event object e is the first argument.",
+      "start": 103.324,
+      "end": 111.239,
+      "duration": 7.915
+    },
+    {
+      "index": 14,
+      "text": "There's also e dot preventDefault. Use it to stop the browser's default action, like a form submission refreshing the page.",
+      "start": 111.619,
+      "end": 119.981,
+      "duration": 8.363
+    },
+    {
+      "index": 15,
+      "text": "Let's recap. Event handlers are functions you pass to JSX elements: onClick, onChange, onSubmit.",
+      "start": 120.361,
+      "end": 127.871,
+      "duration": 7.509
+    },
+    {
+      "index": 16,
+      "text": "Pass functions, don't call them. No parentheses after the name.",
+      "start": 128.251,
+      "end": 132.645,
+      "duration": 4.395
+    },
+    {
+      "index": 17,
+      "text": "Events propagate upward. Use stopPropagation to stop bubbling, preventDefault to stop browser defaults.",
+      "start": 133.025,
+      "end": 140.535,
+      "duration": 7.509
+    },
+    {
+      "index": 18,
+      "text": "Next up: conditional rendering.",
+      "start": 140.915,
+      "end": 143.091,
+      "duration": 2.176
+    }
+  ]
+}
