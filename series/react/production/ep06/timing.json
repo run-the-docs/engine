@@ -1,0 +1,162 @@
+{
+  "total_voice_duration": 149.095,
+  "total_duration": 153.475,
+  "total_frames_30fps": 4604,
+  "sample_rate": 24000,
+  "segments": [
+    {
+      "index": 0,
+      "text": "Components need to remember things. The current input value, which image is showing, what's in the cart. That's state.",
+      "start": 2.0,
+      "end": 9.445,
+      "duration": 7.445
+    },
+    {
+      "index": 1,
+      "text": "Regular variables don't work. When React re-renders a component, local variables are created fresh every time.",
+      "start": 9.825,
+      "end": 17.591,
+      "duration": 7.765
+    },
+    {
+      "index": 2,
+      "text": "Two problems: local variables don't persist between renders, and changing them doesn't trigger a re-render.",
+      "start": 17.971,
+      "end": 24.883,
+      "duration": 6.912
+    },
+    {
+      "index": 3,
+      "text": "You need two things: a way to keep data between renders, and a way to tell React to render again.",
+      "start": 25.263,
+      "end": 31.641,
+      "duration": 6.379
+    },
+    {
+      "index": 4,
+      "text": "That's what useState gives you. Import it from React: import useState from react.",
+      "start": 32.021,
+      "end": 37.312,
+      "duration": 5.291
+    },
+    {
+      "index": 5,
+      "text": "Call it like this: const, open bracket, index comma setIndex, close bracket, equals useState, open paren, zero, close paren.",
+      "start": 37.692,
+      "end": 47.057,
+      "duration": 9.365
+    },
+    {
+      "index": 6,
+      "text": "useState returns an array with exactly two items. The current value, and a function to update it.",
+      "start": 47.437,
+      "end": 54.008,
+      "duration": 6.571
+    },
+    {
+      "index": 7,
+      "text": "The square brackets are array destructuring. You're naming the two items: index and setIndex.",
+      "start": 54.388,
+      "end": 60.831,
+      "duration": 6.443
+    },
+    {
+      "index": 8,
+      "text": "When you call setIndex, React stores the new value and re-renders the component with fresh data.",
+      "start": 61.211,
+      "end": 67.461,
+      "duration": 6.251
+    },
+    {
+      "index": 9,
+      "text": "That's the key difference. Regular variables reset on re-render. State persists.",
+      "start": 67.841,
+      "end": 73.196,
+      "duration": 5.355
+    },
+    {
+      "index": 10,
+      "text": "You can have multiple state variables. Each useState call is independent.",
+      "start": 73.576,
+      "end": 78.632,
+      "duration": 5.056
+    },
+    {
+      "index": 11,
+      "text": "const index, setIndex equals useState zero. const showMore, setShowMore equals useState false. Totally fine.",
+      "start": 79.012,
+      "end": 87.588,
+      "duration": 8.576
+    },
+    {
+      "index": 12,
+      "text": "Hooks are special functions that start with use. useState is a Hook. There are others: useEffect, useContext, useRef.",
+      "start": 87.968,
+      "end": 96.245,
+      "duration": 8.277
+    },
+    {
+      "index": 13,
+      "text": "One important rule: only call Hooks at the top level of your component. Never inside loops, conditions, or nested functions.",
+      "start": 96.625,
+      "end": 105.436,
+      "duration": 8.811
+    },
+    {
+      "index": 14,
+      "text": "Why? React relies on the order of Hook calls to know which state belongs to which useState call.",
+      "start": 105.816,
+      "end": 111.725,
+      "duration": 5.909
+    },
+    {
+      "index": 15,
+      "text": "State is local to the component. If you render the same component twice, each copy gets its own state.",
+      "start": 112.105,
+      "end": 118.911,
+      "duration": 6.805
+    },
+    {
+      "index": 16,
+      "text": "Changing state in one instance doesn't affect the other. They're completely independent.",
+      "start": 119.291,
+      "end": 124.837,
+      "duration": 5.547
+    },
+    {
+      "index": 17,
+      "text": "Let's recap. State is a component's memory \u2014 it persists between renders.",
+      "start": 125.217,
+      "end": 130.316,
+      "duration": 5.099
+    },
+    {
+      "index": 18,
+      "text": "useState returns a value and a setter. Calling the setter triggers a re-render.",
+      "start": 130.696,
+      "end": 135.965,
+      "duration": 5.269
+    },
+    {
+      "index": 19,
+      "text": "You can have multiple state variables. Each is independent.",
+      "start": 136.345,
+      "end": 140.505,
+      "duration": 4.16
+    },
+    {
+      "index": 20,
+      "text": "Hooks must be called at the top level. State is local to each component instance.",
+      "start": 140.885,
+      "end": 146.453,
+      "duration": 5.568
+    },
+    {
+      "index": 21,
+      "text": "Next up: responding to events.",
+      "start": 146.833,
+      "end": 149.095,
+      "duration": 2.261
+    }
+  ]
+}
