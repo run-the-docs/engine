@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#0d0d1a;width:1920px;height:1080px;overflow:hidden;}canvas{display:block;}</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+const W=1920,H=1080,CX=960,CY=540;
+const BG='#0d0d1a',REACT='#61dafb',TEXT='#f8fafc',CODE_BG='#0d1117';
+const GREEN='#22c55e',YELLOW='#eab308',RED='#ef4444',PURPLE='#a78bfa',ORANGE='#f97316';
+let TIMING=[{"index": 0, "text": "JSX lets you write markup inside JavaScript. But sometimes you need JavaScript inside that markup.", "start": 2.0, "end": 9.957}, {"index": 1, "text": "Curly braces are the escape hatch. They open a window from JSX back into JavaScript.", "start": 10.337, "end": 16.844}, {"index": 2, "text": "Start simple. String attributes use quotes: src equals quote, URL, quote. That's a fixed string.", "start": 17.224, "end": 24.221}, {"index": 3, "text": "But what if the URL comes from a variable? Replace the quotes with curly braces: src equals open brace, avatar, close brace.", "start": 24.601, "end": 33.988}, {"index": 4, "text": "Now React reads the avatar variable instead of a literal string. That's the core idea.", "start": 34.368, "end": 40.448}, {"index": 5, "text": "Any JavaScript expression works inside curly braces. Variables, function calls, math \u2014 anything that produces a value.", "start": 40.828, "end": 49.489}, {"index": 6, "text": "Here's a function call: open brace, formatDate, parentheses, today, close brace. React runs the function and inserts the result.", "start": 49.869, "end": 58.787}, {"index": 7, "text": "Where can you use curly braces? Two places only.", "start": 59.167, "end": 62.559}, {"index": 8, "text": "First: as text inside a JSX tag. Open brace, name, close brace \u2014 renders the variable as text content.", "start": 62.939, "end": 71.152}, {"index": 9, "text": "Second: as an attribute value, right after the equals sign. src equals open brace, avatar, close brace.", "start": 71.532, "end": 79.553}, {"index": 10, "text": "You cannot use curly braces for tag names. Open angle bracket, open brace, tag, close brace won't work.", "start": 79.933, "end": 87.549}, {"index": 11, "text": "Now for the confusing part: double curly braces. They look special, but they're not.", "start": 87.929, "end": 93.305}, {"index": 12, "text": "The outer braces say: this is JavaScript. The inner braces say: this is a JavaScript object.", "start": 93.685, "end": 100.277}, {"index": 13, "text": "You see this most with inline styles. style equals open brace, open brace, backgroundColor colon black, close brace, close brace.", "start": 100.657, "end": 110.257}, {"index": 14, "text": "The first brace enters JavaScript. The second brace is just an object literal. That's all double curlies are.", "start": 110.637, "end": 118.083}, {"index": 15, "text": "Remember: inline style properties use camelCase too. backgroundColor, not background-color. fontSize, not font-size.", "start": 118.463, "end": 127.039}, {"index": 16, "text": "You can also extract data into an object variable. person dot theme for styles, person dot name for text.", "start": 127.419, "end": 134.907}, {"index": 17, "text": "This keeps your JSX clean. All the data lives in one place, and curly braces reference it.", "start": 135.287, "end": 141.708}, {"index": 18, "text": "Let's recap. Curly braces are your escape hatch from JSX into JavaScript.", "start": 142.088, "end": 147.869}, {"index": 19, "text": "Quotes for fixed strings. Curly braces for dynamic values \u2014 variables, expressions, function calls.", "start": 148.249, "end": 155.247}, {"index": 20, "text": "Double curlies: just an object inside curly braces. Nothing magical.", "start": 155.627, "end": 160.725}, {"index": 21, "text": "Next up: passing props to a component.", "start": 161.105, "end": 163.729}];let TOTAL_DURATION=168.109;
+const ease={out:t=>1-Math.pow(1-t,3),spring:t=>{const c=(2*Math.PI)/2.5;return t===0?0:t===1?1:Math.pow(2,-10*t)*Math.sin((t*10-0.75)*c)+1;}};
+function seg(t,s,e){return Math.max(0,Math.min(1,(t-s)/(e-s)));}
+function roundRect(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.quadraticCurveTo(x+w,y,x+w,y+r);c.lineTo(x+w,y+h-r);c.quadraticCurveTo(x+w,y+h,x+w-r,y+h);c.lineTo(x+r,y+h);c.quadraticCurveTo(x,y+h,x,y+h-r);c.lineTo(x,y+r);c.quadraticCurveTo(x,y,x+r,y);c.closePath();}
+function drawGrid(c){c.strokeStyle='rgba(97,218,251,0.03)';c.lineWidth=1;for(let x=0;x<W;x+=80){c.beginPath();c.moveTo(x,0);c.lineTo(x,H);c.stroke();}for(let y=0;y<H;y+=80){c.beginPath();c.moveTo(0,y);c.lineTo(W,y);c.stroke();}}
+function drawReactLogo(c,cx,cy,r,a,t){if(a<=0)return;c.save();c.globalAlpha=a;c.strokeStyle=REACT;c.lineWidth=r*0.06;c.shadowColor=REACT;c.shadowBlur=18*a;for(let i=0;i<3;i++){c.save();c.translate(cx,cy);c.rotate(i*Math.PI/3+t*0.4);c.beginPath();c.ellipse(0,0,r,r*0.38,0,0,Math.PI*2);c.stroke();c.restore();}c.fillStyle=REACT;c.shadowBlur=0;c.beginPath();c.arc(cx,cy,r*0.18,0,Math.PI*2);c.fill();c.restore();}
+function drawCaption(c,t){let txt='';for(const s of TIMING){if(t>=s.start-0.1&&t<=s.end+0.3){txt=s.text;break;}}if(!txt)return;c.save();c.font='500 20px "JetBrains Mono",monospace';const tw=c.measureText(txt).width,pw=Math.min(tw+48,W-100);c.globalAlpha=0.9;c.fillStyle='rgba(0,0,0,0.85)';roundRect(c,CX-pw/2,968,pw,44,22);c.fill();c.globalAlpha=1;c.fillStyle=TEXT;c.textAlign='center';c.textBaseline='middle';let d=txt;while(c.measureText(d).width>pw-48&&d.length>10)d=d.slice(0,-1);if(d!==txt)d+='…';c.fillText(d,CX,990);c.restore();}
+function drawFileBox(c,x,y,w,h,name,color,a){c.save();c.globalAlpha=a;c.fillStyle=CODE_BG;roundRect(c,x,y,w,h,12);c.fill();c.strokeStyle=color+'88';c.lineWidth=2;c.stroke();c.fillStyle=color+'33';roundRect(c,x,y-30,Math.min(180,name.length*14),30,6);c.fill();c.font='500 16px "JetBrains Mono",monospace';c.fillStyle=color;c.textAlign='left';c.textBaseline='middle';c.fillText(name,x+12,y-15);c.restore();}
+
+// S1: Hook
+function drawScene1(c,t){
+  c.fillStyle=BG;c.fillRect(0,0,W,H);drawGrid(c);
+  const lp=ease.spring(seg(t,2,3));drawReactLogo(c,CX,CY-110,130*lp,lp,t);
+  const ta=ease.out(seg(t,2.5,3.5));
+  if(ta>0){c.save();c.globalAlpha=ta;c.font='bold 110px "JetBrains Mono",monospace';c.fillStyle=YELLOW;c.textAlign='center';c.textBaseline='middle';c.shadowColor=YELLOW;c.shadowBlur=20;c.fillText('{ }',CX,CY+80);c.shadowBlur=0;c.restore();}
+  const sa=ease.out(seg(t,3.3,4.1));
+  if(sa>0){c.save();c.globalAlpha=sa;c.font='500 48px "JetBrains Mono",monospace';c.fillStyle=TEXT;c.textAlign='center';c.textBaseline='middle';c.fillText('JavaScript in JSX',CX,CY+210);c.restore();}
+  const ma=ease.out(seg(t,4.1,5));
+  if(ma>0){c.save();c.globalAlpha=ma;c.font='400 28px "JetBrains Mono",monospace';c.fillStyle='#64748b';c.textAlign='center';c.textBaseline='middle';c.fillText('react.dev/learn  ·  Episode 4',CX,CY+270);c.restore();}
+}
+
+// S2: Quotes vs Braces (10–34s)
+function drawScene2(c,t){
+  const s=10.33;
+  c.fillStyle=BG;c.fillRect(0,0,W,H);drawGrid(c);
+  c.save();c.globalAlpha=ease.out(seg(t,s,s+0.4));c.font='600 42px "JetBrains Mono",monospace';c.fillStyle=REACT;c.textAlign='center';c.textBaseline='middle';c.fillText('Quotes vs Curly Braces',CX,100);c.restore();
+
+  // Fixed string
+  const fp=ease.out(seg(t,s+0.5,s+1.5));
+  if(fp>0){
+    drawFileBox(c,100,180,800,280,'Fixed String',PURPLE,fp);
+    c.save();c.globalAlpha=fp;c.font='500 28px "JetBrains Mono",monospace';c.textAlign='left';c.textBaseline='top';
+    c.fillStyle='#89ddff';c.fillText('<img',130,210);
+    c.fillStyle=PURPLE;c.fillText('  src="https://example.jpg"',130,250);
+    c.fillStyle=PURPLE;c.fillText('  alt="A photo"',130,290);
+    c.fillStyle='#89ddff';c.fillText('/>',130,330);
+    c.font='400 22px "JetBrains Mono",monospace';c.fillStyle='#64748b';c.fillText('← quotes = literal string',560,250);
+    c.restore();
+  }
+
+  // Dynamic value
+  const dp=ease.spring(seg(t,24.6,26));
+  if(dp>0){
+    drawFileBox(c,1020,180,800,280,'Dynamic Value',YELLOW,dp);
+    c.save();c.globalAlpha=dp;c.font='500 28px "JetBrains Mono",monospace';c.textAlign='left';c.textBaseline='top';
+    c.fillStyle='#c792ea';c.fillText('const avatar = "...url";',1050,210);
+    c.fillStyle='#89ddff';c.fillText('<img',1050,260);
+    c.fillStyle=YELLOW;c.fillText('  src={avatar}',1050,300);
+    c.fillStyle='#89ddff';c.fillText('/>',1050,340);
+    c.font='400 22px "JetBrains Mono",monospace';c.fillStyle='#64748b';c.fillText('← braces = JavaScript value',1460,300);
+    c.restore();
+  }
+
+  const keyA=ease.out(seg(t,34,35));
+  if(keyA>0){c.save();c.globalAlpha=keyA;c.fillStyle='rgba(234,179,8,0.08)';roundRect(c,200,520,1520,100,12);c.fill();c.strokeStyle=YELLOW+'66';c.lineWidth=2;c.stroke();c.font='bold 32px "JetBrains Mono",monospace';c.fillStyle=YELLOW;c.textAlign='center';c.textBaseline='middle';c.fillText('"quotes" = fixed string    { braces } = JavaScript',CX,570);c.restore();}
+}
+
+// S3: Expressions (34–59s)
+function drawScene3(c,t){
+  const s=34.36;
+  c.fillStyle=BG;c.fillRect(0,0,W,H);drawGrid(c);
+  c.save();c.globalAlpha=ease.out(seg(t,s,s+0.4));c.font='600 42px "JetBrains Mono",monospace';c.fillStyle=YELLOW;c.textAlign='center';c.textBaseline='middle';c.fillText('Any Expression Works',CX,100);c.restore();
+
+  const examples=[
+    {icon:'📦',code:'{name}',desc:'Variable reference',color:REACT,delay:0},
+    {icon:'🔧',code:'{formatDate(today)}',desc:'Function call',color:GREEN,delay:0.5},
+    {icon:'🔢',code:'{count + 1}',desc:'Math expression',color:YELLOW,delay:1.0},
+    {icon:'❓',code:'{isAdmin ? "Yes" : "No"}',desc:'Ternary expression',color:ORANGE,delay:1.5},
+  ];
+  examples.forEach((ex,i)=>{
+    const ep=ease.spring(seg(t,s+0.5+ex.delay,s+1.3+ex.delay));
+    if(ep<=0)return;
+    const ey=200+i*180;
+    c.save();c.globalAlpha=ep;c.translate(0,(1-ep)*20);
+    c.fillStyle='rgba(97,218,251,0.04)';roundRect(c,200,ey,1520,140,12);c.fill();
+    c.strokeStyle=ex.color+'55';c.lineWidth=2;c.stroke();
+    c.fillStyle=ex.color;roundRect(c,200,ey,5,140,2);c.fill();
+    c.font='48px serif';c.textAlign='left';c.textBaseline='middle';c.fillText(ex.icon,230,ey+45);
+    c.font='bold 32px "JetBrains Mono",monospace';c.fillStyle=ex.color;c.fillText(ex.code,310,ey+40);
+    c.font='400 24px "JetBrains Mono",monospace';c.fillStyle='#94a3b8';c.fillText(ex.desc,310,ey+95);
+    c.restore();
+  });
+}
+
+// S4: Where to use (59–88s)
+function drawScene4(c,t){
+  const s=59.15;
+  c.fillStyle=BG;c.fillRect(0,0,W,H);drawGrid(c);
+  c.save();c.globalAlpha=ease.out(seg(t,s,s+0.4));c.font='600 42px "JetBrains Mono",monospace';c.fillStyle=GREEN;c.textAlign='center';c.textBaseline='middle';c.fillText('Where Can You Use { } ?',CX,100);c.restore();
+
+  // Place 1: Text content
+  const p1=ease.spring(seg(t,s+0.5,s+1.5));
+  if(p1>0){
+    c.save();c.globalAlpha=p1;
+    c.fillStyle='rgba(34,197,94,0.06)';roundRect(c,100,200,1720,250,16);c.fill();
+    c.strokeStyle=GREEN+'66';c.lineWidth=2;c.stroke();
+    c.font='600 30px "JetBrains Mono",monospace';c.fillStyle=GREEN;c.textAlign='left';c.textBaseline='middle';
+    c.fillText('✅  1. As text content',140,240);
+    c.font='500 28px "JetBrains Mono",monospace';c.fillStyle=REACT;
+    c.fillText('<h1>{name}\'s To Do List</h1>',180,310);
+    c.font='400 22px "JetBrains Mono",monospace';c.fillStyle='#94a3b8';
+    c.fillText('Renders the value of name as text',180,380);
+    c.restore();
+  }
+
+  // Place 2: Attributes
+  const p2=ease.spring(seg(t,71.5,72.5));
+  if(p2>0){
+    c.save();c.globalAlpha=p2;
+    c.fillStyle='rgba(34,197,94,0.06)';roundRect(c,100,500,1720,250,16);c.fill();
+    c.strokeStyle=GREEN+'66';c.lineWidth=2;c.stroke();
+    c.font='600 30px "JetBrains Mono",monospace';c.fillStyle=GREEN;c.textAlign='left';c.textBaseline='middle';
+    c.fillText('✅  2. As attribute values (after =)',140,540);
+    c.font='500 28px "JetBrains Mono",monospace';c.fillStyle=REACT;
+    c.fillText('src={avatar}   className={styles.photo}',180,610);
+    c.font='400 22px "JetBrains Mono",monospace';c.fillStyle='#94a3b8';
+    c.fillText('Reads the JavaScript variable as the attribute value',180,680);
+    c.restore();
+  }
+
+  // Not allowed
+  const na=ease.out(seg(t,79.9,81));
+  if(na>0){
+    c.save();c.globalAlpha=na;
+    c.fillStyle='rgba(239,68,68,0.06)';roundRect(c,100,800,1720,100,12);c.fill();
+    c.strokeStyle=RED+'44';c.lineWidth=2;c.stroke();
+    c.font='500 26px "JetBrains Mono",monospace';c.fillStyle=RED;c.textAlign='center';c.textBaseline='middle';
+    c.fillText('❌  NOT for tag names:  <{tag}> won\'t work',CX,850);
+    c.restore();
+  }
+}
+
+// S5: Double Curlies (88–118s)
+function drawScene5(c,t){
+  const s=87.88;
+  c.fillStyle=BG;c.fillRect(0,0,W,H);drawGrid(c);
+  c.save();c.globalAlpha=ease.out(seg(t,s,s+0.4));c.font='600 42px "JetBrains Mono",monospace';c.fillStyle=ORANGE;c.textAlign='center';c.textBaseline='middle';c.fillText('Double Curlies {{ }}',CX,100);c.restore();
+
+  // Big visual
+  const bp=ease.spring(seg(t,s+1,s+2));
+  if(bp>0){
+    c.save();c.globalAlpha=bp;
+    // Outer brace
+    c.font='bold 200px "JetBrains Mono",monospace';c.fillStyle=YELLOW+'44';c.textAlign='center';c.textBaseline='middle';
+    c.fillText('{',CX-200,CY-60);c.fillText('}',CX+200,CY-60);
+    // Inner brace
+    c.font='bold 140px "JetBrains Mono",monospace';c.fillStyle=ORANGE;
+    c.fillText('{',CX-100,CY-60);c.fillText('}',CX+100,CY-60);
+    // Labels
+    c.font='500 24px "JetBrains Mono",monospace';
+    c.fillStyle=YELLOW;c.fillText('JSX → JS',CX-280,CY+80);
+    c.fillStyle=ORANGE;c.fillText('JS Object',CX+280,CY+80);
+    c.restore();
+  }
+
+  // Code example
+  const cp=ease.out(seg(t,100.7,102));
+  if(cp>0){
+    drawFileBox(c,200,550,1520,300,'Inline Styles',ORANGE,cp);
+    c.save();c.globalAlpha=cp;c.font='500 26px "JetBrains Mono",monospace';c.textAlign='left';c.textBaseline='top';
+    c.fillStyle='#89ddff';c.fillText('<ul style={',230,580);
+    c.fillStyle=ORANGE;c.fillText('  {',230,616);
+    c.fillText('    backgroundColor: "black",',230,652);
+    c.fillText('    color: "pink"',230,688);
+    c.fillText('  }',230,724);
+    c.fillStyle='#89ddff';c.fillText('}>',230,760);
+    c.font='400 22px "JetBrains Mono",monospace';c.fillStyle='#64748b';
+    c.fillText('outer { } = enter JS  ·  inner { } = object literal',900,660);
+    c.restore();
+  }
+}
+
+// S6: Extract Data (118–142s)
+function drawScene6(c,t){
+  const s=118.46;
+  c.fillStyle=BG;c.fillRect(0,0,W,H);drawGrid(c);
+  c.save();c.globalAlpha=ease.out(seg(t,s,s+0.4));c.font='600 42px "JetBrains Mono",monospace';c.fillStyle=PURPLE;c.textAlign='center';c.textBaseline='middle';c.fillText('Extract Data into Objects',CX,100);c.restore();
+
+  const lp=ease.out(seg(t,s+0.5,s+1.5));
+  if(lp>0){
+    drawFileBox(c,100,170,800,500,'Data Object',PURPLE,lp);
+    c.save();c.globalAlpha=lp;c.font='500 24px "JetBrains Mono",monospace';c.textAlign='left';c.textBaseline='top';
+    c.fillStyle='#c792ea';c.fillText('const person = {',130,200);
+    c.fillStyle=TEXT;c.fillText('  name: "Gregorio",',130,236);
+    c.fillText('  theme: {',130,272);
+    c.fillStyle=ORANGE;c.fillText('    backgroundColor: "black",',130,308);
+    c.fillText('    color: "pink"',130,344);
+    c.fillStyle=TEXT;c.fillText('  }',130,380);
+    c.fillStyle='#c792ea';c.fillText('};',130,416);
+    c.restore();
+  }
+
+  const rp=ease.out(seg(t,s+2,s+3));
+  if(rp>0){
+    drawFileBox(c,1020,170,800,300,'Usage in JSX',REACT,rp);
+    c.save();c.globalAlpha=rp;c.font='500 24px "JetBrains Mono",monospace';c.textAlign='left';c.textBaseline='top';
+    c.fillStyle='#89ddff';c.fillText('<div style={',1050,200);
+    c.fillStyle=PURPLE;c.fillText('person.theme',1280,200);
+    c.fillStyle='#89ddff';c.fillText('}>',1490,200);
+    c.fillStyle='#89ddff';c.fillText('  <h1>{',1050,240);
+    c.fillStyle=PURPLE;c.fillText('person.name',1170,240);
+    c.fillStyle='#89ddff';c.fillText("}' Todos</h1>",1365,240);
+    c.fillStyle='#89ddff';c.fillText('</div>',1050,280);
+    c.restore();
+  }
+
+  const noteA=ease.out(seg(t,135.3,136.3));
+  if(noteA>0){c.save();c.globalAlpha=noteA;c.fillStyle='rgba(168,85,247,0.06)';roundRect(c,200,700,1520,100,12);c.fill();c.strokeStyle=PURPLE+'44';c.lineWidth=2;c.stroke();c.font='500 26px "JetBrains Mono",monospace';c.fillStyle=PURPLE;c.textAlign='center';c.textBaseline='middle';c.fillText('Data in one place, JSX references it — clean separation',CX,750);c.restore();}
+}
+
+// S7: Recap (142–164s)
+function drawScene7(c,t){
+  const s=142.06;
+  c.fillStyle=BG;c.fillRect(0,0,W,H);
+  const bg=c.createRadialGradient(CX,CY,50,CX,CY,700);bg.addColorStop(0,'rgba(97,218,251,0.08)');bg.addColorStop(1,'transparent');c.fillStyle=bg;c.fillRect(0,0,W,H);drawGrid(c);
+  drawReactLogo(c,CX,CY-280,60,ease.out(seg(t,s,s+0.6)),t);
+  c.save();c.globalAlpha=ease.out(seg(t,s,s+0.5));c.font='600 38px "JetBrains Mono",monospace';c.fillStyle=TEXT;c.textAlign='center';c.textBaseline='middle';c.fillText("Here's what you learned",CX,CY-170);c.restore();
+  const recap=[
+    {icon:'🔑',text:'{ } = escape hatch from JSX into JavaScript',color:YELLOW,delay:0.4},
+    {icon:'💬',text:'"quotes" for strings, {braces} for dynamic values',color:REACT,delay:0.8},
+    {icon:'📍',text:'Use in text content and after = in attributes',color:GREEN,delay:1.2},
+    {icon:'📦',text:'{{ }} = object inside braces, not special syntax',color:ORANGE,delay:1.6},
+    {icon:'🐪',text:'Inline styles use camelCase: backgroundColor, fontSize',color:PURPLE,delay:2.0},
+  ];
+  recap.forEach((item,i)=>{
+    const rp=ease.spring(seg(t,s+item.delay,s+item.delay+0.5));if(rp<=0)return;
+    const ry=CY-60+i*90;
+    c.save();c.globalAlpha=rp;c.translate(0,(1-rp)*20);
+    c.font='36px serif';c.textAlign='left';c.textBaseline='middle';c.fillText(item.icon,CX-650,ry);
+    c.font='500 24px "JetBrains Mono",monospace';c.fillStyle=item.color;c.fillText(item.text,CX-590,ry);c.restore();
+  });
+  const na=ease.out(seg(t,s+3,s+3.8));
+  if(na>0){c.save();c.globalAlpha=na;c.font='bold 48px "JetBrains Mono",monospace';c.fillStyle=REACT;c.textAlign='center';c.textBaseline='middle';c.shadowColor=REACT;c.shadowBlur=20;c.fillText('Next up: Props  →',CX,CY+380);c.shadowBlur=0;c.restore();}
+}
+
+// S8: Outro
+function drawScene8(c,t){
+  const s=164;c.fillStyle=BG;c.fillRect(0,0,W,H);
+  const g=c.createRadialGradient(CX,CY,50,CX,CY,600);g.addColorStop(0,'rgba(97,218,251,0.15)');g.addColorStop(1,'transparent');c.fillStyle=g;c.fillRect(0,0,W,H);
+  const a=ease.out(seg(t,s,s+0.5));drawReactLogo(c,CX,CY-120,90,a,t);
+  c.save();c.globalAlpha=a;c.font='bold 100px "JetBrains Mono",monospace';c.textAlign='center';c.textBaseline='middle';c.shadowColor=REACT;c.shadowBlur=30;c.fillStyle=TEXT;c.fillText('Run the Docs',CX,CY+40);c.shadowBlur=0;c.font='400 34px "JetBrains Mono",monospace';c.fillStyle='#64748b';c.fillText('Technical docs. Made watchable.',CX,CY+115);c.font='500 24px "JetBrains Mono",monospace';c.fillStyle=REACT;c.fillText('react  ·  ep 4  ·  curly braces',CX,CY+175);c.restore();
+}
+
+const ST=[0,10.33,34.36,59.15,87.88,118.46,142.06,164];
+const SF=[drawScene1,drawScene2,drawScene3,drawScene4,drawScene5,drawScene6,drawScene7,drawScene8];
+window.renderFrame=function(fi){
+  const t=fi/30,c=document.getElementById('c').getContext('2d');c.clearRect(0,0,W,H);
+  let si=0;for(let i=1;i<ST.length;i++){if(t>=ST[i])si=i;else break;}
+  SF[si](c,t);
+  for(let i=1;i<ST.length;i++){const xf=ST[i];if(t>=xf&&t<xf+0.4){const ov=seg(t,xf,xf+0.4);c.globalAlpha=ov;c.fillStyle=BG;c.fillRect(0,0,W,H);c.globalAlpha=1;SF[i](c,t);break;}}
+  drawCaption(c,t);
+  if(t>TOTAL_DURATION-1.5){c.globalAlpha=seg(t,TOTAL_DURATION-1,TOTAL_DURATION);c.fillStyle='#000';c.fillRect(0,0,W,H);c.globalAlpha=1;}
+};
+window.setTiming=function(s,d){TIMING=s;TOTAL_DURATION=d;};
+</script>
+</body>
+</html>

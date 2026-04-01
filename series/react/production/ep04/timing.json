@@ -1,0 +1,162 @@
+{
+  "total_voice_duration": 163.729,
+  "total_duration": 168.109,
+  "total_frames_30fps": 5043,
+  "sample_rate": 24000,
+  "segments": [
+    {
+      "index": 0,
+      "text": "JSX lets you write markup inside JavaScript. But sometimes you need JavaScript inside that markup.",
+      "start": 2.0,
+      "end": 9.957,
+      "duration": 7.957
+    },
+    {
+      "index": 1,
+      "text": "Curly braces are the escape hatch. They open a window from JSX back into JavaScript.",
+      "start": 10.337,
+      "end": 16.844,
+      "duration": 6.507
+    },
+    {
+      "index": 2,
+      "text": "Start simple. String attributes use quotes: src equals quote, URL, quote. That's a fixed string.",
+      "start": 17.224,
+      "end": 24.221,
+      "duration": 6.997
+    },
+    {
+      "index": 3,
+      "text": "But what if the URL comes from a variable? Replace the quotes with curly braces: src equals open brace, avatar, close brace.",
+      "start": 24.601,
+      "end": 33.988,
+      "duration": 9.387
+    },
+    {
+      "index": 4,
+      "text": "Now React reads the avatar variable instead of a literal string. That's the core idea.",
+      "start": 34.368,
+      "end": 40.448,
+      "duration": 6.08
+    },
+    {
+      "index": 5,
+      "text": "Any JavaScript expression works inside curly braces. Variables, function calls, math \u2014 anything that produces a value.",
+      "start": 40.828,
+      "end": 49.489,
+      "duration": 8.661
+    },
+    {
+      "index": 6,
+      "text": "Here's a function call: open brace, formatDate, parentheses, today, close brace. React runs the function and inserts the result.",
+      "start": 49.869,
+      "end": 58.787,
+      "duration": 8.917
+    },
+    {
+      "index": 7,
+      "text": "Where can you use curly braces? Two places only.",
+      "start": 59.167,
+      "end": 62.559,
+      "duration": 3.392
+    },
+    {
+      "index": 8,
+      "text": "First: as text inside a JSX tag. Open brace, name, close brace \u2014 renders the variable as text content.",
+      "start": 62.939,
+      "end": 71.152,
+      "duration": 8.213
+    },
+    {
+      "index": 9,
+      "text": "Second: as an attribute value, right after the equals sign. src equals open brace, avatar, close brace.",
+      "start": 71.532,
+      "end": 79.553,
+      "duration": 8.021
+    },
+    {
+      "index": 10,
+      "text": "You cannot use curly braces for tag names. Open angle bracket, open brace, tag, close brace won't work.",
+      "start": 79.933,
+      "end": 87.549,
+      "duration": 7.616
+    },
+    {
+      "index": 11,
+      "text": "Now for the confusing part: double curly braces. They look special, but they're not.",
+      "start": 87.929,
+      "end": 93.305,
+      "duration": 5.376
+    },
+    {
+      "index": 12,
+      "text": "The outer braces say: this is JavaScript. The inner braces say: this is a JavaScript object.",
+      "start": 93.685,
+      "end": 100.277,
+      "duration": 6.592
+    },
+    {
+      "index": 13,
+      "text": "You see this most with inline styles. style equals open brace, open brace, backgroundColor colon black, close brace, close brace.",
+      "start": 100.657,
+      "end": 110.257,
+      "duration": 9.6
+    },
+    {
+      "index": 14,
+      "text": "The first brace enters JavaScript. The second brace is just an object literal. That's all double curlies are.",
+      "start": 110.637,
+      "end": 118.083,
+      "duration": 7.445
+    },
+    {
+      "index": 15,
+      "text": "Remember: inline style properties use camelCase too. backgroundColor, not background-color. fontSize, not font-size.",
+      "start": 118.463,
+      "end": 127.039,
+      "duration": 8.576
+    },
+    {
+      "index": 16,
+      "text": "You can also extract data into an object variable. person dot theme for styles, person dot name for text.",
+      "start": 127.419,
+      "end": 134.907,
+      "duration": 7.488
+    },
+    {
+      "index": 17,
+      "text": "This keeps your JSX clean. All the data lives in one place, and curly braces reference it.",
+      "start": 135.287,
+      "end": 141.708,
+      "duration": 6.421
+    },
+    {
+      "index": 18,
+      "text": "Let's recap. Curly braces are your escape hatch from JSX into JavaScript.",
+      "start": 142.088,
+      "end": 147.869,
+      "duration": 5.781
+    },
+    {
+      "index": 19,
+      "text": "Quotes for fixed strings. Curly braces for dynamic values \u2014 variables, expressions, function calls.",
+      "start": 148.249,
+      "end": 155.247,
+      "duration": 6.997
+    },
+    {
+      "index": 20,
+      "text": "Double curlies: just an object inside curly braces. Nothing magical.",
+      "start": 155.627,
+      "end": 160.725,
+      "duration": 5.099
+    },
+    {
+      "index": 21,
+      "text": "Next up: passing props to a component.",
+      "start": 161.105,
+      "end": 163.729,
+      "duration": 2.624
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+1
+00:00:02,000 --> 00:00:09,957
+JSX lets you write markup inside JavaScript. But sometimes you need JavaScript inside that markup.
+
+2
+00:00:10,336 --> 00:00:16,844
+Curly braces are the escape hatch. They open a window from JSX back into JavaScript.
+
+3
+00:00:17,224 --> 00:00:24,221
+Start simple. String attributes use quotes: src equals quote, URL, quote. That's a fixed string.
+
+4
+00:00:24,600 --> 00:00:33,987
+But what if the URL comes from a variable? Replace the quotes with curly braces: src equals open brace, avatar, close brace.
+
+5
+00:00:34,368 --> 00:00:40,448
+Now React reads the avatar variable instead of a literal string. That's the core idea.
+
+6
+00:00:40,828 --> 00:00:49,488
+Any JavaScript expression works inside curly braces. Variables, function calls, math — anything that produces a value.
+
+7
+00:00:49,868 --> 00:00:58,786
+Here's a function call: open brace, formatDate, parentheses, today, close brace. React runs the function and inserts the result.
+
+8
+00:00:59,167 --> 00:01:02,558
+Where can you use curly braces? Two places only.
+
+9
+00:01:02,939 --> 00:01:11,152
+First: as text inside a JSX tag. Open brace, name, close brace — renders the variable as text content.
+
+10
+00:01:11,531 --> 00:01:19,552
+Second: as an attribute value, right after the equals sign. src equals open brace, avatar, close brace.
+
+11
+00:01:19,933 --> 00:01:27,549
+You cannot use curly braces for tag names. Open angle bracket, open brace, tag, close brace won't work.
+
+12
+00:01:27,929 --> 00:01:33,305
+Now for the confusing part: double curly braces. They look special, but they're not.
+
+13
+00:01:33,685 --> 00:01:40,277
+The outer braces say: this is JavaScript. The inner braces say: this is a JavaScript object.
+
+14
+00:01:40,656 --> 00:01:50,257
+You see this most with inline styles. style equals open brace, open brace, backgroundColor colon black, close brace, close brace.
+
+15
+00:01:50,637 --> 00:01:58,082
+The first brace enters JavaScript. The second brace is just an object literal. That's all double curlies are.
+
+16
+00:01:58,462 --> 00:02:07,039
+Remember: inline style properties use camelCase too. backgroundColor, not background-color. fontSize, not font-size.
+
+17
+00:02:07,418 --> 00:02:14,907
+You can also extract data into an object variable. person dot theme for styles, person dot name for text.
+
+18
+00:02:15,287 --> 00:02:21,707
+This keeps your JSX clean. All the data lives in one place, and curly braces reference it.
+
+19
+00:02:22,087 --> 00:02:27,868
+Let's recap. Curly braces are your escape hatch from JSX into JavaScript.
+
+20
+00:02:28,248 --> 00:02:35,247
+Quotes for fixed strings. Curly braces for dynamic values — variables, expressions, function calls.
+
+21
+00:02:35,627 --> 00:02:40,724
+Double curlies: just an object inside curly braces. Nothing magical.
+
+22
+00:02:41,104 --> 00:02:43,729
+Next up: passing props to a component.
