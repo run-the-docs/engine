@@ -1,0 +1,162 @@
+{
+  "total_voice_duration": 169.191,
+  "total_duration": 173.571,
+  "total_frames_30fps": 5207,
+  "sample_rate": 24000,
+  "segments": [
+    {
+      "index": 0,
+      "text": "JSX is how React lets you write HTML-like markup inside JavaScript. Most React developers use it every day.",
+      "start": 2.0,
+      "end": 11.259,
+      "duration": 9.259
+    },
+    {
+      "index": 1,
+      "text": "Traditionally, web developers kept HTML, CSS, and JavaScript in separate files.",
+      "start": 11.639,
+      "end": 18.359,
+      "duration": 6.72
+    },
+    {
+      "index": 2,
+      "text": "But as apps got more interactive, logic started controlling the markup. JavaScript decided what HTML to show.",
+      "start": 18.739,
+      "end": 26.717,
+      "duration": 7.979
+    },
+    {
+      "index": 3,
+      "text": "React embraces this. In React, rendering logic and markup live together in the same component.",
+      "start": 27.097,
+      "end": 33.86,
+      "duration": 6.763
+    },
+    {
+      "index": 4,
+      "text": "A sidebar component contains both the layout markup and the logic that controls it.",
+      "start": 34.24,
+      "end": 40.192,
+      "duration": 5.952
+    },
+    {
+      "index": 5,
+      "text": "This isn't HTML though. It's JSX \u2014 a syntax extension for JavaScript that looks like HTML but has stricter rules.",
+      "start": 40.572,
+      "end": 49.681,
+      "duration": 9.109
+    },
+    {
+      "index": 6,
+      "text": "JSX and React are separate things. JSX is the syntax, React is the library. You can use them independently.",
+      "start": 50.061,
+      "end": 58.893,
+      "duration": 8.832
+    },
+    {
+      "index": 7,
+      "text": "Let's convert some HTML to JSX. Here's valid HTML: an h1, an image tag, and a list.",
+      "start": 59.273,
+      "end": 67.145,
+      "duration": 7.872
+    },
+    {
+      "index": 8,
+      "text": "If you paste this directly into a React component, it won't work. JSX has three rules you need to follow.",
+      "start": 67.525,
+      "end": 74.928,
+      "duration": 7.403
+    },
+    {
+      "index": 9,
+      "text": "Rule one: return a single root element. You can't return multiple tags side by side.",
+      "start": 75.308,
+      "end": 81.303,
+      "duration": 5.995
+    },
+    {
+      "index": 10,
+      "text": "Wrap everything in a div. Or better yet, use a Fragment \u2014 that's the empty angle bracket syntax.",
+      "start": 81.683,
+      "end": 88.168,
+      "duration": 6.485
+    },
+    {
+      "index": 11,
+      "text": "Fragments group elements without adding extra nodes to the DOM. No leftover divs in your HTML.",
+      "start": 88.548,
+      "end": 95.887,
+      "duration": 7.339
+    },
+    {
+      "index": 12,
+      "text": "Rule two: close all tags. In HTML, image tags and br tags can be left open. In JSX, every tag must close.",
+      "start": 96.267,
+      "end": 105.845,
+      "duration": 9.579
+    },
+    {
+      "index": 13,
+      "text": "img becomes img slash. li needs a closing li tag. br becomes br slash. No exceptions.",
+      "start": 106.225,
+      "end": 113.607,
+      "duration": 7.381
+    },
+    {
+      "index": 14,
+      "text": "Rule three: camelCase your attributes. class becomes className. stroke-width becomes strokeWidth.",
+      "start": 113.987,
+      "end": 120.856,
+      "duration": 6.869
+    },
+    {
+      "index": 15,
+      "text": "Why? Because JSX compiles to JavaScript objects, and JavaScript doesn't allow dashes in property names.",
+      "start": 121.236,
+      "end": 128.937,
+      "duration": 7.701
+    },
+    {
+      "index": 16,
+      "text": "There are two exceptions: aria dash attributes and data dash attributes keep their dashes. Everything else is camelCase.",
+      "start": 129.317,
+      "end": 137.531,
+      "duration": 8.213
+    },
+    {
+      "index": 17,
+      "text": "Don't memorize every attribute. React will tell you in the console when you get one wrong.",
+      "start": 137.911,
+      "end": 143.713,
+      "duration": 5.803
+    },
+    {
+      "index": 18,
+      "text": "Let's recap. JSX lets you write markup inside JavaScript, because logic and markup belong together.",
+      "start": 144.093,
+      "end": 151.688,
+      "duration": 7.595
+    },
+    {
+      "index": 19,
+      "text": "Three rules: one root element, close every tag, camelCase attributes.",
+      "start": 152.068,
+      "end": 157.401,
+      "duration": 5.333
+    },
+    {
+      "index": 20,
+      "text": "Fragments avoid extra wrapper divs. className replaces class. And React's error messages guide you.",
+      "start": 157.781,
+      "end": 164.715,
+      "duration": 6.933
+    },
+    {
+      "index": 21,
+      "text": "Next up: JavaScript in JSX with curly braces.",
+      "start": 165.095,
+      "end": 169.191,
+      "duration": 4.096
+    }
+  ]
+}

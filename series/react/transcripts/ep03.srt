@@ -1,0 +1,87 @@
+1
+00:00:02,000 --> 00:00:11,259
+JSX is how React lets you write HTML-like markup inside JavaScript. Most React developers use it every day.
+
+2
+00:00:11,638 --> 00:00:18,359
+Traditionally, web developers kept HTML, CSS, and JavaScript in separate files.
+
+3
+00:00:18,739 --> 00:00:26,716
+But as apps got more interactive, logic started controlling the markup. JavaScript decided what HTML to show.
+
+4
+00:00:27,097 --> 00:00:33,859
+React embraces this. In React, rendering logic and markup live together in the same component.
+
+5
+00:00:34,240 --> 00:00:40,192
+A sidebar component contains both the layout markup and the logic that controls it.
+
+6
+00:00:40,572 --> 00:00:49,680
+This isn't HTML though. It's JSX — a syntax extension for JavaScript that looks like HTML but has stricter rules.
+
+7
+00:00:50,060 --> 00:00:58,893
+JSX and React are separate things. JSX is the syntax, React is the library. You can use them independently.
+
+8
+00:00:59,273 --> 00:01:07,144
+Let's convert some HTML to JSX. Here's valid HTML: an h1, an image tag, and a list.
+
+9
+00:01:07,525 --> 00:01:14,927
+If you paste this directly into a React component, it won't work. JSX has three rules you need to follow.
+
+10
+00:01:15,308 --> 00:01:21,302
+Rule one: return a single root element. You can't return multiple tags side by side.
+
+11
+00:01:21,683 --> 00:01:28,168
+Wrap everything in a div. Or better yet, use a Fragment — that's the empty angle bracket syntax.
+
+12
+00:01:28,548 --> 00:01:35,887
+Fragments group elements without adding extra nodes to the DOM. No leftover divs in your HTML.
+
+13
+00:01:36,266 --> 00:01:45,844
+Rule two: close all tags. In HTML, image tags and br tags can be left open. In JSX, every tag must close.
+
+14
+00:01:46,224 --> 00:01:53,606
+img becomes img slash. li needs a closing li tag. br becomes br slash. No exceptions.
+
+15
+00:01:53,986 --> 00:02:00,855
+Rule three: camelCase your attributes. class becomes className. stroke-width becomes strokeWidth.
+
+16
+00:02:01,236 --> 00:02:08,937
+Why? Because JSX compiles to JavaScript objects, and JavaScript doesn't allow dashes in property names.
+
+17
+00:02:09,317 --> 00:02:17,531
+There are two exceptions: aria dash attributes and data dash attributes keep their dashes. Everything else is camelCase.
+
+18
+00:02:17,911 --> 00:02:23,712
+Don't memorize every attribute. React will tell you in the console when you get one wrong.
+
+19
+00:02:24,092 --> 00:02:31,687
+Let's recap. JSX lets you write markup inside JavaScript, because logic and markup belong together.
+
+20
+00:02:32,068 --> 00:02:37,401
+Three rules: one root element, close every tag, camelCase attributes.
+
+21
+00:02:37,781 --> 00:02:44,715
+Fragments avoid extra wrapper divs. className replaces class. And React's error messages guide you.
+
+22
+00:02:45,094 --> 00:02:49,191
+Next up: JavaScript in JSX with curly braces.

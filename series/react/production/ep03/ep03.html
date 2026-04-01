@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0d0d1a; width: 1920px; height: 1080px; overflow: hidden; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+const W=1920,H=1080,CX=960,CY=540;
+const BG='#0d0d1a',REACT='#61dafb',TEXT='#f8fafc',CODE_BG='#0d1117';
+const GREEN='#22c55e',YELLOW='#eab308',RED='#ef4444',PURPLE='#a78bfa',ORANGE='#f97316';
+let TIMING=[{"index": 0, "text": "JSX is how React lets you write HTML-like markup inside JavaScript. Most React developers use it every day.", "start": 2.0, "end": 11.259}, {"index": 1, "text": "Traditionally, web developers kept HTML, CSS, and JavaScript in separate files.", "start": 11.639, "end": 18.359}, {"index": 2, "text": "But as apps got more interactive, logic started controlling the markup. JavaScript decided what HTML to show.", "start": 18.739, "end": 26.717}, {"index": 3, "text": "React embraces this. In React, rendering logic and markup live together in the same component.", "start": 27.097, "end": 33.86}, {"index": 4, "text": "A sidebar component contains both the layout markup and the logic that controls it.", "start": 34.24, "end": 40.192}, {"index": 5, "text": "This isn't HTML though. It's JSX \u2014 a syntax extension for JavaScript that looks like HTML but has stricter rules.", "start": 40.572, "end": 49.681}, {"index": 6, "text": "JSX and React are separate things. JSX is the syntax, React is the library. You can use them independently.", "start": 50.061, "end": 58.893}, {"index": 7, "text": "Let's convert some HTML to JSX. Here's valid HTML: an h1, an image tag, and a list.", "start": 59.273, "end": 67.145}, {"index": 8, "text": "If you paste this directly into a React component, it won't work. JSX has three rules you need to follow.", "start": 67.525, "end": 74.928}, {"index": 9, "text": "Rule one: return a single root element. You can't return multiple tags side by side.", "start": 75.308, "end": 81.303}, {"index": 10, "text": "Wrap everything in a div. Or better yet, use a Fragment \u2014 that's the empty angle bracket syntax.", "start": 81.683, "end": 88.168}, {"index": 11, "text": "Fragments group elements without adding extra nodes to the DOM. No leftover divs in your HTML.", "start": 88.548, "end": 95.887}, {"index": 12, "text": "Rule two: close all tags. In HTML, image tags and br tags can be left open. In JSX, every tag must close.", "start": 96.267, "end": 105.845}, {"index": 13, "text": "img becomes img slash. li needs a closing li tag. br becomes br slash. No exceptions.", "start": 106.225, "end": 113.607}, {"index": 14, "text": "Rule three: camelCase your attributes. class becomes className. stroke-width becomes strokeWidth.", "start": 113.987, "end": 120.856}, {"index": 15, "text": "Why? Because JSX compiles to JavaScript objects, and JavaScript doesn't allow dashes in property names.", "start": 121.236, "end": 128.937}, {"index": 16, "text": "There are two exceptions: aria dash attributes and data dash attributes keep their dashes. Everything else is camelCase.", "start": 129.317, "end": 137.531}, {"index": 17, "text": "Don't memorize every attribute. React will tell you in the console when you get one wrong.", "start": 137.911, "end": 143.713}, {"index": 18, "text": "Let's recap. JSX lets you write markup inside JavaScript, because logic and markup belong together.", "start": 144.093, "end": 151.688}, {"index": 19, "text": "Three rules: one root element, close every tag, camelCase attributes.", "start": 152.068, "end": 157.401}, {"index": 20, "text": "Fragments avoid extra wrapper divs. className replaces class. And React's error messages guide you.", "start": 157.781, "end": 164.715}, {"index": 21, "text": "Next up: JavaScript in JSX with curly braces.", "start": 165.095, "end": 169.191}];
+let TOTAL_DURATION=173.571;
+
+const ease={
+  out:t=>1-Math.pow(1-t,3),
+  spring:t=>{const c=(2*Math.PI)/2.5;return t===0?0:t===1?1:Math.pow(2,-10*t)*Math.sin((t*10-0.75)*c)+1;},
+};
+function seg(t,s,e){return Math.max(0,Math.min(1,(t-s)/(e-s)));}
+function roundRect(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.quadraticCurveTo(x+w,y,x+w,y+r);c.lineTo(x+w,y+h-r);c.quadraticCurveTo(x+w,y+h,x+w-r,y+h);c.lineTo(x+r,y+h);c.quadraticCurveTo(x,y+h,x,y+h-r);c.lineTo(x,y+r);c.quadraticCurveTo(x,y,x+r,y);c.closePath();}
+function drawGrid(c){c.strokeStyle='rgba(97,218,251,0.03)';c.lineWidth=1;for(let x=0;x<W;x+=80){c.beginPath();c.moveTo(x,0);c.lineTo(x,H);c.stroke();}for(let y=0;y<H;y+=80){c.beginPath();c.moveTo(0,y);c.lineTo(W,y);c.stroke();}}
+function drawReactLogo(c,cx,cy,r,a,t){if(a<=0)return;c.save();c.globalAlpha=a;c.strokeStyle=REACT;c.lineWidth=r*0.06;c.shadowColor=REACT;c.shadowBlur=18*a;for(let i=0;i<3;i++){c.save();c.translate(cx,cy);c.rotate(i*Math.PI/3+t*0.4);c.beginPath();c.ellipse(0,0,r,r*0.38,0,0,Math.PI*2);c.stroke();c.restore();}c.fillStyle=REACT;c.shadowBlur=0;c.beginPath();c.arc(cx,cy,r*0.18,0,Math.PI*2);c.fill();c.restore();}
+function drawCaption(c,t){let txt='';for(const s of TIMING){if(t>=s.start-0.1&&t<=s.end+0.3){txt=s.text;break;}}if(!txt)return;c.save();c.font='500 20px "JetBrains Mono",monospace';const tw=c.measureText(txt).width,pw=Math.min(tw+48,W-100);c.globalAlpha=0.9;c.fillStyle='rgba(0,0,0,0.85)';roundRect(c,CX-pw/2,968,pw,44,22);c.fill();c.globalAlpha=1;c.fillStyle=TEXT;c.textAlign='center';c.textBaseline='middle';let d=txt;while(c.measureText(d).width>pw-48&&d.length>10)d=d.slice(0,-1);if(d!==txt)d+='…';c.fillText(d,CX,990);c.restore();}
+function drawFileBox(c,x,y,w,h,name,color,a){c.save();c.globalAlpha=a;c.fillStyle=CODE_BG;roundRect(c,x,y,w,h,12);c.fill();c.strokeStyle=color+'88';c.lineWidth=2;c.stroke();c.fillStyle=color+'33';roundRect(c,x,y-30,Math.min(180,name.length*14),30,6);c.fill();c.font='500 16px "JetBrains Mono",monospace';c.fillStyle=color;c.textAlign='left';c.textBaseline='middle';c.fillText(name,x+12,y-15);c.restore();}
+
+// S1: Hook
+function drawScene1(c,t){
+  c.fillStyle=BG;c.fillRect(0,0,W,H);drawGrid(c);
+  const lp=ease.spring(seg(t,2,3));
+  drawReactLogo(c,CX,CY-110,130*lp,lp,t);
+  const ta=ease.out(seg(t,2.5,3.5));
+  if(ta>0){c.save();c.globalAlpha=ta;c.font='bold 110px "JetBrains Mono",monospace';c.fillStyle=REACT;c.textAlign='center';c.textBaseline='middle';c.shadowColor=REACT;c.shadowBlur=20;c.fillText('JSX',CX,CY+80);c.shadowBlur=0;c.restore();}
+  const sa=ease.out(seg(t,3.3,4.1));
+  if(sa>0){c.save();c.globalAlpha=sa;c.font='500 48px "JetBrains Mono",monospace';c.fillStyle=TEXT;c.textAlign='center';c.textBaseline='middle';c.fillText('Writing Markup with JSX',CX,CY+200);c.restore();}
+  const ma=ease.out(seg(t,4.1,5));
+  if(ma>0){c.save();c.globalAlpha=ma;c.font='400 28px "JetBrains Mono",monospace';c.fillStyle='#64748b';c.textAlign='center';c.textBaseline='middle';c.fillText('react.dev/learn  ·  Episode 3',CX,CY+270);c.restore();}
+}
+
+// S2: Traditional → React (11–40s)
+function drawScene2(c,t){
+  const s=11.63;
+  c.fillStyle=BG;c.fillRect(0,0,W,H);drawGrid(c);
+  const ta=ease.out(seg(t,s,s+0.4));
+  c.save();c.globalAlpha=ta;c.font='600 42px "JetBrains Mono",monospace';c.fillStyle=REACT;c.textAlign='center';c.textBaseline='middle';c.fillText('The Old Way vs The React Way',CX,100);c.restore();
+
+  // Three separate boxes
+  const boxes=[
+    {label:'HTML',icon:'📄',color:ORANGE,x:200},
+    {label:'CSS',icon:'🎨',color:PURPLE,x:700},
+    {label:'JavaScript',icon:'⚡',color:YELLOW,x:1200},
+  ];
+  boxes.forEach((b,i)=>{
+    const bp=ease.spring(seg(t,s+0.5+i*0.3,s+1.3+i*0.3));
+    if(bp<=0)return;
+    c.save();c.globalAlpha=bp;
+    c.fillStyle='rgba(97,218,251,0.04)';
+    roundRect(c,b.x,220,460,250,16);c.fill();
+    c.strokeStyle=b.color+'77';c.lineWidth=2;c.stroke();
+    c.font='60px serif';c.textAlign='center';c.textBaseline='middle';
+    c.fillText(b.icon,b.x+230,310);
+    c.font='bold 36px "JetBrains Mono",monospace';c.fillStyle=b.color;
+    c.fillText(b.label,b.x+230,400);
+    c.restore();
+  });
+
+  // "Separate files" label
+  const sepA=ease.out(seg(t,s+2,s+2.8));
+  if(sepA>0){c.save();c.globalAlpha=sepA;c.font='400 28px "JetBrains Mono",monospace';c.fillStyle='#64748b';c.textAlign='center';c.fillText('Separate files — logic far from markup',CX,510);c.restore();}
+
+  // Arrow down to React component
+  const arrowA=ease.out(seg(t,27,28));
+  if(arrowA>0){
+    c.save();c.globalAlpha=arrowA;c.strokeStyle=REACT;c.lineWidth=3;
+    c.beginPath();c.moveTo(CX,540);c.lineTo(CX,590);c.stroke();
+    c.fillStyle=REACT;c.beginPath();c.moveTo(CX,600);c.lineTo(CX-8,590);c.lineTo(CX+8,590);c.closePath();c.fill();
+    c.restore();
+  }
+
+  // React component box
+  const reactP=ease.spring(seg(t,27.5,28.5));
+  if(reactP>0){
+    c.save();c.globalAlpha=reactP;
+    c.fillStyle='rgba(97,218,251,0.08)';
+    roundRect(c,300,610,1320,300,16);c.fill();
+    c.strokeStyle=REACT+'aa';c.lineWidth=3;c.stroke();
+    drawReactLogo(c,400,760,40,reactP,t);
+    c.font='600 32px "JetBrains Mono",monospace';c.fillStyle=REACT;c.textAlign='left';c.textBaseline='middle';
+    c.fillText('Sidebar.jsx',470,710);
+    c.font='400 24px "JetBrains Mono",monospace';c.fillStyle=ORANGE;c.fillText('  <nav>...</nav>',470,760);
+    c.fillStyle=YELLOW;c.fillText('  if (isLoggedIn) { ... }',470,800);
+    c.fillStyle=PURPLE;c.fillText('  style={{ color: "blue" }}',470,840);
+    c.font='500 26px "JetBrains Mono",monospace';c.fillStyle=TEXT;c.textAlign='center';
+    c.fillText('Logic + Markup + Style = One Component',CX,890);
+    c.restore();
+  }
+}
+
+// S3: Three Rules intro (40–67s)
+function drawScene3(c,t){
+  const s=40.56;
+  c.fillStyle=BG;c.fillRect(0,0,W,H);drawGrid(c);
+  const ta=ease.out(seg(t,s,s+0.4));
+  c.save();c.globalAlpha=ta;c.font='600 42px "JetBrains Mono",monospace';c.fillStyle=RED;c.textAlign='center';c.textBaseline='middle';c.fillText('JSX Has Three Rules',CX,100);c.restore();
+
+  // Broken HTML example
+  const codeP=ease.out(seg(t,s+1,s+2));
+  if(codeP>0){
+    drawFileBox(c,200,170,700,400,'broken.jsx',RED,codeP);
+    c.save();c.globalAlpha=codeP;c.font='400 22px "JetBrains Mono",monospace';c.textAlign='left';c.textBaseline='top';
+    const lines=[
+      {t:'// This breaks!',c:RED},
+      {t:'return (',c:TEXT},
+      {t:'  <h1>Todos</h1>',c:'#89ddff'},
+      {t:'  <img src="..." class="photo">',c:'#89ddff'},
+      {t:'  <ul>',c:'#89ddff'},
+      {t:'    <li>Item one',c:TEXT},
+      {t:'    <li>Item two',c:TEXT},
+      {t:'  </ul>',c:'#89ddff'},
+      {t:')',c:TEXT},
+    ];
+    lines.forEach((l,i)=>{c.fillStyle=l.c;c.fillText(l.t,230,200+i*38);});
+    c.restore();
+  }
+
+  // Three rule cards
+  const rules=[
+    {num:'1',label:'Single Root',desc:'Wrap in <div> or <>',icon:'🌳',color:GREEN,delay:0},
+    {num:'2',label:'Close All Tags',desc:'<img /> not <img>',icon:'🔒',color:YELLOW,delay:0.4},
+    {num:'3',label:'camelCase',desc:'className not class',icon:'🐪',color:ORANGE,delay:0.8},
+  ];
+  rules.forEach((r,i)=>{
+    const rp=ease.spring(seg(t,59+r.delay,60+r.delay));
+    if(rp<=0)return;
+    const ry=200+i*200;
+    c.save();c.globalAlpha=rp;
+    c.fillStyle='rgba(97,218,251,0.04)';
+    roundRect(c,1000,ry,820,160,12);c.fill();
+    c.strokeStyle=r.color+'77';c.lineWidth=2;c.stroke();
+    c.fillStyle=r.color;roundRect(c,1000,ry,6,160,3);c.fill();
+    c.font='48px serif';c.textAlign='left';c.textBaseline='middle';c.fillText(r.icon,1030,ry+50);
+    c.font='bold 34px "JetBrains Mono",monospace';c.fillStyle=r.color;c.fillText(r.num+'. '+r.label,1100,ry+45);
+    c.font='400 24px "JetBrains Mono",monospace';c.fillStyle='#94a3b8';c.fillText(r.desc,1100,ry+100);
+    c.restore();
+  });
+}
+
+// S4: Rule 1 — Single Root + Fragments (67–96s)
+function drawScene4(c,t){
+  const s=67.46;
+  c.fillStyle=BG;c.fillRect(0,0,W,H);drawGrid(c);
+  const ta=ease.out(seg(t,s,s+0.4));
+  c.save();c.globalAlpha=ta;c.font='600 42px "JetBrains Mono",monospace';c.fillStyle=GREEN;c.textAlign='center';c.textBaseline='middle';c.fillText('Rule 1: Single Root Element',CX,100);c.restore();
+
+  // Wrong
+  const wp=ease.out(seg(t,s+0.5,s+1.2));
+  if(wp>0){
+    drawFileBox(c,100,170,800,260,'\u274C Multiple roots',RED,wp);
+    c.save();c.globalAlpha=wp;c.font='400 24px "JetBrains Mono",monospace';c.textAlign='left';c.textBaseline='top';
+    c.fillStyle=RED;c.fillText('return (',130,200);
+    c.fillText('  <h1>Title</h1>',130,236);
+    c.fillText('  <p>Content</p>',130,272);
+    c.fillText('  // Error! Two roots',130,308);
+    c.fillText(')',130,344);
+    c.restore();
+  }
+
+  // Right — div wrapper
+  const rp1=ease.out(seg(t,s+2,s+3));
+  if(rp1>0){
+    drawFileBox(c,1020,170,800,260,'\u2705 Wrap in <div>',GREEN,rp1);
+    c.save();c.globalAlpha=rp1;c.font='400 24px "JetBrains Mono",monospace';c.textAlign='left';c.textBaseline='top';
+    c.fillStyle=GREEN;c.fillText('return (',1050,200);
+    c.fillText('  <div>',1050,236);
+    c.fillText('    <h1>Title</h1>',1050,272);
+    c.fillText('    <p>Content</p>',1050,308);
+    c.fillText('  </div>',1050,344);
+    c.fillText(')',1050,380);
+    c.restore();
+  }
+
+  // Fragment
+  const fp=ease.spring(seg(t,81.7,83));
+  if(fp>0){
+    c.save();c.globalAlpha=fp;
+    c.fillStyle='rgba(97,218,251,0.06)';
+    roundRect(c,200,500,1520,300,16);c.fill();
+    c.strokeStyle=REACT+'66';c.lineWidth=2;c.stroke();
+    c.font='bold 80px "JetBrains Mono",monospace';c.fillStyle=REACT;c.textAlign='center';c.textBaseline='middle';
+    c.shadowColor=REACT;c.shadowBlur=15;c.fillText('<>  </>',CX,600);c.shadowBlur=0;
+    c.font='500 30px "JetBrains Mono",monospace';c.fillStyle=TEXT;
+    c.fillText('Fragment — groups elements with zero DOM footprint',CX,700);
+    c.font='400 24px "JetBrains Mono",monospace';c.fillStyle='#64748b';
+    c.fillText('No extra <div> in the rendered HTML',CX,750);
+    c.restore();
+  }
+}
+
+// S5: Rule 2 — Close All Tags (96–114s)
+function drawScene5(c,t){
+  const s=96.26;
+  c.fillStyle=BG;c.fillRect(0,0,W,H);drawGrid(c);
+  const ta=ease.out(seg(t,s,s+0.4));
+  c.save();c.globalAlpha=ta;c.font='600 42px "JetBrains Mono",monospace';c.fillStyle=YELLOW;c.textAlign='center';c.textBaseline='middle';c.fillText('Rule 2: Close All Tags',CX,100);c.restore();
+
+  const pairs=[
+    {html:'<img src="...">',jsx:'<img src="..." />',delay:0},
+    {html:'<br>',jsx:'<br />',delay:0.5},
+    {html:'<li>Item',jsx:'<li>Item</li>',delay:1.0},
+    {html:'<input type="text">',jsx:'<input type="text" />',delay:1.5},
+  ];
+  pairs.forEach((p,i)=>{
+    const pp=ease.spring(seg(t,s+0.5+p.delay,s+1.3+p.delay));
+    if(pp<=0)return;
+    const py=220+i*170;
+    c.save();c.globalAlpha=pp;
+    // HTML side
+    c.fillStyle='rgba(239,68,68,0.06)';roundRect(c,100,py,800,130,12);c.fill();
+    c.strokeStyle=RED+'44';c.lineWidth=1;c.stroke();
+    c.font='600 20px "JetBrains Mono",monospace';c.fillStyle=RED;c.textAlign='left';c.textBaseline='middle';
+    c.fillText('HTML',130,py+25);
+    c.font='500 28px "JetBrains Mono",monospace';c.fillStyle='#94a3b8';
+    c.fillText(p.html,130,py+80);
+    // Arrow
+    c.fillStyle=GREEN;c.font='bold 32px "JetBrains Mono",monospace';c.textAlign='center';
+    c.fillText('→',950,py+65);
+    // JSX side
+    c.fillStyle='rgba(34,197,94,0.06)';roundRect(c,1020,py,800,130,12);c.fill();
+    c.strokeStyle=GREEN+'44';c.lineWidth=1;c.stroke();
+    c.font='600 20px "JetBrains Mono",monospace';c.fillStyle=GREEN;c.textAlign='left';
+    c.fillText('JSX',1050,py+25);
+    c.font='500 28px "JetBrains Mono",monospace';c.fillStyle=GREEN;
+    c.fillText(p.jsx,1050,py+80);
+    c.restore();
+  });
+
+  const noteA=ease.out(seg(t,s+4,s+5));
+  if(noteA>0){c.save();c.globalAlpha=noteA;c.font='500 26px "JetBrains Mono",monospace';c.fillStyle=YELLOW;c.textAlign='center';c.textBaseline='middle';c.fillText('Every tag must explicitly close — no exceptions in JSX',CX,920);c.restore();}
+}
+
+// S6: Rule 3 — camelCase (114–144s)
+function drawScene6(c,t){
+  const s=113.96;
+  c.fillStyle=BG;c.fillRect(0,0,W,H);drawGrid(c);
+  const ta=ease.out(seg(t,s,s+0.4));
+  c.save();c.globalAlpha=ta;c.font='600 42px "JetBrains Mono",monospace';c.fillStyle=ORANGE;c.textAlign='center';c.textBaseline='middle';c.fillText('Rule 3: camelCase Attributes',CX,100);c.restore();
+
+  const attrs=[
+    {html:'class="photo"',jsx:'className="photo"',why:'class is reserved in JS',delay:0},
+    {html:'stroke-width="2"',jsx:'strokeWidth="2"',why:'dashes invalid in JS keys',delay:0.5},
+    {html:'tabindex="1"',jsx:'tabIndex="1"',why:'camelCase convention',delay:1.0},
+    {html:'onclick="fn()"',jsx:'onClick={fn}',why:'event handlers too',delay:1.5},
+  ];
+  attrs.forEach((a,i)=>{
+    const ap=ease.spring(seg(t,s+0.5+a.delay,s+1.3+a.delay));
+    if(ap<=0)return;
+    const ay=200+i*160;
+    c.save();c.globalAlpha=ap;
+    c.fillStyle='rgba(97,218,251,0.03)';roundRect(c,100,ay,1720,130,12);c.fill();
+    c.strokeStyle=ORANGE+'44';c.lineWidth=1;c.stroke();
+    c.fillStyle=ORANGE;roundRect(c,100,ay,5,130,2);c.fill();
+    c.font='500 26px "JetBrains Mono",monospace';c.fillStyle=RED;c.textAlign='left';c.textBaseline='middle';
+    c.fillText(a.html,140,ay+40);
+    c.fillStyle=GREEN;c.font='bold 28px "JetBrains Mono",monospace';c.textAlign='center';
+    c.fillText('→',850,ay+40);
+    c.fillStyle=GREEN;c.font='500 26px "JetBrains Mono",monospace';c.textAlign='left';
+    c.fillText(a.jsx,920,ay+40);
+    c.font='400 20px "JetBrains Mono",monospace';c.fillStyle='#64748b';
+    c.fillText(a.why,920,ay+85);
+    c.restore();
+  });
+
+  // Exception note
+  const exA=ease.out(seg(t,129.3,130.3));
+  if(exA>0){c.save();c.globalAlpha=exA;c.fillStyle='rgba(168,85,247,0.06)';roundRect(c,200,860,1520,100,12);c.fill();c.strokeStyle=PURPLE+'44';c.lineWidth=1;c.stroke();c.font='500 24px "JetBrains Mono",monospace';c.fillStyle=PURPLE;c.textAlign='center';c.textBaseline='middle';c.fillText('Exceptions: aria-* and data-* keep their dashes',CX,910);c.restore();}
+}
+
+// S7: Recap (144–169s)
+function drawScene7(c,t){
+  const s=144.08;
+  c.fillStyle=BG;c.fillRect(0,0,W,H);
+  const bg=c.createRadialGradient(CX,CY,50,CX,CY,700);
+  bg.addColorStop(0,'rgba(97,218,251,0.08)');bg.addColorStop(1,'transparent');
+  c.fillStyle=bg;c.fillRect(0,0,W,H);drawGrid(c);
+  drawReactLogo(c,CX,CY-280,60,ease.out(seg(t,s,s+0.6)),t);
+  c.save();c.globalAlpha=ease.out(seg(t,s,s+0.5));c.font='600 38px "JetBrains Mono",monospace';c.fillStyle=TEXT;c.textAlign='center';c.textBaseline='middle';c.fillText("Here's what you learned",CX,CY-170);c.restore();
+
+  const recap=[
+    {icon:'💡',text:'JSX = markup inside JavaScript, because logic + markup belong together',color:REACT,delay:0.4},
+    {icon:'🌳',text:'Rule 1: Single root element — use <> fragments to avoid extra divs',color:GREEN,delay:0.8},
+    {icon:'🔒',text:'Rule 2: Close every tag — <img />, <br />, <li>...</li>',color:YELLOW,delay:1.2},
+    {icon:'🐪',text:'Rule 3: camelCase attributes — className, onClick, strokeWidth',color:ORANGE,delay:1.6},
+    {icon:'💬',text:'React error messages guide you when you get something wrong',color:PURPLE,delay:2.0},
+  ];
+  recap.forEach((item,i)=>{
+    const rp=ease.spring(seg(t,s+item.delay,s+item.delay+0.5));
+    if(rp<=0)return;
+    const ry=CY-60+i*90;
+    c.save();c.globalAlpha=rp;c.translate(0,(1-rp)*20);
+    c.font='36px serif';c.textAlign='left';c.textBaseline='middle';c.fillText(item.icon,CX-650,ry);
+    c.font='500 24px "JetBrains Mono",monospace';c.fillStyle=item.color;c.fillText(item.text,CX-590,ry);
+    c.restore();
+  });
+  const na=ease.out(seg(t,s+3,s+3.8));
+  if(na>0){c.save();c.globalAlpha=na;c.font='bold 48px "JetBrains Mono",monospace';c.fillStyle=REACT;c.textAlign='center';c.textBaseline='middle';c.shadowColor=REACT;c.shadowBlur=20;c.fillText('Next up: Curly Braces in JSX  →',CX,CY+380);c.shadowBlur=0;c.restore();}
+}
+
+// S8: Outro
+function drawScene8(c,t){
+  const s=169.5;
+  c.fillStyle=BG;c.fillRect(0,0,W,H);
+  const g=c.createRadialGradient(CX,CY,50,CX,CY,600);
+  g.addColorStop(0,'rgba(97,218,251,0.15)');g.addColorStop(1,'transparent');
+  c.fillStyle=g;c.fillRect(0,0,W,H);
+  const a=ease.out(seg(t,s,s+0.5));
+  drawReactLogo(c,CX,CY-120,90,a,t);
+  c.save();c.globalAlpha=a;c.font='bold 100px "JetBrains Mono",monospace';c.textAlign='center';c.textBaseline='middle';c.shadowColor=REACT;c.shadowBlur=30;c.fillStyle=TEXT;c.fillText('Run the Docs',CX,CY+40);c.shadowBlur=0;c.font='400 34px "JetBrains Mono",monospace';c.fillStyle='#64748b';c.fillText('Technical docs. Made watchable.',CX,CY+115);c.font='500 24px "JetBrains Mono",monospace';c.fillStyle=REACT;c.fillText('react  ·  ep 3  ·  JSX markup',CX,CY+175);c.restore();
+}
+
+const ST=[0,11.63,40.56,67.46,96.26,113.96,144.08,169.5];
+const SF=[drawScene1,drawScene2,drawScene3,drawScene4,drawScene5,drawScene6,drawScene7,drawScene8];
+
+window.renderFrame=function(fi){
+  const t=fi/30,c=document.getElementById('c').getContext('2d');
+  c.clearRect(0,0,W,H);
+  let si=0;for(let i=1;i<ST.length;i++){if(t>=ST[i])si=i;else break;}
+  SF[si](c,t);
+  for(let i=1;i<ST.length;i++){const xf=ST[i];if(t>=xf&&t<xf+0.4){const ov=seg(t,xf,xf+0.4);c.globalAlpha=ov;c.fillStyle=BG;c.fillRect(0,0,W,H);c.globalAlpha=1;SF[i](c,t);break;}}
+  drawCaption(c,t);
+  if(t>TOTAL_DURATION-1.5){c.globalAlpha=seg(t,TOTAL_DURATION-1,TOTAL_DURATION);c.fillStyle='#000';c.fillRect(0,0,W,H);c.globalAlpha=1;}
+};
+window.setTiming=function(s,d){TIMING=s;TOTAL_DURATION=d;};
+</script>
+</body>
+</html>
