@@ -1,75 +1,105 @@
 {
-  "sentences": [
+  "segments": [
     {
+      "index": 0,
       "text": "Labels are not just YAML decoration. They're integrated into the Kubernetes API as first-class query parameters.",
       "start": 1.0,
-      "end": 9.448
+      "end": 9.448,
+      "duration": 8.448
     },
     {
+      "index": 1,
       "text": "When you run kubectl get pods with the lowercase L flag, you're passing a label selector to the API server.",
       "start": 9.828,
-      "end": 17.231
+      "end": 17.2307,
+      "duration": 7.4027
     },
     {
+      "index": 2,
       "text": "Under the hood it becomes a URL query parameter: labelSelector equals environment equals production.",
-      "start": 17.611,
-      "end": 25.163
+      "start": 17.6107,
+      "end": 25.1627,
+      "duration": 7.552
     },
     {
+      "index": 3,
       "text": "The equality-based form looks like this in a URL: labelSelector=environment%3Dproduction,tier%3Dfrontend \u2014 percent-encoded equals signs.",
-      "start": 25.543,
-      "end": 37.873
+      "start": 25.5427,
+      "end": 37.8733,
+      "duration": 12.3307
     },
     {
+      "index": 4,
       "text": "Set-based looks like this: labelSelector=environment+in+%28production%2Cqa%29 \u2014 the in keyword, percent-encoded parens, percent-encoded commas.",
-      "start": 38.253,
-      "end": 52.76
+      "start": 38.2533,
+      "end": 52.76,
+      "duration": 14.5067
     },
     {
+      "index": 5,
       "text": "In practice you use kubectl, not raw URLs. Here are the patterns you'll use daily.",
       "start": 53.14,
-      "end": 58.9
+      "end": 58.9,
+      "duration": 5.76
     },
     {
+      "index": 6,
       "text": "kubectl get pods -l environment=production,tier=frontend \u2014 multiple equality requirements.",
       "start": 59.28,
-      "end": 66.768
+      "end": 66.768,
+      "duration": 7.488
     },
     {
+      "index": 7,
       "text": "kubectl get pods -l 'environment in (production, qa)' \u2014 set-based, quotes required in the shell because of the parentheses.",
       "start": 67.148,
-      "end": 75.297
+      "end": 75.2973,
+      "duration": 8.1493
     },
     {
+      "index": 8,
       "text": "kubectl get pods -l 'environment,environment notin (frontend)' \u2014 exists check combined with notin.",
-      "start": 75.677,
-      "end": 82.845
+      "start": 75.6773,
+      "end": 82.8453,
+      "duration": 7.168
     },
     {
+      "index": 9,
       "text": "A real pattern for finding pods that have an environment label but it's not frontend.",
-      "start": 83.225,
-      "end": 88.879
+      "start": 83.2253,
+      "end": 88.8787,
+      "duration": 5.6533
     },
     {
+      "index": 10,
       "text": "You can also add a label column to any get output with the capital L flag.",
-      "start": 89.259,
-      "end": 94.507
+      "start": 89.2587,
+      "end": 94.5067,
+      "duration": 5.248
     },
     {
+      "index": 11,
       "text": "kubectl get pods -Lapp -Ltier -Lrole prints those label values as extra columns. Invaluable for debugging a cluster with many services.",
-      "start": 94.887,
-      "end": 105.127
+      "start": 94.8867,
+      "end": 105.1267,
+      "duration": 10.24
     },
     {
+      "index": 12,
       "text": "To update labels on existing objects, use kubectl label.",
-      "start": 105.507,
-      "end": 109.837
+      "start": 105.5067,
+      "end": 109.8373,
+      "duration": 4.3307
     },
     {
+      "index": 13,
       "text": "kubectl label pods -l app=nginx tier=fe \u2014 finds all nginx pods and applies the tier label. It filters first, then labels.",
-      "start": 110.217,
-      "end": 121.332
+      "start": 110.2173,
+      "end": 121.332,
+      "duration": 11.1147
     }
   ],
-  "total_duration": 124.712
+  "total_voice_duration": 121.332,
+  "total_duration": 124.332,
+  "total_frames_30fps": 3730
 }
