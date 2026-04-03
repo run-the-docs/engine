@@ -15,6 +15,8 @@ Playlist: [Kubernetes — Run the Docs](https://www.youtube.com/playlist?list=PL
 | 09 | Ingress | Networking | ~2:35 | ✅ Published | [Watch](https://youtu.be/HRCcIP-IMHM) | [ep09.srt](./transcripts/ep09.srt) |
 | 10 | StatefulSets | Workloads | ~2:25 | ⚠️ Video uploaded, caption pending | [Watch](https://youtu.be/vO6UTF7e0y8) | [ep10.srt](./transcripts/ep10.srt) |
 | 11 | DaemonSets & Jobs | Workloads | ~2:50 | Ready | TBD | [ep11.srt](./transcripts/ep11.srt) |
+| 12 | Node Affinity & Taints | Scheduling | ~7:00 | Ready | TBD | [ep12.srt](./transcripts/ep12.srt) |
+| 13 | Labels & Selectors | Objects | ~8:47 | Ready | TBD | [ep13.srt](./transcripts/ep13.srt) |
 
 ## Release Strategy
 
