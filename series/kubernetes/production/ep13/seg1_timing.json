@@ -1,0 +1,45 @@
+{
+  "sentences": [
+    {
+      "text": "You have fifty Pods running.",
+      "start": 2.0,
+      "end": 3.899
+    },
+    {
+      "text": "Some are in production. Some are in staging.",
+      "start": 4.279,
+      "end": 7.201
+    },
+    {
+      "text": "Some are backends, some are frontends.",
+      "start": 7.581,
+      "end": 10.184
+    },
+    {
+      "text": "How does Kubernetes even know which is which?",
+      "start": 10.564,
+      "end": 13.572
+    },
+    {
+      "text": "The answer is Labels. Two words. A colon. Maximum power.",
+      "start": 13.952,
+      "end": 18.475
+    },
+    {
+      "text": "Labels let you attach arbitrary metadata to any object \u2014 and then query, route, and manage objects in bulk using that metadata.",
+      "start": 18.855,
+      "end": 27.921
+    },
+    {
+      "text": "Selectors are what make the queries possible.",
+      "start": 28.301,
+      "end": 31.587
+    },
+    {
+      "text": "This is episode thirteen. Labels and Selectors. Let's go.",
+      "start": 31.967,
+      "end": 36.212
+    }
+  ],
+  "total_duration": 40.592
+}

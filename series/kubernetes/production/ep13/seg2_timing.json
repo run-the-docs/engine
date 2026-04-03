@@ -1,0 +1,95 @@
+{
+  "sentences": [
+    {
+      "text": "Labels are key-value pairs attached to Kubernetes objects.",
+      "start": 2.0,
+      "end": 6.203
+    },
+    {
+      "text": "Any object \u2014 Pods, Services, Deployments, Nodes, even Namespaces.",
+      "start": 6.583,
+      "end": 11.575
+    },
+    {
+      "text": "They're meant to carry identifying attributes that are meaningful to users.",
+      "start": 11.955,
+      "end": 16.861
+    },
+    {
+      "text": "Not to the Kubernetes control plane itself \u2014 just to you, your team, and your tooling.",
+      "start": 17.241,
+      "end": 23.001
+    },
+    {
+      "text": "If information doesn't help identify or select objects \u2014 like build timestamps or creator emails \u2014 use annotations instead.",
+      "start": 23.381,
+      "end": 32.427
+    },
+    {
+      "text": "Labels are for selection. Annotations are for everything else.",
+      "start": 32.807,
+      "end": 37.159
+    },
+    {
+      "text": "Now, label syntax. A label key has two parts: an optional prefix and a name, separated by a slash.",
+      "start": 37.539,
+      "end": 44.813
+    },
+    {
+      "text": "The name is required. It must be 63 characters or less, starting and ending with an alphanumeric character.",
+      "start": 45.193,
+      "end": 52.895
+    },
+    {
+      "text": "Dashes, underscores, and dots are allowed in between.",
+      "start": 53.275,
+      "end": 57.2
+    },
+    {
+      "text": "The prefix is optional. If present, it must be a valid DNS subdomain \u2014 up to 253 characters.",
+      "start": 57.58,
+      "end": 65.345
+    },
+    {
+      "text": "The prefixes kubernetes.io and k8s.io are reserved for Kubernetes core components.",
+      "start": 65.725,
+      "end": 72.595
+    },
+    {
+      "text": "If you're writing an operator or controller that adds labels to user objects, you must use a prefix \u2014 so users know the label came from automation, not their own config.",
+      "start": 72.975,
+      "end": 84.26
+    },
+    {
+      "text": "Label values follow similar rules: 63 characters max, can be empty, must start and end with alphanumeric if non-empty.",
+      "start": 84.64,
+      "end": 93.877
+    },
+    {
+      "text": "Here's a real example. A Pod manifest with two labels \u2014 environment: production and app: nginx. That's all it takes.",
+      "start": 94.257,
+      "end": 102.684
+    },
+    {
+      "text": "Common patterns you'll see in real clusters: release: stable or canary.",
+      "start": 103.064,
+      "end": 108.269
+    },
+    {
+      "text": "Environment: dev, qa, or production. Tier: frontend, backend, or cache.",
+      "start": 108.649,
+      "end": 114.025
+    },
+    {
+      "text": "Partition: customerA or customerB.",
+      "start": 114.405,
+      "end": 117.349
+    },
+    {
+      "text": "You can define your own conventions. The constraint is just syntax, not semantics.",
+      "start": 117.729,
+      "end": 123.468
+    }
+  ],
+  "total_duration": 127.848
+}

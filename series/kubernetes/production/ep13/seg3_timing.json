@@ -1,0 +1,115 @@
+{
+  "sentences": [
+    {
+      "text": "Labels are only useful if you can query them. That's what selectors are for.",
+      "start": 2.0,
+      "end": 7.013
+    },
+    {
+      "text": "There are two types: equality-based and set-based.",
+      "start": 7.393,
+      "end": 10.636
+    },
+    {
+      "text": "Equality-based requirements use the equals, double-equals, or not-equals operators.",
+      "start": 11.016,
+      "end": 16.883
+    },
+    {
+      "text": "All three mean what you'd expect.",
+      "start": 17.263,
+      "end": 19.524
+    },
+    {
+      "text": "environment=production selects every object where environment equals production.",
+      "start": 19.904,
+      "end": 25.749
+    },
+    {
+      "text": "tier!=frontend excludes everything with tier set to frontend \u2014 including objects that have no tier label at all.",
+      "start": 26.129,
+      "end": 34.065
+    },
+    {
+      "text": "You combine requirements with a comma, which acts as a logical AND. There is no OR operator.",
+      "start": 34.445,
+      "end": 40.76
+    },
+    {
+      "text": "If you need OR \u2014 use set-based selectors.",
+      "start": 41.14,
+      "end": 44.105
+    },
+    {
+      "text": "Set-based requirements are more expressive.",
+      "start": 44.485,
+      "end": 47.451
+    },
+    {
+      "text": "The in operator selects objects where the label value is in a set.",
+      "start": 47.831,
+      "end": 52.247
+    },
+    {
+      "text": "environment in (production, qa) matches both production and qa environments.",
+      "start": 52.627,
+      "end": 58.088
+    },
+    {
+      "text": "Notin does the opposite.",
+      "start": 58.468,
+      "end": 60.388
+    },
+    {
+      "text": "The exists operator just checks whether a label key is present, regardless of value.",
+      "start": 60.768,
+      "end": 66.528
+    },
+    {
+      "text": "partition selects anything that has a partition label.",
+      "start": 66.908,
+      "end": 70.449
+    },
+    {
+      "text": "Exclamation-partition selects anything that does not.",
+      "start": 70.829,
+      "end": 74.605
+    },
+    {
+      "text": "You can mix both types in a single selector.",
+      "start": 74.985,
+      "end": 78.036
+    },
+    {
+      "text": "partition in (customerA, customerB), environment != qa \u2014 that's a perfectly valid combined selector.",
+      "start": 78.416,
+      "end": 86.139
+    },
+    {
+      "text": "Now, a critical distinction: not all API objects support set-based selectors.",
+      "start": 86.519,
+      "end": 92.151
+    },
+    {
+      "text": "Services and ReplicationControllers only support the equality-based form in their selector field.",
+      "start": 92.531,
+      "end": 99.4
+    },
+    {
+      "text": "But newer resources \u2014 Deployments, ReplicaSets, DaemonSets, Jobs \u2014 support both, using matchLabels and matchExpressions.",
+      "start": 99.78,
+      "end": 108.548
+    },
+    {
+      "text": "matchLabels is a simple key-value map.",
+      "start": 108.928,
+      "end": 111.957
+    },
+    {
+      "text": "matchExpressions is an array where each entry specifies a key, an operator, and a set of values. All entries are ANDed together.",
+      "start": 112.337,
+      "end": 121.255
+    }
+  ],
+  "total_duration": 125.63466666666666
+}
