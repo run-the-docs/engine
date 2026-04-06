@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>* { margin: 0; padding: 0; } body { background: #0d0d1a; overflow: hidden; } canvas { display: block; }</style>
+</head><body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+const W=1920,H=1080,FPS=30,BG='#0d0d1a',ACCENT='#61dafb',TEXT='#f8fafc',CODE_BG='#0d1117',DIM='#94a3b8';
+let T=null;
+fetch('./seg5_timing.json').then(r=>r.json()).then(d=>{T=d;});
+
+function getCaption(t){if(!T)return'';for(const s of T.sentences)if(t>=s.start&&t<=s.end)return s.text;return'';}
+function drawCaption(ctx,t){const c=getCaption(t);if(!c)return;ctx.font='600 28px "Courier New",monospace';const m=ctx.measureText(c),pw=Math.min(m.width+48,W-60),ph=48,px=(W-pw)/2,py=H-95;ctx.fillStyle='rgba(13,13,26,0.9)';ctx.beginPath();ctx.roundRect(px,py,pw,ph,12);ctx.fill();ctx.strokeStyle=ACCENT;ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(px,py,pw,ph,12);ctx.stroke();ctx.fillStyle=TEXT;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(c,W/2,py+ph/2);}
+function drawFooter(ctx){ctx.font='400 18px "Courier New",monospace';ctx.fillStyle='rgba(97,218,251,0.4)';ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText('kubernetes · labels & selectors · ep 13',W/2,H-18);}
+function clamp01(x){return Math.max(0,Math.min(1,x));}
+function easeOut(x){return 1-Math.pow(1-x,3);}
+
+function drawTerminal(ctx,x,y,w,h,lines,alpha,promptIdx){
+  ctx.globalAlpha=alpha;
+  ctx.fillStyle='#0c0c0c';ctx.beginPath();ctx.roundRect(x,y,w,h,10);ctx.fill();
+  ctx.fillStyle='#1a1a2e';ctx.fillRect(x,y,w,32);
+  const dots=['#ff5f56','#ffbd2e','#27c93f'];
+  dots.forEach((c,i)=>{ctx.fillStyle=c;ctx.beginPath();ctx.arc(x+20+i*20,y+16,5,0,Math.PI*2);ctx.fill();});
+  ctx.font='400 20px "Courier New",monospace';ctx.textAlign='left';ctx.textBaseline='top';
+  lines.forEach((l,i)=>{
+    const ly=y+44+i*26;
+    if(promptIdx&&promptIdx.includes(i)){ctx.fillStyle='#22c55e';ctx.fillText('$ ',x+16,ly);ctx.fillStyle=ACCENT;ctx.fillText(l,x+40,ly);}
+    else if(l.startsWith('NAME')||l.startsWith('---')){ctx.fillStyle=DIM;ctx.fillText(l,x+16,ly);}
+    else{ctx.fillStyle=TEXT;ctx.fillText(l,x+16,ly);}
+  });
+  ctx.globalAlpha=1;
+}
+
+function renderFrame(fn){
+  const ctx=document.getElementById('c').getContext('2d');
+  const t=fn/FPS;
+  ctx.fillStyle=BG;ctx.fillRect(0,0,W,H);
+
+  // Scene 1: Field Selectors intro + terminal (t 0-18)
+  const s1=clamp01(t/1)*(1-clamp01((t-18)/1));
+  if(s1>0){
+    ctx.globalAlpha=s1;
+    ctx.font='700 38px "Courier New",monospace';ctx.fillStyle=ACCENT;ctx.textAlign='center';
+    ctx.fillText('Field Selectors',W/2,70);
+    ctx.font='400 24px "Courier New",monospace';ctx.fillStyle=DIM;
+    ctx.fillText('Filter by resource fields — not labels',W/2,115);
+
+    const tLines=[
+      'kubectl get pods --field-selector status.phase=Running',
+      '',
+      'NAME              READY   STATUS    AGE',
+      'web-frontend-1    1/1     Running   3d',
+      'api-backend-1     1/1     Running   5d',
+      'redis-cache-1     1/1     Running   7d',
+    ];
+    drawTerminal(ctx,250,160,1420,220,tLines,easeOut(clamp01((t-1.5)/1.5))*s1,[0]);
+
+    // Explanation
+    ctx.globalAlpha=s1*easeOut(clamp01((t-5)/1));
+    ctx.font='500 22px "Courier New",monospace';ctx.fillStyle=TEXT;ctx.textAlign='left';
+    ctx.fillText('Queries actual spec/status fields, not user-defined metadata',280,430);
+    ctx.globalAlpha=1;
+  }
+
+  // Scene 2: Supported fields table (t 14-42)
+  const s2=clamp01((t-14)/1)*(1-clamp01((t-42)/1));
+  if(s2>0){
+    ctx.globalAlpha=s2;
+    ctx.font='700 34px "Courier New",monospace';ctx.fillStyle=ACCENT;ctx.textAlign='center';
+    ctx.fillText('Supported Field Selectors by Resource',W/2,70);
+
+    const rows=[
+      ['Resource Type','Supported Fields'],
+      ['All Resources','metadata.name, metadata.namespace'],
+      ['Pod','spec.nodeName, status.phase, spec.restartPolicy, ...'],
+      ['Service','spec.clusterIP'],
+      ['Secret','type'],
+      ['Event','reason, type, involvedObject.name, ...'],
+    ];
+    const tx=260,ty=130,rw=1400,rh=55;
+    rows.forEach((row,ri)=>{
+      const ry=ty+ri*rh;
+      const ra=easeOut(clamp01((t-15-ri*0.4)/0.7))*s2;
+      ctx.globalAlpha=ra;
+      if(ri===0){ctx.fillStyle='rgba(97,218,251,0.12)';ctx.fillRect(tx,ry,rw,rh);}
+      else if(ri%2===0){ctx.fillStyle='rgba(255,255,255,0.03)';ctx.fillRect(tx,ry,rw,rh);}
+      ctx.font=ri===0?'700 22px "Courier New",monospace':'400 22px "Courier New",monospace';
+      ctx.textAlign='left';ctx.textBaseline='middle';
+      ctx.fillStyle=ri===0?ACCENT:ri===1?'#22c55e':TEXT;
+      ctx.fillText(row[0],tx+20,ry+rh/2);
+      ctx.fillStyle=ri===0?ACCENT:DIM;
+      ctx.fillText(row[1],tx+400,ry+rh/2);
+    });
+
+    // Operators note
+    ctx.globalAlpha=s2*easeOut(clamp01((t-22)/1));
+    ctx.font='500 22px "Courier New",monospace';ctx.fillStyle=TEXT;ctx.textAlign='center';
+    ctx.fillText('Operators:  =   ==   !=     (same as label selectors)',W/2,500);
+    ctx.fillStyle=DIM;ctx.font='400 20px "Courier New",monospace';
+    ctx.fillText('Chain with commas for AND — same rules',W/2,540);
+
+    // Multi-resource example
+    ctx.globalAlpha=s2*easeOut(clamp01((t-28)/1.5));
+    const mLines=[
+      'kubectl get statefulsets,services --all-namespaces \\',
+      '  --field-selector metadata.namespace!=default',
+    ];
+    drawTerminal(ctx,300,590,1320,110,mLines,s2*easeOut(clamp01((t-28)/1.5)),[0,1]);
+    ctx.globalAlpha=1;
+  }
+
+  // Scene 3: Labels vs Field Selectors comparison (t 40-68)
+  const s3=clamp01((t-40)/1)*(1-clamp01((t-68)/1));
+  if(s3>0){
+    ctx.globalAlpha=s3;
+    ctx.font='700 36px "Courier New",monospace';ctx.fillStyle=ACCENT;ctx.textAlign='center';
+    ctx.fillText('Labels vs Field Selectors',W/2,80);
+
+    // Labels box
+    const la=easeOut(clamp01((t-41)/1))*s3;
+    ctx.globalAlpha=la;
+    const lx=480,ly=180;
+    ctx.fillStyle=CODE_BG;ctx.beginPath();ctx.roundRect(lx-350,ly,700,420,12);ctx.fill();
+    ctx.strokeStyle='#22c55e';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(lx-350,ly,700,420,12);ctx.stroke();
+    ctx.font='700 30px "Courier New",monospace';ctx.fillStyle='#22c55e';ctx.textAlign='center';
+    ctx.fillText('Labels',lx,ly+45);
+    ctx.font='400 22px "Courier New",monospace';ctx.textAlign='left';ctx.fillStyle=TEXT;
+    const lItems=['User-defined metadata','Organizational structure','Drive controllers & services','Equality + set-based selectors','Any key-value you want','Used everywhere in K8s'];
+    lItems.forEach((item,i)=>{ctx.fillText('• '+item,lx-310,ly+100+i*45);});
+
+    // Field Selectors box
+    const fa=easeOut(clamp01((t-42.5)/1))*s3;
+    ctx.globalAlpha=fa;
+    const fx=1440,fy=180;
+    ctx.fillStyle=CODE_BG;ctx.beginPath();ctx.roundRect(fx-350,fy,700,420,12);ctx.fill();
+    ctx.strokeStyle='#f59e0b';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(fx-350,fy,700,420,12);ctx.stroke();
+    ctx.font='700 30px "Courier New",monospace';ctx.fillStyle='#f59e0b';ctx.textAlign='center';
+    ctx.fillText('Field Selectors',fx,fy+45);
+    ctx.font='400 22px "Courier New",monospace';ctx.textAlign='left';ctx.fillStyle=TEXT;
+    const fItems=['Actual spec/status fields','Runtime state queries','Debug & admin queries','Equality-based only','Limited field support','For filtering, not driving'];
+    fItems.forEach((item,i)=>{ctx.fillText('• '+item,fx-310,fy+100+i*45);});
+
+    // VS
+    ctx.globalAlpha=s3;
+    ctx.font='800 48px "Courier New",monospace';ctx.fillStyle=TEXT;ctx.textAlign='center';
+    ctx.fillText('vs',W/2,400);
+    ctx.globalAlpha=1;
+  }
+
+  // Scene 4: Outro card (t 66-end)
+  const s4=clamp01((t-66)/1);
+  if(s4>0){
+    ctx.globalAlpha=s4;
+
+    // Next episode teaser
+    ctx.font='700 56px "Courier New",monospace';ctx.fillStyle=ACCENT;ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('Next Episode',W/2,H/2-100);
+
+    ctx.font='400 36px "Courier New",monospace';ctx.fillStyle=TEXT;
+    ctx.fillText('Namespaces & Names',W/2,H/2-30);
+
+    // EP badge
+    ctx.fillStyle='rgba(97,218,251,0.15)';
+    ctx.beginPath();ctx.roundRect(W/2-80,H/2+20,160,50,25);ctx.fill();
+    ctx.strokeStyle=ACCENT;ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.roundRect(W/2-80,H/2+20,160,50,25);ctx.stroke();
+    ctx.font='600 24px "Courier New",monospace';ctx.fillStyle=ACCENT;
+    ctx.fillText('EP 14',W/2,H/2+46);
+
+    ctx.font='400 28px "Courier New",monospace';ctx.fillStyle=DIM;
+    ctx.fillText('How Kubernetes scopes and identifies',W/2,H/2+120);
+    ctx.fillText('every object in the cluster.',W/2,H/2+160);
+
+    ctx.font='600 32px "Courier New",monospace';ctx.fillStyle=TEXT;
+    ctx.fillText('See you there.',W/2,H/2+230);
+    ctx.globalAlpha=1;
+  }
+
+  drawFooter(ctx);
+  drawCaption(ctx,t);
+}
+
+let frame=0;
+function animate(){renderFrame(frame++);requestAnimationFrame(animate);}
+if(!window.__rendering)animate();
+window.renderFrame=renderFrame;
+</script></body></html>

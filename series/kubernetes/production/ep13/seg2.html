@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>* { margin: 0; padding: 0; } body { background: #0d0d1a; overflow: hidden; } canvas { display: block; }</style>
+</head><body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+const W=1920,H=1080,FPS=30,BG='#0d0d1a',ACCENT='#61dafb',TEXT='#f8fafc',CODE_BG='#0d1117',DIM='#94a3b8';
+let T=null;
+fetch('./seg2_timing.json').then(r=>r.json()).then(d=>{T=d;});
+
+function getCaption(t){if(!T)return'';for(const s of T.sentences)if(t>=s.start&&t<=s.end)return s.text;return'';}
+function drawCaption(ctx,t){const c=getCaption(t);if(!c)return;ctx.font='600 30px "Courier New",monospace';const m=ctx.measureText(c),pw=Math.min(m.width+48,W-80),ph=50,px=(W-pw)/2,py=H-95;ctx.fillStyle='rgba(13,13,26,0.9)';ctx.beginPath();ctx.roundRect(px,py,pw,ph,12);ctx.fill();ctx.strokeStyle=ACCENT;ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(px,py,pw,ph,12);ctx.stroke();ctx.fillStyle=TEXT;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(c,W/2,py+ph/2);}
+function drawFooter(ctx){ctx.font='400 18px "Courier New",monospace';ctx.fillStyle='rgba(97,218,251,0.4)';ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText('kubernetes · labels & selectors · ep 13',W/2,H-18);}
+function clamp01(x){return Math.max(0,Math.min(1,x));}
+function easeOut(x){return 1-Math.pow(1-x,3);}
+function lerp(a,b,t){return a+(b-a)*t;}
+
+// Scenes based on timing
+// Sent 0-1: Labels are key-value pairs (0-8s) -> YAML + pod badges
+// Sent 2-5: Labels vs Annotations (8-25s)
+// Sent 6-8: Key syntax anatomy (25-45s)
+// Sent 9-12: Prefix + validation rules (45-75s)
+// Sent 13: Real YAML example (75-90s)
+// Sent 14-17: Common patterns table (90-end)
+
+function drawCodeBlock(ctx, x, y, w, h, lines, alpha, highlight) {
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = CODE_BG;
+  ctx.beginPath(); ctx.roundRect(x, y, w, h, 10); ctx.fill();
+  ctx.strokeStyle = 'rgba(97,218,251,0.3)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.roundRect(x, y, w, h, 10); ctx.stroke();
+  ctx.font = '400 22px "Courier New",monospace';
+  ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+  lines.forEach((line, i) => {
+    const ly = y + 20 + i * 30;
+    if (highlight && highlight.includes(i)) {
+      ctx.fillStyle = ACCENT;
+    } else if (line.startsWith('#') || line.startsWith('//')) {
+      ctx.fillStyle = '#6b7280';
+    } else {
+      ctx.fillStyle = TEXT;
+    }
+    ctx.fillText(line, x + 20, ly);
+  });
+  ctx.globalAlpha = 1;
+}
+
+function renderFrame(fn) {
+  const ctx = document.getElementById('c').getContext('2d');
+  const t = fn / FPS;
+  ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H);
+
+  // Scene 1: YAML with labels + Pod badges (t 0-10)
+  const s1 = clamp01(t / 1) * (1 - clamp01((t - 10) / 1));
+  if (s1 > 0) {
+    const yamlLines = [
+      'apiVersion: v1',
+      'kind: Pod',
+      'metadata:',
+      '  name: my-pod',
+      '  labels:',
+      '    environment: production',
+      '    app: nginx',
+      'spec:',
+      '  containers:',
+      '    - name: nginx',
+      '      image: nginx:1.25',
+    ];
+    drawCodeBlock(ctx, 100, 120, 650, 380, yamlLines, easeOut(clamp01(t/1)) * s1, [5, 6]);
+
+    // Pod with label badges on right
+    const pa = easeOut(clamp01((t - 0.5) / 1)) * s1;
+    ctx.globalAlpha = pa;
+    const px = 1200, py = 250;
+    ctx.fillStyle = CODE_BG;
+    ctx.beginPath(); ctx.roundRect(px-120, py-100, 240, 200, 12); ctx.fill();
+    ctx.strokeStyle = ACCENT; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.roundRect(px-120, py-100, 240, 200, 12); ctx.stroke();
+    ctx.font = '700 26px "Courier New",monospace'; ctx.fillStyle = TEXT;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('my-pod', px, py - 60);
+
+    // Label badges
+    const badges = [['environment', 'production', '#22c55e'], ['app', 'nginx', '#14b8a6']];
+    badges.forEach(([k, v, col], i) => {
+      const by = py - 10 + i * 50;
+      ctx.fillStyle = col; ctx.globalAlpha = pa * 0.2;
+      ctx.beginPath(); ctx.roundRect(px - 105, by - 14, 210, 32, 8); ctx.fill();
+      ctx.globalAlpha = pa; ctx.fillStyle = col;
+      ctx.font = '500 20px "Courier New",monospace';
+      ctx.fillText(`${k}: ${v}`, px, by + 2);
+    });
+
+    // Arrow from YAML to Pod
+    ctx.globalAlpha = pa * 0.6;
+    ctx.strokeStyle = ACCENT; ctx.lineWidth = 2;
+    ctx.setLineDash([8, 4]);
+    ctx.beginPath(); ctx.moveTo(760, 300); ctx.lineTo(1070, 250); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Title
+    ctx.globalAlpha = s1;
+    ctx.font = '700 38px "Courier New",monospace'; ctx.fillStyle = ACCENT;
+    ctx.textAlign = 'center'; ctx.fillText('Labels: Key-Value Pairs on Any Object', W/2, 70);
+    ctx.globalAlpha = 1;
+  }
+
+  // Scene 2: Labels vs Annotations (t 8-25)
+  const s2 = clamp01((t - 8) / 1) * (1 - clamp01((t - 25) / 1));
+  if (s2 > 0) {
+    ctx.globalAlpha = s2;
+    ctx.font = '700 38px "Courier New",monospace'; ctx.fillStyle = ACCENT;
+    ctx.textAlign = 'center'; ctx.fillText('Labels vs Annotations', W/2, 100);
+
+    // Labels box
+    const lx = 300, ly = 200;
+    ctx.fillStyle = CODE_BG;
+    ctx.beginPath(); ctx.roundRect(lx-180, ly, 360, 350, 12); ctx.fill();
+    ctx.strokeStyle = '#22c55e'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.roundRect(lx-180, ly, 360, 350, 12); ctx.stroke();
+    ctx.font = '700 28px "Courier New",monospace'; ctx.fillStyle = '#22c55e';
+    ctx.fillText('Labels', lx, ly + 40);
+    ctx.font = '400 20px "Courier New",monospace'; ctx.fillStyle = DIM;
+    const lLines = ['For identification', 'For selection', 'Used by selectors', 'Used by controllers', 'Drive Services', '63 char value limit'];
+    lLines.forEach((l, i) => ctx.fillText('• ' + l, lx, ly + 90 + i * 38));
+
+    // Annotations box
+    const ax = 1620 - 300, ay = 200;
+    ctx.fillStyle = CODE_BG;
+    ctx.beginPath(); ctx.roundRect(ax-180, ay, 360, 350, 12); ctx.fill();
+    ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.roundRect(ax-180, ay, 360, 350, 12); ctx.stroke();
+    ctx.font = '700 28px "Courier New",monospace'; ctx.fillStyle = '#f59e0b';
+    ctx.fillText('Annotations', ax, ay + 40);
+    ctx.font = '400 20px "Courier New",monospace'; ctx.fillStyle = DIM;
+    const aLines = ['For everything else', 'Not queryable', 'Build info', 'Creator emails', 'Timestamps', 'No size constraint'];
+    aLines.forEach((l, i) => ctx.fillText('• ' + l, ax, ay + 90 + i * 38));
+
+    // VS divider
+    ctx.font = '800 48px "Courier New",monospace'; ctx.fillStyle = TEXT;
+    ctx.fillText('vs', W/2, 380);
+    ctx.globalAlpha = 1;
+  }
+
+  // Scene 3: Label key anatomy (t 25-48)
+  const s3 = clamp01((t - 25) / 1) * (1 - clamp01((t - 48) / 1));
+  if (s3 > 0) {
+    ctx.globalAlpha = s3;
+    ctx.font = '700 38px "Courier New",monospace'; ctx.fillStyle = ACCENT;
+    ctx.textAlign = 'center'; ctx.fillText('Label Key Anatomy', W/2, 80);
+
+    // Key format: [prefix/]name
+    const kp = easeOut(clamp01((t - 26) / 1));
+    ctx.globalAlpha = s3 * kp;
+
+    // Big format display
+    ctx.font = '700 52px "Courier New",monospace';
+    const baseY = 220;
+
+    // Prefix part
+    ctx.fillStyle = '#f59e0b';
+    ctx.textAlign = 'right';
+    ctx.fillText('prefix', W/2 - 30, baseY);
+
+    // Slash
+    ctx.fillStyle = DIM;
+    ctx.textAlign = 'center';
+    ctx.fillText('/', W/2, baseY);
+
+    // Name part
+    ctx.fillStyle = '#22c55e';
+    ctx.textAlign = 'left';
+    ctx.fillText('name', W/2 + 30, baseY);
+
+    // Brackets around prefix
+    ctx.font = '400 36px "Courier New",monospace';
+    ctx.fillStyle = DIM;
+    ctx.textAlign = 'center';
+    ctx.fillText('[ optional ]', W/2 - 140, baseY + 50);
+    ctx.fillText('[ required ]', W/2 + 140, baseY + 50);
+
+    // Name rules
+    const nr = easeOut(clamp01((t - 28) / 1.5));
+    ctx.globalAlpha = s3 * nr;
+    ctx.font = '600 26px "Courier New",monospace';
+    ctx.textAlign = 'left';
+    const rulesX = 200, rulesY = 360;
+    ctx.fillStyle = '#22c55e';
+    ctx.fillText('Name Rules:', rulesX, rulesY);
+    ctx.font = '400 22px "Courier New",monospace'; ctx.fillStyle = TEXT;
+    ctx.fillText('• Max 63 characters', rulesX + 20, rulesY + 40);
+    ctx.fillText('• Start & end with [a-z0-9]', rulesX + 20, rulesY + 72);
+    ctx.fillText('• Middle: [a-z0-9] + dashes + underscores + dots', rulesX + 20, rulesY + 104);
+
+    // Prefix rules
+    const pr = easeOut(clamp01((t - 30) / 1.5));
+    ctx.globalAlpha = s3 * pr;
+    ctx.fillStyle = '#f59e0b';
+    ctx.font = '600 26px "Courier New",monospace';
+    const prX = 200, prY = 530;
+    ctx.fillText('Prefix Rules:', prX, prY);
+    ctx.font = '400 22px "Courier New",monospace'; ctx.fillStyle = TEXT;
+    ctx.fillText('• Valid DNS subdomain', prX + 20, prY + 40);
+    ctx.fillText('• Max 253 characters', prX + 20, prY + 72);
+
+    // Reserved prefixes
+    const rr = easeOut(clamp01((t - 33) / 1));
+    ctx.globalAlpha = s3 * rr;
+    ctx.fillStyle = '#ef4444';
+    ctx.font = '600 26px "Courier New",monospace';
+    ctx.fillText('Reserved:', prX, prY + 120);
+    ctx.font = '500 24px "Courier New",monospace';
+    ctx.fillText('kubernetes.io/*', prX + 20, prY + 158);
+    ctx.fillText('k8s.io/*', prX + 20, prY + 190);
+    ctx.fillStyle = DIM; ctx.font = '400 20px "Courier New",monospace';
+    ctx.fillText('(for Kubernetes core components only)', prX + 220, prY + 158);
+
+    // Example keys on right
+    ctx.globalAlpha = s3 * easeOut(clamp01((t - 35) / 1.5));
+    const exX = 1100, exY = 360;
+    ctx.fillStyle = ACCENT; ctx.font = '600 26px "Courier New",monospace';
+    ctx.fillText('Examples:', exX, exY);
+    ctx.font = '400 22px "Courier New",monospace';
+    const examples = [
+      ['app', '#22c55e'],
+      ['tier', '#22c55e'],
+      ['release', '#22c55e'],
+      ['app.kubernetes.io/name', '#f59e0b'],
+      ['helm.sh/chart', '#f59e0b'],
+      ['node.kubernetes.io/instance-type', '#ef4444'],
+    ];
+    examples.forEach(([ex, col], i) => {
+      ctx.fillStyle = col;
+      ctx.fillText(ex, exX + 20, exY + 40 + i * 36);
+    });
+
+    ctx.globalAlpha = 1;
+  }
+
+  // Scene 4: Prefix requirement for operators (t 38-55)
+  // (overlaps slightly with scene 3 end, that's fine - scene 3 fades at 48)
+
+  // Scene 5: Real YAML example (t 48-75)
+  const s5 = clamp01((t - 48) / 1) * (1 - clamp01((t - 75) / 1));
+  if (s5 > 0) {
+    ctx.globalAlpha = s5;
+    ctx.font = '700 36px "Courier New",monospace'; ctx.fillStyle = ACCENT;
+    ctx.textAlign = 'center'; ctx.fillText('Label Values & Real Example', W/2, 80);
+
+    // Value rules on left
+    const vr = easeOut(clamp01((t - 49) / 1));
+    ctx.globalAlpha = s5 * vr;
+    ctx.font = '600 26px "Courier New",monospace'; ctx.fillStyle = '#a78bfa';
+    ctx.textAlign = 'left';
+    ctx.fillText('Value Rules:', 150, 170);
+    ctx.font = '400 22px "Courier New",monospace'; ctx.fillStyle = TEXT;
+    ctx.fillText('• Max 63 characters', 170, 210);
+    ctx.fillText('• Can be empty string', 170, 244);
+    ctx.fillText('• Start & end with alphanumeric (if non-empty)', 170, 278);
+    ctx.fillText('• Allowed: [a-z0-9A-Z] - _ .', 170, 312);
+
+    // YAML example
+    ctx.globalAlpha = s5 * easeOut(clamp01((t - 51) / 1.5));
+    const yamlLines = [
+      'apiVersion: v1',
+      'kind: Pod',
+      'metadata:',
+      '  name: my-nginx',
+      '  labels:',
+      '    environment: production',
+      '    app: nginx',
+      'spec:',
+      '  containers:',
+      '    - name: nginx',
+      '      image: nginx:1.25',
+    ];
+    drawCodeBlock(ctx, 150, 380, 600, 380, yamlLines, s5, [5, 6]);
+
+    // Arrow + explanation
+    ctx.globalAlpha = s5 * easeOut(clamp01((t - 53) / 1));
+    ctx.font = '500 22px "Courier New",monospace'; ctx.fillStyle = ACCENT;
+    ctx.textAlign = 'left';
+    ctx.fillText('Two labels attached:', 850, 420);
+    ctx.fillStyle = '#22c55e'; ctx.fillText('environment: production', 870, 470);
+    ctx.fillStyle = '#14b8a6'; ctx.fillText('app: nginx', 870, 510);
+    ctx.fillStyle = DIM; ctx.font = '400 20px "Courier New",monospace';
+    ctx.fillText("That's all it takes.", 870, 570);
+    ctx.globalAlpha = 1;
+  }
+
+  // Scene 6: Common labels table (t 75-end)
+  const s6 = clamp01((t - 75) / 1);
+  if (s6 > 0) {
+    ctx.globalAlpha = s6;
+    ctx.font = '700 36px "Courier New",monospace'; ctx.fillStyle = ACCENT;
+    ctx.textAlign = 'center'; ctx.fillText('Common Label Patterns', W/2, 80);
+
+    const table = [
+      ['Label Key', 'Example Values', 'Purpose'],
+      ['release', 'stable, canary, beta', 'Track release channels'],
+      ['environment', 'dev, qa, production', 'Deployment stage'],
+      ['tier', 'frontend, backend, cache', 'Architecture layer'],
+      ['partition', 'customerA, customerB', 'Tenant isolation'],
+      ['track', 'daily, weekly', 'Release cadence'],
+    ];
+
+    const tx = 260, ty = 160, rw = 1400, rh = 55;
+    table.forEach((row, ri) => {
+      const ry = ty + ri * rh;
+      const rowAlpha = easeOut(clamp01((t - 76 - ri * 0.4) / 0.8)) * s6;
+      ctx.globalAlpha = rowAlpha;
+
+      if (ri === 0) {
+        ctx.fillStyle = 'rgba(97,218,251,0.15)';
+        ctx.fillRect(tx, ry, rw, rh);
+        ctx.font = '700 22px "Courier New",monospace'; ctx.fillStyle = ACCENT;
+      } else {
+        if (ri % 2 === 0) { ctx.fillStyle = 'rgba(255,255,255,0.03)'; ctx.fillRect(tx, ry, rw, rh); }
+        ctx.font = '400 22px "Courier New",monospace'; ctx.fillStyle = TEXT;
+      }
+      ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+      ctx.fillText(row[0], tx + 20, ry + rh/2);
+      ctx.fillStyle = ri === 0 ? ACCENT : '#22c55e';
+      ctx.fillText(row[1], tx + 350, ry + rh/2);
+      ctx.fillStyle = ri === 0 ? ACCENT : DIM;
+      ctx.fillText(row[2], tx + 850, ry + rh/2);
+    });
+
+    // Bottom note
+    ctx.globalAlpha = s6 * easeOut(clamp01((t - 80) / 1));
+    ctx.font = '500 24px "Courier New",monospace'; ctx.fillStyle = TEXT;
+    ctx.textAlign = 'center';
+    ctx.fillText('Define your own conventions.', W/2, 560);
+    ctx.fillStyle = ACCENT;
+    ctx.fillText('The constraint is syntax, not semantics.', W/2, 600);
+    ctx.globalAlpha = 1;
+  }
+
+  drawFooter(ctx);
+  drawCaption(ctx, t);
+}
+
+let frame=0;
+function animate(){renderFrame(frame++);requestAnimationFrame(animate);}
+if(!window.__rendering)animate();
+window.renderFrame=renderFrame;
+</script></body></html>

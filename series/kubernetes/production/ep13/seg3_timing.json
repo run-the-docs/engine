@@ -1,0 +1,168 @@
+{
+  "segments": [
+    {
+      "index": 0,
+      "text": "Labels are only useful if you can query them. That's what selectors are for.",
+      "start": 1.0,
+      "end": 6.0133,
+      "duration": 5.0133
+    },
+    {
+      "index": 1,
+      "text": "There are two types: equality-based and set-based.",
+      "start": 6.3933,
+      "end": 9.636,
+      "duration": 3.2427
+    },
+    {
+      "index": 2,
+      "text": "Equality-based requirements use the equals, double-equals, or not-equals operators.",
+      "start": 10.016,
+      "end": 15.8827,
+      "duration": 5.8667
+    },
+    {
+      "index": 3,
+      "text": "All three mean what you'd expect.",
+      "start": 16.2627,
+      "end": 18.524,
+      "duration": 2.2613
+    },
+    {
+      "index": 4,
+      "text": "environment=production selects every object where environment equals production.",
+      "start": 18.904,
+      "end": 24.7493,
+      "duration": 5.8453
+    },
+    {
+      "index": 5,
+      "text": "tier!=frontend excludes everything with tier set to frontend \u2014 including objects that have no tier label at all.",
+      "start": 25.1293,
+      "end": 33.0653,
+      "duration": 7.936
+    },
+    {
+      "index": 6,
+      "text": "You combine requirements with a comma, which acts as a logical AND.",
+      "start": 33.4453,
+      "end": 38.1387,
+      "duration": 4.6933
+    },
+    {
+      "index": 7,
+      "text": "There is no OR operator. If you need OR \u2014 use set-based selectors.",
+      "start": 38.5187,
+      "end": 43.2333,
+      "duration": 4.7147
+    },
+    {
+      "index": 8,
+      "text": "Set-based requirements are more expressive.",
+      "start": 43.6133,
+      "end": 46.5787,
+      "duration": 2.9653
+    },
+    {
+      "index": 9,
+      "text": "The in operator selects objects where the label value is in a set.",
+      "start": 46.9587,
+      "end": 51.3747,
+      "duration": 4.416
+    },
+    {
+      "index": 10,
+      "text": "environment in (production, qa) matches both production and qa environments.",
+      "start": 51.7547,
+      "end": 57.216,
+      "duration": 5.4613
+    },
+    {
+      "index": 11,
+      "text": "Notin does the opposite.",
+      "start": 57.596,
+      "end": 59.516,
+      "duration": 1.92
+    },
+    {
+      "index": 12,
+      "text": "The exists operator just checks whether a label key is present, regardless of value.",
+      "start": 59.896,
+      "end": 65.656,
+      "duration": 5.76
+    },
+    {
+      "index": 13,
+      "text": "partition selects anything that has a partition label.",
+      "start": 66.036,
+      "end": 69.5773,
+      "duration": 3.5413
+    },
+    {
+      "index": 14,
+      "text": "Exclamation-partition selects anything that does not.",
+      "start": 69.9573,
+      "end": 73.7333,
+      "duration": 3.776
+    },
+    {
+      "index": 15,
+      "text": "You can mix both types in a single selector.",
+      "start": 74.1133,
+      "end": 77.164,
+      "duration": 3.0507
+    },
+    {
+      "index": 16,
+      "text": "partition in (customerA, customerB), environment != qa \u2014 that's a perfectly valid combined selector.",
+      "start": 77.544,
+      "end": 85.2667,
+      "duration": 7.7227
+    },
+    {
+      "index": 17,
+      "text": "Now, a critical distinction: not all API objects support set-based selectors.",
+      "start": 85.6467,
+      "end": 91.2787,
+      "duration": 5.632
+    },
+    {
+      "index": 18,
+      "text": "Services and ReplicationControllers only support the equality-based form in their selector field.",
+      "start": 91.6587,
+      "end": 98.528,
+      "duration": 6.8693
+    },
+    {
+      "index": 19,
+      "text": "But newer resources \u2014 Deployments, ReplicaSets, DaemonSets, Jobs \u2014 support both, using matchLabels and matchExpressions.",
+      "start": 98.908,
+      "end": 107.676,
+      "duration": 8.768
+    },
+    {
+      "index": 20,
+      "text": "matchLabels is a simple key-value map.",
+      "start": 108.056,
+      "end": 111.0853,
+      "duration": 3.0293
+    },
+    {
+      "index": 21,
+      "text": "matchExpressions is an array where each entry specifies a key, an operator, and a set of values.",
+      "start": 111.4653,
+      "end": 118.1853,
+      "duration": 6.72
+    },
+    {
+      "index": 22,
+      "text": "All entries are ANDed together.",
+      "start": 118.5653,
+      "end": 121.1893,
+      "duration": 2.624
+    }
+  ],
+  "total_voice_duration": 121.1893,
+  "total_duration": 124.1893,
+  "total_frames_30fps": 3726
+}

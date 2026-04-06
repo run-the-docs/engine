@@ -1,0 +1,63 @@
+{
+  "segments": [
+    {
+      "index": 0,
+      "text": "You have fifty Pods running.",
+      "start": 2.0,
+      "end": 3.8987,
+      "duration": 1.8987
+    },
+    {
+      "index": 1,
+      "text": "Some are in production. Some are in staging.",
+      "start": 4.2787,
+      "end": 7.2013,
+      "duration": 2.9227
+    },
+    {
+      "index": 2,
+      "text": "Some are backends, some are frontends.",
+      "start": 7.5813,
+      "end": 10.184,
+      "duration": 2.6027
+    },
+    {
+      "index": 3,
+      "text": "How does Kubernetes even know which is which?",
+      "start": 10.564,
+      "end": 13.572,
+      "duration": 3.008
+    },
+    {
+      "index": 4,
+      "text": "The answer is Labels. Two words. A colon. Maximum power.",
+      "start": 13.952,
+      "end": 18.4747,
+      "duration": 4.5227
+    },
+    {
+      "index": 5,
+      "text": "Labels let you attach arbitrary metadata to any object \u2014 and then query, route, and manage objects in bulk using that metadata.",
+      "start": 18.8547,
+      "end": 27.9213,
+      "duration": 9.0667
+    },
+    {
+      "index": 6,
+      "text": "Selectors are what make the queries possible.",
+      "start": 28.3013,
+      "end": 31.5867,
+      "duration": 3.2853
+    },
+    {
+      "index": 7,
+      "text": "This is episode thirteen. Labels and Selectors. Let's go.",
+      "start": 31.9667,
+      "end": 36.212,
+      "duration": 4.2453
+    }
+  ],
+  "total_voice_duration": 36.212,
+  "total_duration": 40.212,
+  "total_frames_30fps": 1207
+}

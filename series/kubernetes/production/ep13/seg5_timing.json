@@ -1,0 +1,112 @@
+{
+  "segments": [
+    {
+      "index": 0,
+      "text": "One more selector type worth knowing: field selectors. These filter objects by resource field values \u2014 not labels.",
+      "start": 1.0,
+      "end": 8.9147,
+      "duration": 7.9147
+    },
+    {
+      "index": 1,
+      "text": "Where label selectors query user-defined metadata, field selectors query the object's actual spec and status fields.",
+      "start": 9.2947,
+      "end": 17.444,
+      "duration": 8.1493
+    },
+    {
+      "index": 2,
+      "text": "The syntax is similar: kubectl get pods --field-selector status.phase=Running.",
+      "start": 17.824,
+      "end": 24.032,
+      "duration": 6.208
+    },
+    {
+      "index": 3,
+      "text": "That returns only pods currently in the Running phase.",
+      "start": 24.412,
+      "end": 28.3373,
+      "duration": 3.9253
+    },
+    {
+      "index": 4,
+      "text": "All resource types support metadata.name and metadata.namespace as field selector targets.",
+      "start": 28.7173,
+      "end": 35.544,
+      "duration": 6.8267
+    },
+    {
+      "index": 5,
+      "text": "Other fields vary by type \u2014 Pods expose spec.nodeName, status.phase, spec.restartPolicy and a handful of others.",
+      "start": 35.924,
+      "end": 44.5427,
+      "duration": 8.6187
+    },
+    {
+      "index": 6,
+      "text": "Services expose spec.clusterIP. Secrets expose type.",
+      "start": 44.9227,
+      "end": 49.7653,
+      "duration": 4.8427
+    },
+    {
+      "index": 7,
+      "text": "The operators are the same three: equals, double-equals, and not-equals.",
+      "start": 50.1453,
+      "end": 55.0947,
+      "duration": 4.9493
+    },
+    {
+      "index": 8,
+      "text": "You can chain multiple with commas for AND \u2014 same as label selectors.",
+      "start": 55.4747,
+      "end": 60.232,
+      "duration": 4.7573
+    },
+    {
+      "index": 9,
+      "text": "You can also target multiple resource types at once.",
+      "start": 60.612,
+      "end": 64.388,
+      "duration": 3.776
+    },
+    {
+      "index": 10,
+      "text": "kubectl get statefulsets,services --all-namespaces --field-selector metadata.namespace!=default.",
+      "start": 64.768,
+      "end": 72.3413,
+      "duration": 7.5733
+    },
+    {
+      "index": 11,
+      "text": "That returns both resource kinds, filtered to non-default namespaces only.",
+      "start": 72.7213,
+      "end": 77.9053,
+      "duration": 5.184
+    },
+    {
+      "index": 12,
+      "text": "Labels vs field selectors: use labels for your own organizational metadata and to drive controllers and services.",
+      "start": 78.2853,
+      "end": 86.904,
+      "duration": 8.6187
+    },
+    {
+      "index": 13,
+      "text": "Use field selectors when you need to filter on actual runtime state \u2014 phase, node, namespace.",
+      "start": 87.284,
+      "end": 93.9827,
+      "duration": 6.6987
+    },
+    {
+      "index": 14,
+      "text": "Next episode: Namespaces and Names \u2014 how Kubernetes scopes and identifies every object in the cluster. See you there.",
+      "start": 94.3627,
+      "end": 102.96,
+      "duration": 8.5973
+    }
+  ],
+  "total_voice_duration": 102.96,
+  "total_duration": 106.96,
+  "total_frames_30fps": 3209
+}

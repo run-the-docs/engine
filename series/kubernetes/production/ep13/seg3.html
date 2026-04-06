@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>* { margin: 0; padding: 0; } body { background: #0d0d1a; overflow: hidden; } canvas { display: block; }</style>
+</head><body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+const W=1920,H=1080,FPS=30,BG='#0d0d1a',ACCENT='#61dafb',TEXT='#f8fafc',CODE_BG='#0d1117',DIM='#94a3b8';
+let T=null;
+fetch('./seg3_timing.json').then(r=>r.json()).then(d=>{T=d;});
+
+function getCaption(t){if(!T)return'';for(const s of T.sentences)if(t>=s.start&&t<=s.end)return s.text;return'';}
+function drawCaption(ctx,t){const c=getCaption(t);if(!c)return;ctx.font='600 28px "Courier New",monospace';const m=ctx.measureText(c),pw=Math.min(m.width+48,W-60),ph=48,px=(W-pw)/2,py=H-95;ctx.fillStyle='rgba(13,13,26,0.9)';ctx.beginPath();ctx.roundRect(px,py,pw,ph,12);ctx.fill();ctx.strokeStyle=ACCENT;ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(px,py,pw,ph,12);ctx.stroke();ctx.fillStyle=TEXT;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(c,W/2,py+ph/2);}
+function drawFooter(ctx){ctx.font='400 18px "Courier New",monospace';ctx.fillStyle='rgba(97,218,251,0.4)';ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText('kubernetes · labels & selectors · ep 13',W/2,H-18);}
+function clamp01(x){return Math.max(0,Math.min(1,x));}
+function easeOut(x){return 1-Math.pow(1-x,3);}
+
+// Pod grid for filter demos
+const gpods = [];
+const envs = ['production','production','qa','staging','production','qa','staging','production','production','staging','qa','production'];
+const tiers = ['frontend','backend','frontend','backend','cache','frontend','frontend','backend','frontend','cache','backend','backend'];
+const parts = [null,'customerA',null,'customerB','customerA',null,'customerB',null,'customerA','customerA',null,'customerB'];
+for(let i=0;i<12;i++){
+  const col=i%4, row=Math.floor(i/4);
+  gpods.push({x:200+col*180, y:260+row*140, env:envs[i], tier:tiers[i], partition:parts[i]});
+}
+
+function drawMiniPod(ctx, p, alpha, highlight, dimmed) {
+  if(alpha<=0)return;
+  ctx.globalAlpha = alpha * (dimmed ? 0.25 : 1);
+  const bw=150,bh=100,x=p.x-bw/2,y=p.y-bh/2;
+  ctx.fillStyle = highlight ? 'rgba(34,197,94,0.15)' : CODE_BG;
+  ctx.beginPath();ctx.roundRect(x,y,bw,bh,8);ctx.fill();
+  ctx.strokeStyle = highlight ? '#22c55e' : 'rgba(97,218,251,0.3)';
+  ctx.lineWidth = highlight ? 2.5 : 1;
+  ctx.beginPath();ctx.roundRect(x,y,bw,bh,8);ctx.stroke();
+  ctx.font='400 14px "Courier New",monospace';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillStyle = highlight ? '#22c55e' : DIM;
+  ctx.fillText(`env: ${p.env}`, p.x, p.y-22);
+  ctx.fillText(`tier: ${p.tier}`, p.x, p.y+2);
+  if(p.partition){ctx.fillStyle='#f59e0b';ctx.fillText(`part: ${p.partition}`,p.x,p.y+26);}
+  ctx.globalAlpha=1;
+}
+
+function drawCodeBlock(ctx,x,y,w,h,lines,alpha,hl){
+  ctx.globalAlpha=alpha;ctx.fillStyle=CODE_BG;ctx.beginPath();ctx.roundRect(x,y,w,h,10);ctx.fill();
+  ctx.strokeStyle='rgba(97,218,251,0.3)';ctx.lineWidth=1;ctx.beginPath();ctx.roundRect(x,y,w,h,10);ctx.stroke();
+  ctx.font='400 20px "Courier New",monospace';ctx.textAlign='left';ctx.textBaseline='top';
+  lines.forEach((l,i)=>{ctx.fillStyle=hl&&hl.includes(i)?ACCENT:TEXT;ctx.fillText(l,x+20,y+18+i*28);});
+  ctx.globalAlpha=1;
+}
+
+function renderFrame(fn){
+  const ctx=document.getElementById('c').getContext('2d');
+  const t=fn/FPS;
+  ctx.fillStyle=BG;ctx.fillRect(0,0,W,H);
+
+  // Scene 1: Two columns - Equality vs Set-based (t 0-14)
+  const s1=clamp01(t/1)*(1-clamp01((t-14)/1));
+  if(s1>0){
+    ctx.globalAlpha=s1;
+    ctx.font='700 36px "Courier New",monospace';ctx.fillStyle=ACCENT;ctx.textAlign='center';
+    ctx.fillText('Label Selectors',W/2,70);
+
+    // Equality column
+    const ea=easeOut(clamp01((t-0.5)/1))*s1;
+    ctx.globalAlpha=ea;
+    ctx.fillStyle=CODE_BG;ctx.beginPath();ctx.roundRect(100,130,750,480,12);ctx.fill();
+    ctx.strokeStyle='#22c55e';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(100,130,750,480,12);ctx.stroke();
+    ctx.font='700 28px "Courier New",monospace';ctx.fillStyle='#22c55e';ctx.textAlign='center';
+    ctx.fillText('Equality-Based',475,170);
+    ctx.font='400 22px "Courier New",monospace';ctx.textAlign='left';ctx.fillStyle=TEXT;
+    const eqLines=[
+      '  =    equals',
+      '  ==   equals (same as =)',
+      '  !=   not equals',
+      '',
+      '  Examples:',
+      '  environment = production',
+      '  tier != frontend',
+      '',
+      '  Comma = AND:',
+      '  environment=prod, tier=frontend',
+      '',
+      '  No OR operator!',
+    ];
+    eqLines.forEach((l,i)=>{
+      if(l.includes('No OR')){ctx.fillStyle='#ef4444';ctx.font='600 22px "Courier New",monospace';}
+      else if(l.includes('Example')||l.includes('Comma')){ctx.fillStyle=ACCENT;ctx.font='500 22px "Courier New",monospace';}
+      else{ctx.fillStyle=TEXT;ctx.font='400 22px "Courier New",monospace';}
+      ctx.fillText(l,130,210+i*32);
+    });
+
+    // Set-based column
+    const sa2=easeOut(clamp01((t-1.5)/1))*s1;
+    ctx.globalAlpha=sa2;
+    ctx.fillStyle=CODE_BG;ctx.beginPath();ctx.roundRect(1070,130,750,480,12);ctx.fill();
+    ctx.strokeStyle='#a78bfa';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(1070,130,750,480,12);ctx.stroke();
+    ctx.font='700 28px "Courier New",monospace';ctx.fillStyle='#a78bfa';ctx.textAlign='center';
+    ctx.fillText('Set-Based',1445,170);
+    ctx.font='400 22px "Courier New",monospace';ctx.textAlign='left';ctx.fillStyle=TEXT;
+    const setLines=[
+      '  in       value in set',
+      '  notin    value not in set',
+      '  exists   key exists (any value)',
+      '  !key     key does not exist',
+      '',
+      '  Examples:',
+      '  environment in (prod, qa)',
+      '  tier notin (frontend)',
+      '  partition',
+      '  !partition',
+      '',
+      '  More expressive than equality!',
+    ];
+    setLines.forEach((l,i)=>{
+      if(l.includes('More expressive')){ctx.fillStyle='#a78bfa';ctx.font='600 22px "Courier New",monospace';}
+      else if(l.includes('Example')){ctx.fillStyle=ACCENT;ctx.font='500 22px "Courier New",monospace';}
+      else{ctx.fillStyle=TEXT;ctx.font='400 22px "Courier New",monospace';}
+      ctx.fillText(l,1100,210+i*32);
+    });
+    ctx.globalAlpha=1;
+  }
+
+  // Scene 2: Equality filter demo (t 12-35)
+  const s2=clamp01((t-12)/1)*(1-clamp01((t-35)/1));
+  if(s2>0){
+    ctx.globalAlpha=s2;
+    ctx.font='700 32px "Courier New",monospace';ctx.fillStyle=ACCENT;ctx.textAlign='center';
+    ctx.fillText('environment = production',W/2,100);
+
+    // Draw pods with highlighting
+    const filterOn = clamp01((t-14)/1);
+    gpods.forEach((p,i)=>{
+      const match = p.env === 'production';
+      drawMiniPod(ctx, p, s2 * easeOut(clamp01((t-12.5-i*0.1)/0.5)), match && filterOn > 0.5, !match && filterOn > 0.5);
+    });
+
+    // Selector line
+    if(filterOn > 0.5){
+      ctx.globalAlpha = s2;
+      ctx.font='500 24px "Courier New",monospace';ctx.fillStyle='#22c55e';ctx.textAlign='left';
+      ctx.fillText('Matched: 7 pods (production)',900,260);
+      ctx.fillStyle=DIM;ctx.font='400 20px "Courier New",monospace';
+      ctx.fillText('tier!=frontend would exclude frontend pods',900,300);
+      ctx.fillText('Comma joins = AND operator',900,332);
+    }
+    ctx.globalAlpha=1;
+  }
+
+  // Scene 3: Set-based demo (t 33-55)
+  const s3=clamp01((t-33)/1)*(1-clamp01((t-55)/1));
+  if(s3>0){
+    ctx.globalAlpha=s3;
+    ctx.font='700 32px "Courier New",monospace';ctx.fillStyle='#a78bfa';ctx.textAlign='center';
+    ctx.fillText('environment in (production, qa)',W/2,100);
+
+    const filterOn=clamp01((t-35)/1);
+    gpods.forEach((p,i)=>{
+      const match=p.env==='production'||p.env==='qa';
+      drawMiniPod(ctx,p,s3*easeOut(clamp01((t-33.5-i*0.1)/0.5)),match&&filterOn>0.5,!match&&filterOn>0.5);
+    });
+
+    if(filterOn>0.5){
+      ctx.globalAlpha=s3;
+      ctx.font='500 24px "Courier New",monospace';ctx.fillStyle='#a78bfa';ctx.textAlign='left';
+      ctx.fillText('Matched: production + qa pods',900,260);
+
+      // exists/notin demo transition
+      const existDemo = clamp01((t-45)/1);
+      if(existDemo > 0){
+        ctx.globalAlpha = s3 * existDemo;
+        ctx.font='700 28px "Courier New",monospace';ctx.fillStyle='#f59e0b';ctx.textAlign='center';
+        ctx.fillText('!partition  →  pods WITHOUT partition label', W/2, 720);
+        ctx.fillStyle=DIM;ctx.font='400 22px "Courier New",monospace';
+        ctx.fillText('exists checks key presence, regardless of value',W/2,760);
+      }
+    }
+    ctx.globalAlpha=1;
+  }
+
+  // Scene 4: Resource support table (t 53-80)
+  const s4=clamp01((t-53)/1)*(1-clamp01((t-80)/1));
+  if(s4>0){
+    ctx.globalAlpha=s4;
+    ctx.font='700 34px "Courier New",monospace';ctx.fillStyle=ACCENT;ctx.textAlign='center';
+    ctx.fillText('Which Resources Support What?',W/2,80);
+
+    const rows=[
+      ['Resource','Equality','Set-Based'],
+      ['Service','Yes','No'],
+      ['ReplicationController','Yes','No'],
+      ['Deployment','Yes','Yes'],
+      ['ReplicaSet','Yes','Yes'],
+      ['DaemonSet','Yes','Yes'],
+      ['Job','Yes','Yes'],
+    ];
+    const tx=360,ty=150,rw=1200,rh=52;
+    rows.forEach((row,ri)=>{
+      const ry=ty+ri*rh;
+      const ra=easeOut(clamp01((t-54-ri*0.3)/0.6))*s4;
+      ctx.globalAlpha=ra;
+      if(ri===0){ctx.fillStyle='rgba(97,218,251,0.12)';ctx.fillRect(tx,ry,rw,rh);}
+      else if(ri%2===0){ctx.fillStyle='rgba(255,255,255,0.03)';ctx.fillRect(tx,ry,rw,rh);}
+      ctx.font=ri===0?'700 22px "Courier New",monospace':'400 22px "Courier New",monospace';
+      ctx.textAlign='left';ctx.textBaseline='middle';
+      ctx.fillStyle=ri===0?ACCENT:TEXT;ctx.fillText(row[0],tx+20,ry+rh/2);
+      ctx.fillStyle=row[1]==='Yes'?'#22c55e':'#ef4444';if(ri===0)ctx.fillStyle=ACCENT;
+      ctx.textAlign='center';ctx.fillText(row[1],tx+600,ry+rh/2);
+      ctx.fillStyle=row[2]==='Yes'?'#22c55e':'#ef4444';if(ri===0)ctx.fillStyle=ACCENT;
+      ctx.fillText(row[2],tx+950,ry+rh/2);
+    });
+    ctx.globalAlpha=1;
+  }
+
+  // Scene 5: matchLabels + matchExpressions YAML (t 78-end)
+  const s5=clamp01((t-78)/1);
+  if(s5>0){
+    ctx.globalAlpha=s5;
+    ctx.font='700 34px "Courier New",monospace';ctx.fillStyle=ACCENT;ctx.textAlign='center';
+    ctx.fillText('matchLabels & matchExpressions',W/2,70);
+
+    // matchLabels
+    const mlLines=[
+      'selector:',
+      '  matchLabels:',
+      '    app: nginx',
+      '    environment: production',
+    ];
+    drawCodeBlock(ctx,120,140,750,170,mlLines,easeOut(clamp01((t-79)/1))*s5,[1,2,3]);
+
+    ctx.globalAlpha=s5*easeOut(clamp01((t-79.5)/1));
+    ctx.font='500 20px "Courier New",monospace';ctx.fillStyle='#22c55e';ctx.textAlign='left';
+    ctx.fillText('Simple key-value map (equality)',130,340);
+
+    // matchExpressions
+    const meLines=[
+      'selector:',
+      '  matchExpressions:',
+      '    - key: environment',
+      '      operator: In',
+      '      values: [production, qa]',
+      '    - key: tier',
+      '      operator: NotIn',
+      '      values: [frontend]',
+    ];
+    drawCodeBlock(ctx,120,400,750,280,meLines,easeOut(clamp01((t-80)/1))*s5,[1,2,3,4,5,6]);
+
+    ctx.globalAlpha=s5*easeOut(clamp01((t-81)/1));
+    ctx.font='500 20px "Courier New",monospace';ctx.fillStyle='#a78bfa';ctx.textAlign='left';
+    ctx.fillText('Array of {key, operator, values} — all ANDed',130,710);
+
+    // Annotation on right
+    ctx.globalAlpha=s5*easeOut(clamp01((t-82)/1));
+    ctx.font='600 24px "Courier New",monospace';ctx.fillStyle=TEXT;ctx.textAlign='left';
+    ctx.fillText('Operators:',1050,180);
+    ctx.font='400 22px "Courier New",monospace';
+    const ops=[['In','value in set','#22c55e'],['NotIn','value not in set','#ef4444'],['Exists','key must exist','#f59e0b'],['DoesNotExist','key must not exist','#a78bfa']];
+    ops.forEach(([op,desc,col],i)=>{
+      ctx.fillStyle=col;ctx.fillText(op,1070,230+i*45);
+      ctx.fillStyle=DIM;ctx.fillText(desc,1280,230+i*45);
+    });
+    ctx.globalAlpha=1;
+  }
+
+  drawFooter(ctx);
+  drawCaption(ctx,t);
+}
+
+let frame=0;
+function animate(){renderFrame(frame++);requestAnimationFrame(animate);}
+if(!window.__rendering)animate();
+window.renderFrame=renderFrame;
+</script></body></html>

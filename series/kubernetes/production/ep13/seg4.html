@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>* { margin: 0; padding: 0; } body { background: #0d0d1a; overflow: hidden; } canvas { display: block; }</style>
+</head><body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+const W=1920,H=1080,FPS=30,BG='#0d0d1a',ACCENT='#61dafb',TEXT='#f8fafc',CODE_BG='#0d1117',DIM='#94a3b8';
+let T=null;
+fetch('./seg4_timing.json').then(r=>r.json()).then(d=>{T=d;});
+
+function getCaption(t){if(!T)return'';for(const s of T.sentences)if(t>=s.start&&t<=s.end)return s.text;return'';}
+function drawCaption(ctx,t){const c=getCaption(t);if(!c)return;ctx.font='600 28px "Courier New",monospace';const m=ctx.measureText(c),pw=Math.min(m.width+48,W-60),ph=48,px=(W-pw)/2,py=H-95;ctx.fillStyle='rgba(13,13,26,0.9)';ctx.beginPath();ctx.roundRect(px,py,pw,ph,12);ctx.fill();ctx.strokeStyle=ACCENT;ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(px,py,pw,ph,12);ctx.stroke();ctx.fillStyle=TEXT;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(c,W/2,py+ph/2);}
+function drawFooter(ctx){ctx.font='400 18px "Courier New",monospace';ctx.fillStyle='rgba(97,218,251,0.4)';ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText('kubernetes · labels & selectors · ep 13',W/2,H-18);}
+function clamp01(x){return Math.max(0,Math.min(1,x));}
+function easeOut(x){return 1-Math.pow(1-x,3);}
+
+function drawTerminal(ctx,x,y,w,h,lines,alpha,promptIdx){
+  ctx.globalAlpha=alpha;
+  ctx.fillStyle='#0c0c0c';ctx.beginPath();ctx.roundRect(x,y,w,h,10);ctx.fill();
+  // Title bar
+  ctx.fillStyle='#1a1a2e';ctx.fillRect(x,y,w,32);
+  ctx.beginPath();ctx.roundRect(x,y,w,32,{upperLeft:10,upperRight:10,lowerLeft:0,lowerRight:0});
+  const dots=['#ff5f56','#ffbd2e','#27c93f'];
+  dots.forEach((c,i)=>{ctx.fillStyle=c;ctx.beginPath();ctx.arc(x+20+i*20,y+16,5,0,Math.PI*2);ctx.fill();});
+  ctx.font='400 20px "Courier New",monospace';ctx.textAlign='left';ctx.textBaseline='top';
+  lines.forEach((l,i)=>{
+    const ly=y+44+i*26;
+    if(promptIdx&&promptIdx.includes(i)){ctx.fillStyle='#22c55e';ctx.fillText('$ ',x+16,ly);ctx.fillStyle=ACCENT;ctx.fillText(l,x+40,ly);}
+    else if(l.startsWith('NAME')||l.startsWith('---')){ctx.fillStyle=DIM;ctx.fillText(l,x+16,ly);}
+    else{ctx.fillStyle=TEXT;ctx.fillText(l,x+16,ly);}
+  });
+  ctx.globalAlpha=1;
+}
+
+function renderFrame(fn){
+  const ctx=document.getElementById('c').getContext('2d');
+  const t=fn/FPS;
+  ctx.fillStyle=BG;ctx.fillRect(0,0,W,H);
+
+  // Scene 1: API URL breakdown (t 0-18)
+  const s1=clamp01(t/1)*(1-clamp01((t-18)/1));
+  if(s1>0){
+    ctx.globalAlpha=s1;
+    ctx.font='700 34px "Courier New",monospace';ctx.fillStyle=ACCENT;ctx.textAlign='center';
+    ctx.fillText('Labels in the Kubernetes API',W/2,70);
+
+    // kubectl -> API server diagram
+    const da=easeOut(clamp01((t-1)/1.5))*s1;
+    ctx.globalAlpha=da;
+    // kubectl box
+    ctx.fillStyle=CODE_BG;ctx.beginPath();ctx.roundRect(100,160,350,80,10);ctx.fill();
+    ctx.strokeStyle=ACCENT;ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(100,160,350,80,10);ctx.stroke();
+    ctx.font='600 24px "Courier New",monospace';ctx.fillStyle=ACCENT;ctx.textAlign='center';
+    ctx.fillText('kubectl get pods -l ...',275,205);
+
+    // Arrow
+    ctx.strokeStyle=DIM;ctx.lineWidth=2;ctx.setLineDash([6,4]);
+    ctx.beginPath();ctx.moveTo(460,200);ctx.lineTo(650,200);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle=DIM;ctx.beginPath();ctx.moveTo(650,195);ctx.lineTo(670,200);ctx.lineTo(650,205);ctx.fill();
+
+    // API server box
+    ctx.fillStyle=CODE_BG;ctx.beginPath();ctx.roundRect(680,160,420,80,10);ctx.fill();
+    ctx.strokeStyle='#22c55e';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(680,160,420,80,10);ctx.stroke();
+    ctx.font='600 24px "Courier New",monospace';ctx.fillStyle='#22c55e';
+    ctx.fillText('API Server',890,195);
+    ctx.font='400 18px "Courier New",monospace';ctx.fillStyle=DIM;
+    ctx.fillText('?labelSelector=...',890,220);
+
+    // URL breakdown
+    ctx.globalAlpha=s1*easeOut(clamp01((t-4)/2));
+    ctx.font='600 24px "Courier New",monospace';ctx.fillStyle=TEXT;ctx.textAlign='left';
+    ctx.fillText('Equality-based URL:',150,310);
+    ctx.font='400 20px "Courier New",monospace';ctx.fillStyle='#f59e0b';
+    ctx.fillText('labelSelector=environment%3Dproduction,tier%3Dfrontend',170,350);
+    ctx.fillStyle=DIM;ctx.font='400 18px "Courier New",monospace';
+    ctx.fillText('%3D = "="   (percent-encoded)',170,382);
+
+    ctx.globalAlpha=s1*easeOut(clamp01((t-8)/2));
+    ctx.font='600 24px "Courier New",monospace';ctx.fillStyle=TEXT;
+    ctx.fillText('Set-based URL:',150,440);
+    ctx.font='400 20px "Courier New",monospace';ctx.fillStyle='#a78bfa';
+    ctx.fillText('labelSelector=environment+in+%28production%2Cqa%29',170,480);
+    ctx.fillStyle=DIM;ctx.font='400 18px "Courier New",monospace';
+    ctx.fillText('%28 = "("   %29 = ")"   %2C = ","',170,512);
+
+    ctx.globalAlpha=s1*easeOut(clamp01((t-12)/1));
+    ctx.font='500 22px "Courier New",monospace';ctx.fillStyle=ACCENT;ctx.textAlign='center';
+    ctx.fillText('In practice, you use kubectl — not raw URLs.',W/2,580);
+    ctx.globalAlpha=1;
+  }
+
+  // Scene 2: kubectl equality demo (t 16-40)
+  const s2=clamp01((t-16)/1)*(1-clamp01((t-40)/1));
+  if(s2>0){
+    ctx.globalAlpha=s2;
+    ctx.font='700 32px "Courier New",monospace';ctx.fillStyle=ACCENT;ctx.textAlign='center';
+    ctx.fillText('kubectl with Label Selectors',W/2,60);
+
+    const termLines=[
+      'kubectl get pods -l environment=production,tier=frontend',
+      '',
+      'NAME              READY   STATUS    AGE',
+      'web-frontend-1    1/1     Running   3d',
+      'web-frontend-2    1/1     Running   3d',
+      'nginx-prod-1      1/1     Running   5d',
+      '',
+      "kubectl get pods -l 'environment in (production, qa)'",
+      '',
+      'NAME              READY   STATUS    AGE',
+      'web-frontend-1    1/1     Running   3d',
+      'web-frontend-2    1/1     Running   3d',
+      'nginx-prod-1      1/1     Running   5d',
+      'api-qa-1          1/1     Running   1d',
+      'api-qa-2          1/1     Running   1d',
+    ];
+    const ta=easeOut(clamp01((t-17)/1.5))*s2;
+    drawTerminal(ctx,200,110,1520,460,termLines,ta,[0,7]);
+    ctx.globalAlpha=1;
+  }
+
+  // Scene 3: -L flag and exists demo (t 38-68)
+  const s3=clamp01((t-38)/1)*(1-clamp01((t-68)/1));
+  if(s3>0){
+    ctx.globalAlpha=s3;
+    ctx.font='700 32px "Courier New",monospace';ctx.fillStyle=ACCENT;ctx.textAlign='center';
+    ctx.fillText('Label Columns & Exists Check',W/2,60);
+
+    // -L flag demo
+    const t3a=easeOut(clamp01((t-39)/1.5))*s3;
+    const lLines=[
+      'kubectl get pods -Lapp -Ltier -Lrole',
+      '',
+      'NAME              READY  STATUS   AGE  APP     TIER      ROLE',
+      'web-frontend-1    1/1    Running  3d   nginx   frontend  web',
+      'api-backend-1     1/1    Running  5d   api     backend   server',
+      'redis-cache-1     1/1    Running  7d   redis   cache     store',
+      'worker-1          1/1    Running  2d   worker  backend   proc',
+    ];
+    drawTerminal(ctx,120,100,1680,240,lLines,t3a,[0]);
+
+    // exists demo
+    const t3b=easeOut(clamp01((t-48)/1.5))*s3;
+    const eLines=[
+      "kubectl get pods -l 'environment,environment notin (frontend)'",
+      '',
+      'NAME              READY  STATUS   AGE',
+      'api-backend-1     1/1    Running  5d',
+      'redis-cache-1     1/1    Running  7d',
+      'worker-1          1/1    Running  2d',
+    ];
+    drawTerminal(ctx,120,380,1680,210,eLines,t3b,[0]);
+
+    ctx.globalAlpha=s3*t3b;
+    ctx.font='400 20px "Courier New",monospace';ctx.fillStyle=DIM;ctx.textAlign='left';
+    ctx.fillText('exists check + notin = has env label but not "frontend"',160,620);
+    ctx.globalAlpha=1;
+  }
+
+  // Scene 4: kubectl label command (t 65-90)
+  const s4=clamp01((t-65)/1)*(1-clamp01((t-90)/1));
+  if(s4>0){
+    ctx.globalAlpha=s4;
+    ctx.font='700 32px "Courier New",monospace';ctx.fillStyle=ACCENT;ctx.textAlign='center';
+    ctx.fillText('Updating Labels with kubectl',W/2,60);
+
+    const kLines=[
+      'kubectl label pods -l app=nginx tier=fe',
+      '',
+      'pod/nginx-prod-1 labeled',
+      'pod/nginx-prod-2 labeled',
+      'pod/nginx-staging-1 labeled',
+    ];
+    const t4a=easeOut(clamp01((t-66)/1.5))*s4;
+    drawTerminal(ctx,200,120,1520,200,kLines,t4a,[0]);
+
+    // Before/after
+    ctx.globalAlpha=s4*easeOut(clamp01((t-70)/1.5));
+    ctx.font='600 26px "Courier New",monospace';ctx.textAlign='center';
+
+    // Before
+    ctx.fillStyle='#ef4444';ctx.fillText('Before',480,390);
+    ctx.fillStyle=CODE_BG;ctx.beginPath();ctx.roundRect(280,420,400,160,10);ctx.fill();
+    ctx.strokeStyle='#ef4444';ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(280,420,400,160,10);ctx.stroke();
+    ctx.font='400 20px "Courier New",monospace';ctx.fillStyle=TEXT;ctx.textAlign='left';
+    ctx.fillText('labels:',310,460);ctx.fillText('  app: nginx',310,490);
+    ctx.fillStyle=DIM;ctx.fillText('  (no tier label)',310,520);
+
+    // Arrow
+    ctx.fillStyle=ACCENT;ctx.textAlign='center';ctx.font='700 36px "Courier New",monospace';
+    ctx.fillText('→',960,500);
+
+    // After
+    ctx.font='600 26px "Courier New",monospace';
+    ctx.fillStyle='#22c55e';ctx.fillText('After',1440,390);
+    ctx.fillStyle=CODE_BG;ctx.beginPath();ctx.roundRect(1240,420,400,160,10);ctx.fill();
+    ctx.strokeStyle='#22c55e';ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(1240,420,400,160,10);ctx.stroke();
+    ctx.font='400 20px "Courier New",monospace';ctx.fillStyle=TEXT;ctx.textAlign='left';
+    ctx.fillText('labels:',1270,460);ctx.fillText('  app: nginx',1270,490);
+    ctx.fillStyle='#22c55e';ctx.fillText('  tier: fe',1270,520);
+
+    // Callout
+    ctx.globalAlpha=s4*easeOut(clamp01((t-76)/1));
+    ctx.font='700 36px "Courier New",monospace';ctx.fillStyle=ACCENT;ctx.textAlign='center';
+    ctx.fillText('Labels = API-first querying.',W/2,680);
+    ctx.font='500 28px "Courier New",monospace';ctx.fillStyle=TEXT;
+    ctx.fillText('Not decoration.',W/2,730);
+    ctx.globalAlpha=1;
+  }
+
+  drawFooter(ctx);
+  drawCaption(ctx,t);
+}
+
+let frame=0;
+function animate(){renderFrame(frame++);requestAnimationFrame(animate);}
+if(!window.__rendering)animate();
+window.renderFrame=renderFrame;
+</script></body></html>

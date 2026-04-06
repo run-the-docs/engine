@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; }
+  body { background: #0d0d1a; overflow: hidden; }
+  canvas { display: block; }
+</style>
+</head><body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+const W = 1920, H = 1080, FPS = 30;
+const BG = '#0d0d1a', ACCENT = '#61dafb', TEXT = '#f8fafc', CODE_BG = '#0d1117';
+const AMBER = '#f59e0b';
+let timingData = null;
+
+fetch('./seg1_timing.json').then(r => r.json()).then(d => { timingData = d; });
+
+const pods = [];
+for (let i = 0; i < 12; i++) {
+  const col = i % 4, row = Math.floor(i / 4);
+  pods.push({
+    x: 360 + col * 300, y: 200 + row * 220,
+    name: `pod-${i + 1}`,
+    labels: null
+  });
+}
+
+const labelSets = [
+  { 'environment': 'production', 'tier': 'frontend', 'app': 'nginx' },
+  { 'environment': 'production', 'tier': 'backend', 'app': 'api' },
+  { 'environment': 'staging', 'tier': 'frontend', 'app': 'nginx' },
+  { 'environment': 'staging', 'tier': 'backend', 'app': 'worker' },
+  { 'environment': 'production', 'tier': 'cache', 'app': 'redis' },
+  { 'environment': 'production', 'tier': 'frontend', 'app': 'web' },
+  { 'environment': 'staging', 'tier': 'cache', 'app': 'redis' },
+  { 'environment': 'production', 'tier': 'backend', 'app': 'auth' },
+  { 'environment': 'staging', 'tier': 'frontend', 'app': 'web' },
+  { 'environment': 'production', 'tier': 'backend', 'app': 'payments' },
+  { 'environment': 'staging', 'tier': 'backend', 'app': 'api' },
+  { 'environment': 'production', 'tier': 'frontend', 'app': 'dashboard' },
+];
+
+const labelColors = {
+  'production': '#22c55e', 'staging': '#f59e0b',
+  'frontend': '#61dafb', 'backend': '#a78bfa', 'cache': '#fb923c',
+  'nginx': '#14b8a6', 'api': '#f472b6', 'redis': '#ef4444',
+  'web': '#38bdf8', 'worker': '#facc15', 'auth': '#818cf8',
+  'payments': '#4ade80', 'dashboard': '#c084fc'
+};
+
+function getCaption(t) {
+  if (!timingData) return '';
+  for (const s of timingData.sentences) {
+    if (t >= s.start && t <= s.end) return s.text;
+  }
+  return '';
+}
+
+function drawCaption(ctx, t) {
+  const caption = getCaption(t);
+  if (!caption) return;
+  ctx.font = '600 32px "Courier New", monospace';
+  const m = ctx.measureText(caption);
+  const pw = Math.min(m.width + 48, W - 80), ph = 52;
+  const px = (W - pw) / 2, py = H - 100;
+  ctx.fillStyle = 'rgba(13,13,26,0.88)';
+  ctx.beginPath();
+  ctx.roundRect(px, py, pw, ph, 12);
+  ctx.fill();
+  ctx.strokeStyle = ACCENT;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.roundRect(px, py, pw, ph, 12);
+  ctx.stroke();
+  ctx.fillStyle = TEXT;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(caption, W / 2, py + ph / 2);
+}
+
+function drawFooter(ctx) {
+  ctx.font = '400 18px "Courier New", monospace';
+  ctx.fillStyle = 'rgba(97,218,251,0.4)';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+  ctx.fillText('kubernetes · labels & selectors · ep 13', W / 2, H - 18);
+}
+
+function easeOut(x) { return 1 - Math.pow(1 - x, 3); }
+function clamp01(x) { return Math.max(0, Math.min(1, x)); }
+
+function drawPodBox(ctx, pod, alpha, showLabels, labelAlpha) {
+  if (alpha <= 0) return;
+  ctx.globalAlpha = alpha;
+  const bw = 240, bh = 170;
+  const x = pod.x - bw/2, y = pod.y - bh/2;
+
+  ctx.fillStyle = CODE_BG;
+  ctx.beginPath();
+  ctx.roundRect(x, y, bw, bh, 10);
+  ctx.fill();
+  ctx.strokeStyle = ACCENT;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.roundRect(x, y, bw, bh, 10);
+  ctx.stroke();
+
+  ctx.fillStyle = TEXT;
+  ctx.font = '600 22px "Courier New", monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(pod.name, pod.x, pod.y - 50);
+
+  if (showLabels && pod.labels) {
+    ctx.globalAlpha = alpha * labelAlpha;
+    const entries = Object.entries(pod.labels);
+    entries.forEach(([k, v], i) => {
+      const ly = pod.y - 15 + i * 32;
+      const label = `${k}: ${v}`;
+      ctx.font = '400 16px "Courier New", monospace';
+      const tw = ctx.measureText(label).width + 16;
+      const lx = pod.x - tw / 2;
+      ctx.fillStyle = labelColors[v] || ACCENT;
+      ctx.globalAlpha = alpha * labelAlpha * 0.2;
+      ctx.beginPath();
+      ctx.roundRect(lx, ly - 11, tw, 24, 6);
+      ctx.fill();
+      ctx.globalAlpha = alpha * labelAlpha;
+      ctx.fillStyle = labelColors[v] || ACCENT;
+      ctx.textAlign = 'center';
+      ctx.fillText(label, pod.x, ly + 1);
+    });
+  }
+  ctx.globalAlpha = 1;
+}
+
+function renderFrame(fn) {
+  const ctx = document.getElementById('c').getContext('2d');
+  const t = fn / FPS;
+  ctx.fillStyle = BG;
+  ctx.fillRect(0, 0, W, H);
+
+  const podAppear = clamp01((t - 0.5) / 2.5);
+  const questionAlpha = clamp01((t - 4) / 0.5) * (1 - clamp01((t - 10) / 0.5));
+  const labelsAppear = clamp01((t - 7.5) / 3);
+  const boldTextAlpha = clamp01((t - 14) / 0.5) * (1 - clamp01((t - 27) / 0.8));
+  const titleCardAlpha = clamp01((t - 29) / 1);
+  const podsVisible = 1 - clamp01((t - 28.5) / 1);
+
+  if (podsVisible > 0) {
+    for (let i = 0; i < pods.length; i++) {
+      const podAlpha = clamp01(easeOut(clamp01(podAppear * 3 - i * 0.15))) * podsVisible;
+      if (labelsAppear > 0 && !pods[i].labels) pods[i].labels = labelSets[i];
+      drawPodBox(ctx, pods[i], podAlpha, labelsAppear > 0, easeOut(clamp01(labelsAppear * 2 - i * 0.08)));
+    }
+  }
+
+  if (questionAlpha > 0) {
+    ctx.globalAlpha = questionAlpha;
+    ctx.font = '700 40px "Courier New", monospace';
+    ctx.fillStyle = AMBER;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('How does Kubernetes know which is which?', W / 2, 830);
+    ctx.globalAlpha = 1;
+  }
+
+  if (boldTextAlpha > 0 && labelsAppear > 0.5) {
+    ctx.globalAlpha = boldTextAlpha * 0.9;
+    ctx.fillStyle = 'rgba(13,13,26,0.7)';
+    ctx.fillRect(0, 810, W, 70);
+    ctx.globalAlpha = boldTextAlpha;
+    ctx.font = '800 44px "Courier New", monospace';
+    ctx.fillStyle = ACCENT;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('Labels. Two words. A colon. Maximum power.', W / 2, 845);
+    ctx.globalAlpha = 1;
+  }
+
+  if (titleCardAlpha > 0) {
+    ctx.globalAlpha = titleCardAlpha;
+    ctx.font = '800 72px "Courier New", monospace';
+    ctx.fillStyle = ACCENT;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('Labels & Selectors', W / 2, H / 2 - 30);
+    ctx.font = '400 36px "Courier New", monospace';
+    ctx.fillStyle = TEXT;
+    ctx.fillText('Episode 13', W / 2, H / 2 + 50);
+    ctx.font = '600 28px "Courier New", monospace';
+    ctx.fillStyle = 'rgba(97,218,251,0.5)';
+    ctx.fillText('Kubernetes', W / 2, H / 2 + 110);
+    ctx.globalAlpha = 1;
+  }
+
+  drawFooter(ctx);
+  drawCaption(ctx, t);
+}
+
+let frame = 0;
+function animate() { renderFrame(frame++); requestAnimationFrame(animate); }
+if (!window.__rendering) animate();
+window.renderFrame = renderFrame;
+</script></body></html>

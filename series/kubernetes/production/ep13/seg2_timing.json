@@ -1,0 +1,140 @@
+{
+  "segments": [
+    {
+      "index": 0,
+      "text": "Labels are key-value pairs attached to Kubernetes objects.",
+      "start": 1.0,
+      "end": 5.2027,
+      "duration": 4.2027
+    },
+    {
+      "index": 1,
+      "text": "Any object \u2014 Pods, Services, Deployments, Nodes, even Namespaces.",
+      "start": 5.5827,
+      "end": 10.5747,
+      "duration": 4.992
+    },
+    {
+      "index": 2,
+      "text": "They're meant to carry identifying attributes that are meaningful to users.",
+      "start": 10.9547,
+      "end": 15.8613,
+      "duration": 4.9067
+    },
+    {
+      "index": 3,
+      "text": "Not to the Kubernetes control plane itself \u2014 just to you, your team, and your tooling.",
+      "start": 16.2413,
+      "end": 22.0013,
+      "duration": 5.76
+    },
+    {
+      "index": 4,
+      "text": "If information doesn't help identify or select objects \u2014 like build timestamps or creator emails \u2014 use annotations instead.",
+      "start": 22.3813,
+      "end": 31.4267,
+      "duration": 9.0453
+    },
+    {
+      "index": 5,
+      "text": "Labels are for selection. Annotations are for everything else.",
+      "start": 31.8067,
+      "end": 36.1587,
+      "duration": 4.352
+    },
+    {
+      "index": 6,
+      "text": "Now, label syntax. A label key has two parts: an optional prefix and a name, separated by a slash.",
+      "start": 36.5387,
+      "end": 43.8133,
+      "duration": 7.2747
+    },
+    {
+      "index": 7,
+      "text": "The name is required. It must be 63 characters or less, starting and ending with an alphanumeric character.",
+      "start": 44.1933,
+      "end": 51.8947,
+      "duration": 7.7013
+    },
+    {
+      "index": 8,
+      "text": "Dashes, underscores, and dots are allowed in between.",
+      "start": 52.2747,
+      "end": 56.2,
+      "duration": 3.9253
+    },
+    {
+      "index": 9,
+      "text": "The prefix is optional. If present, it must be a valid DNS subdomain \u2014 up to 253 characters.",
+      "start": 56.58,
+      "end": 64.3453,
+      "duration": 7.7653
+    },
+    {
+      "index": 10,
+      "text": "The prefixes kubernetes.io and k8s.io are reserved for Kubernetes core components.",
+      "start": 64.7253,
+      "end": 71.5947,
+      "duration": 6.8693
+    },
+    {
+      "index": 11,
+      "text": "If you're writing an operator or controller that adds labels to user objects, you must use a prefix.",
+      "start": 71.9747,
+      "end": 78.7587,
+      "duration": 6.784
+    },
+    {
+      "index": 12,
+      "text": "So users know the label came from automation, not their own config.",
+      "start": 79.1387,
+      "end": 83.6613,
+      "duration": 4.5227
+    },
+    {
+      "index": 13,
+      "text": "Label values follow similar rules: 63 characters max, can be empty, must start and end with alphanumeric if non-empty.",
+      "start": 84.0413,
+      "end": 93.2787,
+      "duration": 9.2373
+    },
+    {
+      "index": 14,
+      "text": "Here's a real example. A Pod manifest with two labels \u2014 environment: production and app: nginx. That's all it takes.",
+      "start": 93.6587,
+      "end": 102.0853,
+      "duration": 8.4267
+    },
+    {
+      "index": 15,
+      "text": "Common patterns you'll see in real clusters: release: stable or canary.",
+      "start": 102.4653,
+      "end": 107.6707,
+      "duration": 5.2053
+    },
+    {
+      "index": 16,
+      "text": "Environment: dev, qa, or production. Tier: frontend, backend, or cache.",
+      "start": 108.0507,
+      "end": 113.4267,
+      "duration": 5.376
+    },
+    {
+      "index": 17,
+      "text": "Partition: customerA or customerB.",
+      "start": 113.8067,
+      "end": 116.7507,
+      "duration": 2.944
+    },
+    {
+      "index": 18,
+      "text": "You can define your own conventions. The constraint is just syntax, not semantics.",
+      "start": 117.1307,
+      "end": 122.8693,
+      "duration": 5.7387
+    }
+  ],
+  "total_voice_duration": 122.8693,
+  "total_duration": 125.8693,
+  "total_frames_30fps": 3777
+}
