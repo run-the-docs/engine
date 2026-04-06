@@ -1,0 +1,19 @@
+{
+  "episodes": [
+    {"ep": 12, "series": "kubernetes", "title": "The Kubernetes API", "docsUrl": "https://kubernetes.io/docs/concepts/overview/kubernetes-api/", "videoDate": "2026-03-30", "youtubeId": ""},
+    {"ep": 13, "series": "kubernetes", "title": "Labels & Selectors", "docsUrl": "https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/", "videoDate": "2026-03-31", "youtubeId": ""},
+    {"ep": 14, "series": "kubernetes", "title": "Namespaces", "docsUrl": "https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/", "videoDate": "2026-04-04", "youtubeId": "GtyV0FKYl0A"},
+    {"ep": 15, "series": "kubernetes", "title": "Finalizers & Owner References", "docsUrl": "https://kubernetes.io/docs/concepts/overview/working-with-objects/finalizers/", "videoDate": "2026-04-06", "youtubeId": "4LIoF7U7lZA"},
+    {"ep": 16, "series": "kubernetes", "title": "Nodes", "docsUrl": "https://kubernetes.io/docs/concepts/architecture/nodes/", "videoDate": "", "youtubeId": ""},
+    {"ep": 17, "series": "kubernetes", "title": "Controllers", "docsUrl": "https://kubernetes.io/docs/concepts/architecture/controller/", "videoDate": "", "youtubeId": ""},
+    {"ep": 18, "series": "kubernetes", "title": "Garbage Collection", "docsUrl": "https://kubernetes.io/docs/concepts/architecture/garbage-collection/", "videoDate": "", "youtubeId": ""},
+    {"ep": 19, "series": "kubernetes", "title": "Leases", "docsUrl": "https://kubernetes.io/docs/concepts/architecture/leases/", "videoDate": "", "youtubeId": ""},
+    {"ep": 20, "series": "kubernetes", "title": "Cloud Controller", "docsUrl": "https://kubernetes.io/docs/concepts/architecture/cloud-controller/", "videoDate": "", "youtubeId": ""},
+    {"ep": 21, "series": "kubernetes", "title": "cgroups in Kubernetes", "docsUrl": "https://kubernetes.io/docs/concepts/architecture/cgroups/", "videoDate": "", "youtubeId": ""},
+    {"ep": 22, "series": "kubernetes", "title": "Container Images", "docsUrl": "https://kubernetes.io/docs/concepts/containers/images/", "videoDate": "", "youtubeId": ""},
+    {"ep": 23, "series": "kubernetes", "title": "Container Lifecycle Hooks", "docsUrl": "https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/", "videoDate": "", "youtubeId": ""},
+    {"ep": 24, "series": "kubernetes", "title": "Runtime Classes", "docsUrl": "https://kubernetes.io/docs/concepts/containers/runtime-class/", "videoDate": "", "youtubeId": ""},
+    {"ep": 25, "series": "kubernetes", "title": "Container Runtime Interface", "docsUrl": "https://kubernetes.io/docs/concepts/containers/cri/", "videoDate": "", "youtubeId": ""},
+    {"ep": 26, "series": "kubernetes", "title": "Pod Lifecycle", "docsUrl": "https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/", "videoDate": "", "youtubeId": ""}
+  ]
+}
