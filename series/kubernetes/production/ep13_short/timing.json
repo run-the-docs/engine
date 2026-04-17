@@ -1,0 +1,85 @@
+{
+  "segments": [
+    {
+      "index": 0,
+      "text": "In Kubernetes, every object can have labels \u2014 key-value pairs you attach to Pods, Services, Deployments, and more.",
+      "start": 2.0,
+      "end": 9.8933,
+      "duration": 7.8933
+    },
+    {
+      "index": 1,
+      "text": "Labels are how you organize your cluster.",
+      "start": 10.2733,
+      "end": 13.2387,
+      "duration": 2.9653
+    },
+    {
+      "index": 2,
+      "text": "Environment: production. App: nginx. Tier: backend.",
+      "start": 13.6187,
+      "end": 17.8427,
+      "duration": 4.224
+    },
+    {
+      "index": 3,
+      "text": "They're not just decoration \u2014 selectors use labels to target resources.",
+      "start": 18.2227,
+      "end": 22.9587,
+      "duration": 4.736
+    },
+    {
+      "index": 4,
+      "text": "There are two kinds of selector.",
+      "start": 23.3387,
+      "end": 25.152,
+      "duration": 1.8133
+    },
+    {
+      "index": 5,
+      "text": "Equality-based: app equals nginx. App not equals frontend.",
+      "start": 25.532,
+      "end": 30.3533,
+      "duration": 4.8213
+    },
+    {
+      "index": 6,
+      "text": "And set-based: app in web, api. Or: environment not in staging, dev.",
+      "start": 30.7333,
+      "end": 36.3867,
+      "duration": 5.6533
+    },
+    {
+      "index": 7,
+      "text": "A Service uses a label selector to decide which Pods receive its traffic.",
+      "start": 36.7667,
+      "end": 42.036,
+      "duration": 5.2693
+    },
+    {
+      "index": 8,
+      "text": "A Deployment uses selectors to know which Pods it owns.",
+      "start": 42.416,
+      "end": 46.4267,
+      "duration": 4.0107
+    },
+    {
+      "index": 9,
+      "text": "One rule: no logical OR. Multiple requirements use AND \u2014 all must match.",
+      "start": 46.8067,
+      "end": 52.1613,
+      "duration": 5.3547
+    },
+    {
+      "index": 10,
+      "text": "Labels identify. Selectors connect. That's the wiring behind everything in Kubernetes.",
+      "start": 52.5413,
+      "end": 58.9413,
+      "duration": 6.4
+    }
+  ],
+  "total_voice_duration": 58.9413,
+  "total_duration": 59.9413,
+  "total_frames": 1799,
+  "total_frames_30fps": 1799
+}

@@ -1,0 +1,99 @@
+{
+  "segments": [
+    {
+      "index": 0,
+      "text": "When you delete a Kubernetes object, it doesn't always disappear immediately.",
+      "start": 2.0,
+      "end": 6.992,
+      "duration": 4.992
+    },
+    {
+      "index": 1,
+      "text": "That's finalizers at work.",
+      "start": 7.372,
+      "end": 9.5267,
+      "duration": 2.1547
+    },
+    {
+      "index": 2,
+      "text": "A finalizer is a namespaced key you add to an object's metadata.",
+      "start": 9.9067,
+      "end": 14.5787,
+      "duration": 4.672
+    },
+    {
+      "index": 3,
+      "text": "When Kubernetes sees it, deletion is blocked until a controller removes the finalizer.",
+      "start": 14.9587,
+      "end": 20.8893,
+      "duration": 5.9307
+    },
+    {
+      "index": 4,
+      "text": "Here's the flow.",
+      "start": 21.2693,
+      "end": 22.5707,
+      "duration": 1.3013
+    },
+    {
+      "index": 5,
+      "text": "You run kubectl delete.",
+      "start": 22.9507,
+      "end": 24.828,
+      "duration": 1.8773
+    },
+    {
+      "index": 6,
+      "text": "Kubernetes sets a deletionTimestamp \u2014 the object is marked for deletion, but it stays.",
+      "start": 25.208,
+      "end": 31.352,
+      "duration": 6.144
+    },
+    {
+      "index": 7,
+      "text": "The controller performs cleanup \u2014 removes external resources, updates dependent objects.",
+      "start": 31.732,
+      "end": 37.8333,
+      "duration": 6.1013
+    },
+    {
+      "index": 8,
+      "text": "Then it removes the finalizer.",
+      "start": 38.2133,
+      "end": 40.7093,
+      "duration": 2.496
+    },
+    {
+      "index": 9,
+      "text": "Now Kubernetes actually deletes the object.",
+      "start": 41.0893,
+      "end": 44.46,
+      "duration": 3.3707
+    },
+    {
+      "index": 10,
+      "text": "The most common example: the PersistentVolume protection finalizer.",
+      "start": 44.84,
+      "end": 49.448,
+      "duration": 4.608
+    },
+    {
+      "index": 11,
+      "text": "It prevents a PV from being deleted while a Pod is still using it.",
+      "start": 49.828,
+      "end": 54.2227,
+      "duration": 4.3947
+    },
+    {
+      "index": 12,
+      "text": "The rule: if an object won't delete, check its finalizers first.",
+      "start": 54.6027,
+      "end": 58.976,
+      "duration": 4.3733
+    }
+  ],
+  "total_voice_duration": 58.976,
+  "total_duration": 59.976,
+  "total_frames": 1800,
+  "total_frames_30fps": 1800
+}

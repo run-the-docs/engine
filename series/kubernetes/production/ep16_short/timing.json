@@ -1,0 +1,92 @@
+{
+  "segments": [
+    {
+      "index": 0,
+      "text": "A Kubernetes node is the machine that runs your workloads.",
+      "start": 2.0,
+      "end": 6.1173,
+      "duration": 4.1173
+    },
+    {
+      "index": 1,
+      "text": "Every node hosts three components: the kubelet, the container runtime, and kube-proxy.",
+      "start": 6.4973,
+      "end": 12.492,
+      "duration": 5.9947
+    },
+    {
+      "index": 2,
+      "text": "The kubelet is the agent on each node.",
+      "start": 12.872,
+      "end": 15.8373,
+      "duration": 2.9653
+    },
+    {
+      "index": 3,
+      "text": "It registers the node with the control plane and runs the Pods assigned to that node.",
+      "start": 16.2173,
+      "end": 21.764,
+      "duration": 5.5467
+    },
+    {
+      "index": 4,
+      "text": "Nodes can register themselves \u2014 the default \u2014 or you can add them manually.",
+      "start": 22.144,
+      "end": 27.008,
+      "duration": 4.864
+    },
+    {
+      "index": 5,
+      "text": "The control plane tracks node health through conditions.",
+      "start": 27.388,
+      "end": 30.9507,
+      "duration": 3.5627
+    },
+    {
+      "index": 6,
+      "text": "Ready means the node is healthy and can schedule Pods.",
+      "start": 31.3307,
+      "end": 35.2133,
+      "duration": 3.8827
+    },
+    {
+      "index": 7,
+      "text": "MemoryPressure, DiskPressure, and PIDPressure are warning signals.",
+      "start": 35.5933,
+      "end": 40.308,
+      "duration": 4.7147
+    },
+    {
+      "index": 8,
+      "text": "NetworkUnavailable means the network isn't configured.",
+      "start": 40.688,
+      "end": 44.656,
+      "duration": 3.968
+    },
+    {
+      "index": 9,
+      "text": "When a node goes unhealthy, the node controller evicts its Pods.",
+      "start": 45.036,
+      "end": 49.388,
+      "duration": 4.352
+    },
+    {
+      "index": 10,
+      "text": "Rate limits prevent cascading failures across the cluster.",
+      "start": 49.768,
+      "end": 53.672,
+      "duration": 3.904
+    },
+    {
+      "index": 11,
+      "text": "Nodes are the foundation. Everything else runs on top of them.",
+      "start": 54.052,
+      "end": 58.4253,
+      "duration": 4.3733
+    }
+  ],
+  "total_voice_duration": 58.4253,
+  "total_duration": 59.4253,
+  "total_frames": 1783,
+  "total_frames_30fps": 1783
+}

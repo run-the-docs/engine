@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #080810; width: 1080px; height: 1920px; overflow: hidden; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script>
+const W = 1080, H = 1920, CX = 540, FPS = 30;
+const BG      = '#080810';
+const ACCENT  = '#326CE5';
+const ACCENT2 = '#61a8ff';
+const TEXT    = '#f8fafc';
+const MUTED   = '#94a3b8';
+const CODE_BG = '#0d1117';
+const GREEN   = '#4ade80';
+const YELLOW  = '#facc15';
+const RED     = '#f87171';
+const ORANGE  = '#fb923c';
+
+let segments = [], totalDuration = 60;
+
+window.setTiming = function(segs, dur) { segments = segs; totalDuration = dur; };
+
+function clamp(v, lo=0, hi=1) { return Math.max(lo, Math.min(hi, v)); }
+function easeOut(x) { return 1 - Math.pow(1 - clamp(x), 3); }
+function prog(t, t0, t1) { return clamp((t - t0) / (t1 - t0)); }
+function segStart(i) { return segments[i] ? segments[i].start : 0; }
+function segEnd(i)   { return segments[i] ? segments[i].end   : totalDuration; }
+
+function setFont(ctx, size, weight=400) {
+  ctx.font = `${weight} ${size}px 'JetBrains Mono', monospace`;
+}
+
+function drawTextFit(ctx, text, x, y, maxW, fontSize, color, align='center', weight=700) {
+  let size = fontSize;
+  ctx.font = `${weight} ${size}px 'JetBrains Mono', monospace`;
+  while (ctx.measureText(text).width > maxW && size > 10) {
+    size -= 1;
+    ctx.font = `${weight} ${size}px 'JetBrains Mono', monospace`;
+  }
+  ctx.fillStyle = color;
+  ctx.textAlign = align;
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, x, y);
+}
+
+function drawBG(ctx) {
+  ctx.clearRect(0, 0, W, H);
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, '#0d0d1a');
+  grad.addColorStop(1, '#080810');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+}
+
+function drawCaption(ctx, t) {
+  const seg = segments.find(s => t >= s.start && t < s.end);
+  if (!seg) return;
+  const text = seg.text;
+  let fontSize = 30;
+  ctx.font = `400 ${fontSize}px 'JetBrains Mono', monospace`;
+  const maxTextW = W - 160;
+  while (ctx.measureText(text).width > maxTextW && fontSize > 16) {
+    fontSize--;
+    ctx.font = `400 ${fontSize}px 'JetBrains Mono', monospace`;
+  }
+  let displayText = text;
+  if (ctx.measureText(displayText).width > maxTextW) {
+    displayText = text.slice(0, 58) + '…';
+  }
+  const tw = ctx.measureText(displayText).width;
+  const pillW = tw + 64, pillH = 64;
+  const px = CX - pillW / 2, py = H - 180;
+  ctx.save();
+  ctx.beginPath();
+  ctx.roundRect(px, py, pillW, pillH, 32);
+  ctx.fillStyle = 'rgba(50,108,229,0.18)';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(50,108,229,0.5)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  ctx.fillStyle = TEXT;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(displayText, CX, py + pillH / 2);
+  ctx.restore();
+}
+
+function drawFooter(ctx, label) {
+  let fontSize = 26;
+  ctx.font = `600 ${fontSize}px 'JetBrains Mono', monospace`;
+  const tw = ctx.measureText(label).width;
+  const pillW = Math.min(tw + 48, W - 80), pillH = 52;
+  const px = CX - pillW / 2, py = H - 90;
+  ctx.save();
+  ctx.beginPath();
+  ctx.roundRect(px, py, pillW, pillH, 26);
+  ctx.fillStyle = 'rgba(50,108,229,0.12)';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(50,108,229,0.35)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  ctx.fillStyle = ACCENT2;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(label, CX, py + pillH / 2);
+  ctx.restore();
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.roundRect(x, y, w, h, r);
+}
+
+// ── Scene 1: Hook + What is a finalizer ───────────────────────────────────
+// Segs 0-3: intro → "A finalizer is a namespaced key..." → "deletion is blocked"
+function drawScene1(ctx, t) {
+  drawBG(ctx);
+
+  // Top accent
+  ctx.fillStyle = ORANGE;
+  ctx.fillRect(80, 60, 920, 6);
+
+  // Title
+  const ta = easeOut(prog(t, 0.3, 1.2));
+  ctx.save(); ctx.globalAlpha = ta;
+  setFont(ctx, 70, 700);
+  ctx.fillStyle = TEXT;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('Finalizers', CX, 210);
+  ctx.fillStyle = ORANGE;
+  setFont(ctx, 36, 400);
+  ctx.fillText('kubernetes · ep 15', CX, 290);
+  ctx.restore();
+
+  // "Object won't delete?" hook card
+  const hookA = easeOut(prog(t, segStart(0), segStart(0) + 1.0));
+  ctx.save(); ctx.globalAlpha = hookA;
+  roundRect(ctx, 80, 380, 920, 200, 20);
+  ctx.fillStyle = 'rgba(251,146,60,0.1)';
+  ctx.fill();
+  ctx.strokeStyle = ORANGE;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  setFont(ctx, 38, 700);
+  ctx.fillStyle = ORANGE;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText("Object won't delete?", CX, 455);
+  setFont(ctx, 28, 400);
+  ctx.fillStyle = TEXT;
+  ctx.fillText("That's finalizers at work.", CX, 510);
+  ctx.restore();
+
+  // Finalizer in metadata YAML
+  const yamlA = easeOut(prog(t, segStart(2), segStart(2) + 1.0));
+  ctx.save(); ctx.globalAlpha = yamlA;
+  roundRect(ctx, 80, 640, 920, 320, 20);
+  ctx.fillStyle = CODE_BG;
+  ctx.fill();
+  ctx.strokeStyle = ACCENT;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  const lines = [
+    { text: 'metadata:', color: MUTED },
+    { text: '  name: my-resource', color: TEXT },
+    { text: '  finalizers:', color: MUTED },
+    { text: '    - example.com/my-finalizer', color: GREEN },
+  ];
+  lines.forEach((l, i) => {
+    setFont(ctx, 30, 400);
+    ctx.fillStyle = l.color;
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    ctx.fillText(l.text, 120, 710 + i * 60);
+  });
+  ctx.restore();
+
+  // "Deletion blocked" note
+  const noteA = easeOut(prog(t, segStart(3), segStart(3) + 0.8));
+  ctx.save(); ctx.globalAlpha = noteA;
+  roundRect(ctx, 80, 1010, 920, 100, 16);
+  ctx.fillStyle = 'rgba(248,113,113,0.1)';
+  ctx.fill();
+  ctx.strokeStyle = RED;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  setFont(ctx, 30, 600);
+  ctx.fillStyle = RED;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('⛔  Deletion blocked until finalizer removed', CX, 1060);
+  ctx.restore();
+
+  drawCaption(ctx, t);
+  drawFooter(ctx, 'kubernetes · finalizers');
+}
+
+// ── Scene 2: Deletion flow diagram ────────────────────────────────────────
+// Segs 4-9: "Here's the flow" → kubectl delete → deletionTimestamp → cleanup → remove finalizer → deleted
+function drawScene2(ctx, t) {
+  drawBG(ctx);
+
+  const ha = easeOut(prog(t, segStart(4), segStart(4) + 0.8));
+  ctx.save(); ctx.globalAlpha = ha;
+  setFont(ctx, 56, 700);
+  ctx.fillStyle = TEXT;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText("Deletion Flow", CX, 150);
+  ctx.restore();
+
+  const steps = [
+    { label: 'kubectl delete',            desc: 'You run the command',           color: YELLOW,  seg: 5  },
+    { label: 'deletionTimestamp set',     desc: 'Object marked, stays alive',    color: ORANGE,  seg: 6  },
+    { label: 'Controller cleans up',      desc: 'Removes ext. resources',        color: ACCENT2, seg: 7  },
+    { label: 'Finalizer removed',         desc: 'Controller signals done',       color: GREEN,   seg: 8  },
+    { label: 'Object deleted',            desc: 'Now Kubernetes deletes it',     color: RED,     seg: 9  },
+  ];
+
+  const stepH = 190, startY = 260;
+  steps.forEach((step, i) => {
+    const a = easeOut(prog(t, segStart(step.seg), segStart(step.seg) + 0.8));
+    ctx.save(); ctx.globalAlpha = a;
+
+    // Box
+    roundRect(ctx, 80, startY + i * stepH, 920, 140, 16);
+    ctx.fillStyle = CODE_BG;
+    ctx.fill();
+    ctx.strokeStyle = step.color;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Step number
+    ctx.beginPath();
+    ctx.arc(130, startY + i * stepH + 70, 28, 0, Math.PI * 2);
+    ctx.fillStyle = step.color;
+    ctx.fill();
+    setFont(ctx, 28, 700);
+    ctx.fillStyle = '#080810';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(String(i + 1), 130, startY + i * stepH + 70);
+
+    // Label
+    drawTextFit(ctx, step.label, 590, startY + i * stepH + 52, 700, 32, step.color, 'center', 700);
+
+    // Desc
+    setFont(ctx, 24, 400);
+    ctx.fillStyle = MUTED;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(step.desc, 590, startY + i * stepH + 95);
+
+    // Connector arrow (except last)
+    if (i < steps.length - 1) {
+      ctx.strokeStyle = step.color;
+      ctx.lineWidth = 2;
+      ctx.setLineDash([4, 3]);
+      ctx.beginPath();
+      ctx.moveTo(CX, startY + i * stepH + 140);
+      ctx.lineTo(CX, startY + i * stepH + 148);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    ctx.restore();
+  });
+
+  drawCaption(ctx, t);
+  drawFooter(ctx, 'kubernetes · finalizers');
+}
+
+// ── Scene 3: PV example + rule ─────────────────────────────────────────────
+// Segs 10-12: PV protection + rule
+function drawScene3(ctx, t) {
+  drawBG(ctx);
+
+  const ha = easeOut(prog(t, segStart(10), segStart(10) + 0.8));
+  ctx.save(); ctx.globalAlpha = ha;
+  setFont(ctx, 52, 700);
+  ctx.fillStyle = TEXT;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('Real Example', CX, 160);
+  ctx.restore();
+
+  // PV protection box
+  const pvA = easeOut(prog(t, segStart(10), segStart(10) + 1.0));
+  ctx.save(); ctx.globalAlpha = pvA;
+  roundRect(ctx, 80, 250, 920, 440, 20);
+  ctx.fillStyle = CODE_BG;
+  ctx.fill();
+  ctx.strokeStyle = ACCENT;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  setFont(ctx, 30, 700);
+  ctx.fillStyle = ACCENT;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('PersistentVolume', CX, 320);
+
+  const pvLines = [
+    { text: 'finalizers:', color: MUTED },
+    { text: '  - kubernetes.io/pv-protection', color: GREEN },
+  ];
+  pvLines.forEach((l, i) => {
+    setFont(ctx, 30, 400);
+    ctx.fillStyle = l.color;
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    ctx.fillText(l.text, 120, 400 + i * 62);
+  });
+
+  setFont(ctx, 26, 400);
+  ctx.fillStyle = MUTED;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText("Prevents deletion while a Pod is using it", CX, 560);
+
+  // Pod ↔ PV visual
+  roundRect(ctx, 120, 610, 320, 60, 12);
+  ctx.fillStyle = 'rgba(74,222,128,0.12)';
+  ctx.fill();
+  ctx.strokeStyle = GREEN;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  setFont(ctx, 24, 600);
+  ctx.fillStyle = GREEN;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('Pod', 280, 640);
+
+  ctx.strokeStyle = ACCENT;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(440, 640);
+  ctx.lineTo(560, 640);
+  ctx.stroke();
+  ctx.fillStyle = ACCENT;
+  ctx.beginPath();
+  ctx.moveTo(550, 633); ctx.lineTo(570, 640); ctx.lineTo(550, 647);
+  ctx.closePath(); ctx.fill();
+
+  roundRect(ctx, 570, 610, 320, 60, 12);
+  ctx.fillStyle = 'rgba(50,108,229,0.12)';
+  ctx.fill();
+  ctx.strokeStyle = ACCENT;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  setFont(ctx, 24, 600);
+  ctx.fillStyle = ACCENT;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('PV (blocked)', 730, 640);
+
+  ctx.restore();
+
+  // Final rule
+  const ruleA = easeOut(prog(t, segStart(12), segStart(12) + 1.0));
+  ctx.save(); ctx.globalAlpha = ruleA;
+  roundRect(ctx, 80, 780, 920, 160, 20);
+  ctx.fillStyle = 'rgba(50,108,229,0.12)';
+  ctx.fill();
+  ctx.strokeStyle = ACCENT;
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+  setFont(ctx, 34, 700);
+  ctx.fillStyle = TEXT;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText("Object won't delete?", CX, 838);
+  ctx.fillStyle = ACCENT;
+  ctx.fillText('Check its finalizers first.', CX, 895);
+  ctx.restore();
+
+  drawCaption(ctx, t);
+  drawFooter(ctx, 'kubernetes · finalizers');
+}
+
+// ── Dispatcher ────────────────────────────────────────────────────────────
+window.renderFrame = function(frameNum) {
+  const ctx = document.getElementById('c').getContext('2d');
+  const t = frameNum / FPS;
+
+  const s4  = segStart(4);
+  const s10 = segStart(10);
+
+  if (t < s4) {
+    drawScene1(ctx, t);
+  } else if (t < s10) {
+    drawScene2(ctx, t);
+  } else {
+    drawScene3(ctx, t);
+  }
+};
+</script>
+</body>
+</html>

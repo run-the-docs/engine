@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #080810; width: 1080px; height: 1920px; overflow: hidden; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script>
+// ── Constants ──────────────────────────────────────────────────────────────
+const W = 1080, H = 1920, CX = 540, FPS = 30;
+const BG      = '#080810';
+const CANVAS_BG = '#0d0d1a';
+const ACCENT  = '#326CE5';
+const ACCENT2 = '#61a8ff';
+const TEXT    = '#f8fafc';
+const MUTED   = '#94a3b8';
+const CODE_BG = '#0d1117';
+const GREEN   = '#4ade80';
+const YELLOW  = '#facc15';
+const RED     = '#f87171';
+const PURPLE  = '#a78bfa';
+
+// ── Timing state ──────────────────────────────────────────────────────────
+let segments = [], totalDuration = 60;
+
+window.setTiming = function(segs, dur) {
+  segments = segs;
+  totalDuration = dur;
+};
+
+function tSec(frameNum) { return frameNum / FPS; }
+function segAt(t) {
+  for (let i = segments.length - 1; i >= 0; i--) {
+    if (t >= segments[i].start) return i;
+  }
+  return 0;
+}
+function segStart(i) { return segments[i] ? segments[i].start : 0; }
+function segEnd(i)   { return segments[i] ? segments[i].end   : totalDuration; }
+
+// ── Easing ────────────────────────────────────────────────────────────────
+function clamp(v, lo=0, hi=1) { return Math.max(lo, Math.min(hi, v)); }
+function easeOut(x) { return 1 - Math.pow(1 - clamp(x), 3); }
+function easeIn(x)  { return clamp(x) * clamp(x); }
+function prog(t, t0, t1) { return clamp((t - t0) / (t1 - t0)); }
+
+// ── Font helpers ──────────────────────────────────────────────────────────
+function setFont(ctx, size, weight=400) {
+  ctx.font = `${weight} ${size}px 'JetBrains Mono', monospace`;
+}
+
+function drawTextFit(ctx, text, x, y, maxW, fontSize, color, align='center', weight=700) {
+  let size = fontSize;
+  ctx.font = `${weight} ${size}px 'JetBrains Mono', monospace`;
+  while (ctx.measureText(text).width > maxW && size > 10) {
+    size -= 1;
+    ctx.font = `${weight} ${size}px 'JetBrains Mono', monospace`;
+  }
+  ctx.fillStyle = color;
+  ctx.textAlign = align;
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, x, y);
+}
+
+function wrapText(ctx, text, x, y, maxW, lineH) {
+  const words = text.split(' ');
+  let line = '', lines = [];
+  for (const w of words) {
+    const test = line ? line + ' ' + w : w;
+    if (ctx.measureText(test).width > maxW && line) { lines.push(line); line = w; }
+    else line = test;
+  }
+  if (line) lines.push(line);
+  lines.forEach((l, i) => ctx.fillText(l, x, y + i * lineH));
+  return lines.length;
+}
+
+// ── Background ────────────────────────────────────────────────────────────
+function drawBG(ctx) {
+  ctx.clearRect(0, 0, W, H);
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, '#0d0d1a');
+  grad.addColorStop(1, '#080810');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+}
+
+// ── Caption pill ─────────────────────────────────────────────────────────
+function drawCaption(ctx, t) {
+  const seg = segments.find(s => t >= s.start && t < s.end);
+  if (!seg) return;
+
+  const text = seg.text;
+  let fontSize = 32;
+  ctx.font = `400 ${fontSize}px 'JetBrains Mono', monospace`;
+  const maxTextW = W - 160;
+  while (ctx.measureText(text).width > maxTextW && fontSize > 18) {
+    fontSize--;
+    ctx.font = `400 ${fontSize}px 'JetBrains Mono', monospace`;
+  }
+
+  let displayText = text;
+  if (ctx.measureText(text).width > maxTextW) {
+    displayText = text.slice(0, 60) + '…';
+    ctx.font = `400 ${fontSize}px 'JetBrains Mono', monospace`;
+  }
+
+  const tw = ctx.measureText(displayText).width;
+  const pillW = tw + 64, pillH = 64;
+  const px = CX - pillW / 2;
+  const py = H - 180;
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.roundRect(px, py, pillW, pillH, 32);
+  ctx.fillStyle = 'rgba(50,108,229,0.18)';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(50,108,229,0.5)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  ctx.fillStyle = TEXT;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(displayText, CX, py + pillH / 2);
+  ctx.restore();
+}
+
+// ── Footer ────────────────────────────────────────────────────────────────
+function drawFooter(ctx, label) {
+  const text = label;
+  let fontSize = 26;
+  ctx.font = `600 ${fontSize}px 'JetBrains Mono', monospace`;
+  const tw = ctx.measureText(text).width;
+  const pillW = Math.min(tw + 48, W - 80), pillH = 52;
+  const px = CX - pillW / 2;
+  const py = H - 90;
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.roundRect(px, py, pillW, pillH, 26);
+  ctx.fillStyle = 'rgba(50,108,229,0.12)';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(50,108,229,0.35)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  ctx.fillStyle = ACCENT2;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, CX, py + pillH / 2);
+  ctx.restore();
+}
+
+// ── Rounded rect ─────────────────────────────────────────────────────────
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.roundRect(x, y, w, h, r);
+}
+
+// ── Scene helpers ─────────────────────────────────────────────────────────
+function drawTitle(ctx, text, y, alpha) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  drawTextFit(ctx, text, CX, y, W - 80, 72, ACCENT, 'center', 700);
+  ctx.restore();
+}
+
+function drawSubtitle(ctx, text, y, alpha, color=MUTED) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  drawTextFit(ctx, text, CX, y, W - 80, 42, color, 'center', 400);
+  ctx.restore();
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// SCENES
+// ══════════════════════════════════════════════════════════════════════════
+
+// Scene 1 — Hook (0 → seg[2].end)
+// Narration: "In Kubernetes..." / "Labels are how..." / "Environment: production..."
+function drawScene1(ctx, t) {
+  drawBG(ctx);
+  // Accent bar at top
+  ctx.fillStyle = ACCENT;
+  ctx.fillRect(80, 60, 920, 6);
+
+  // Title
+  const ta = easeOut(prog(t, 0.3, 1.2));
+  ctx.save(); ctx.globalAlpha = ta;
+  setFont(ctx, 80, 700);
+  ctx.fillStyle = TEXT;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('Labels &', CX, 220);
+  ctx.fillStyle = ACCENT;
+  ctx.fillText('Selectors', CX, 320);
+  ctx.restore();
+
+  // Episode tag
+  const tagA = easeOut(prog(t, 0.8, 1.6));
+  ctx.save(); ctx.globalAlpha = tagA;
+  setFont(ctx, 28, 400);
+  ctx.fillStyle = MUTED;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('kubernetes · ep 13', CX, 430);
+  ctx.restore();
+
+  // Label card (first sentence)
+  const s0 = segStart(0);
+  const cardA = easeOut(prog(t, s0, s0 + 1.2));
+  ctx.save(); ctx.globalAlpha = cardA;
+  roundRect(ctx, 80, 560, 920, 440, 20);
+  ctx.fillStyle = CODE_BG;
+  ctx.fill();
+  ctx.strokeStyle = ACCENT;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  setFont(ctx, 30, 600);
+  ctx.fillStyle = MUTED;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('metadata:', 120, 620);
+
+  ctx.fillStyle = MUTED;
+  ctx.fillText('  labels:', 120, 675);
+
+  const labels = [
+    { k: '    environment:', v: 'production', color: GREEN },
+    { k: '    app:', v: 'nginx', color: YELLOW },
+    { k: '    tier:', v: 'backend', color: ACCENT2 },
+  ];
+
+  const s2 = segStart(2);
+  labels.forEach((lb, i) => {
+    const la = easeOut(prog(t, s2 + i * 0.5, s2 + i * 0.5 + 0.8));
+    ctx.save(); ctx.globalAlpha = la;
+    setFont(ctx, 30, 400);
+    ctx.fillStyle = MUTED;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(lb.k, 120, 740 + i * 72);
+    ctx.fillStyle = lb.color;
+    ctx.fillText(' ' + lb.v, 120 + ctx.measureText(lb.k).width, 740 + i * 72);
+    ctx.restore();
+  });
+  ctx.restore();
+
+  drawCaption(ctx, t);
+  drawFooter(ctx, 'kubernetes · labels & selectors');
+}
+
+// Scene 2 — Selectors (seg 4 → seg 7)
+// Narration: "There are two kinds..." / equality-based / set-based / Service uses...
+function drawScene2(ctx, t) {
+  drawBG(ctx);
+
+  // Heading
+  const ha = easeOut(prog(t, segStart(4), segStart(4) + 0.8));
+  ctx.save(); ctx.globalAlpha = ha;
+  setFont(ctx, 60, 700);
+  ctx.fillStyle = TEXT;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('Selectors', CX, 160);
+  ctx.restore();
+
+  // Equality-based panel
+  const eq_a = easeOut(prog(t, segStart(5), segStart(5) + 0.8));
+  ctx.save(); ctx.globalAlpha = eq_a;
+  roundRect(ctx, 60, 260, 960, 320, 20);
+  ctx.fillStyle = CODE_BG;
+  ctx.fill();
+  ctx.strokeStyle = GREEN;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  setFont(ctx, 32, 700);
+  ctx.fillStyle = GREEN;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('Equality-based', 100, 320);
+
+  const eqCmds = ['app = nginx', 'app != frontend'];
+  eqCmds.forEach((cmd, i) => {
+    setFont(ctx, 36, 400);
+    ctx.fillStyle = TEXT;
+    ctx.fillText('  ' + cmd, 100, 400 + i * 70);
+  });
+  ctx.restore();
+
+  // Set-based panel
+  const set_a = easeOut(prog(t, segStart(6), segStart(6) + 0.8));
+  ctx.save(); ctx.globalAlpha = set_a;
+  roundRect(ctx, 60, 620, 960, 360, 20);
+  ctx.fillStyle = CODE_BG;
+  ctx.fill();
+  ctx.strokeStyle = YELLOW;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  setFont(ctx, 32, 700);
+  ctx.fillStyle = YELLOW;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('Set-based', 100, 680);
+
+  const setCmds = ['app in (web, api)', 'env notin (staging, dev)'];
+  setCmds.forEach((cmd, i) => {
+    setFont(ctx, 36, 400);
+    ctx.fillStyle = TEXT;
+    ctx.fillText('  ' + cmd, 100, 760 + i * 70);
+  });
+  ctx.restore();
+
+  // "Use AND (comma) to combine"
+  const rule_a = easeOut(prog(t, segStart(9), segStart(9) + 0.8));
+  ctx.save(); ctx.globalAlpha = rule_a;
+  roundRect(ctx, 60, 1020, 960, 120, 16);
+  ctx.fillStyle = 'rgba(250,204,21,0.08)';
+  ctx.fill();
+  ctx.strokeStyle = YELLOW;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  setFont(ctx, 32, 600);
+  ctx.fillStyle = YELLOW;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('No logical OR — combine with AND', CX, 1080);
+  ctx.restore();
+
+  drawCaption(ctx, t);
+  drawFooter(ctx, 'kubernetes · labels & selectors');
+}
+
+// Scene 3 — How selectors wire things (seg 7 → seg 10)
+// Service → Pods, Deployment → Pods
+function drawScene3(ctx, t) {
+  drawBG(ctx);
+
+  const ha = easeOut(prog(t, segStart(7), segStart(7) + 0.8));
+  ctx.save(); ctx.globalAlpha = ha;
+  setFont(ctx, 52, 700);
+  ctx.fillStyle = TEXT;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('How Selectors Wire Things', CX, 150);
+  ctx.restore();
+
+  // Service box
+  const svcA = easeOut(prog(t, segStart(7), segStart(7) + 1.0));
+  ctx.save(); ctx.globalAlpha = svcA;
+  roundRect(ctx, 260, 280, 560, 140, 20);
+  ctx.fillStyle = 'rgba(50,108,229,0.18)';
+  ctx.fill();
+  ctx.strokeStyle = ACCENT;
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+  setFont(ctx, 42, 700);
+  ctx.fillStyle = ACCENT;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('Service', CX, 350);
+  setFont(ctx, 26, 400);
+  ctx.fillStyle = MUTED;
+  ctx.fillText('selector: app=nginx', CX, 395);
+  ctx.restore();
+
+  // Arrow down to pods
+  const arrA = easeOut(prog(t, segStart(7) + 0.5, segStart(7) + 1.5));
+  ctx.save(); ctx.globalAlpha = arrA;
+  ctx.strokeStyle = ACCENT;
+  ctx.lineWidth = 3;
+  ctx.setLineDash([8, 4]);
+  ctx.beginPath();
+  ctx.moveTo(CX, 420);
+  ctx.lineTo(CX, 560);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  // Arrowhead
+  ctx.fillStyle = ACCENT;
+  ctx.beginPath();
+  ctx.moveTo(CX - 12, 548);
+  ctx.lineTo(CX + 12, 548);
+  ctx.lineTo(CX, 572);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+
+  // Pod cards
+  const podData = [
+    { label: 'nginx-a1b2', x: 120 },
+    { label: 'nginx-c3d4', x: 420 },
+    { label: 'nginx-e5f6', x: 720 },
+  ];
+  podData.forEach((pod, i) => {
+    const pa = easeOut(prog(t, segStart(7) + 1.0 + i * 0.3, segStart(7) + 1.8 + i * 0.3));
+    ctx.save(); ctx.globalAlpha = pa;
+    roundRect(ctx, pod.x, 580, 280, 110, 14);
+    ctx.fillStyle = CODE_BG;
+    ctx.fill();
+    ctx.strokeStyle = GREEN;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    setFont(ctx, 22, 700);
+    ctx.fillStyle = GREEN;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('Pod', pod.x + 140, 625);
+    setFont(ctx, 20, 400);
+    ctx.fillStyle = MUTED;
+    ctx.fillText(pod.label, pod.x + 140, 660);
+    ctx.restore();
+  });
+
+  // Deployment box
+  const depA = easeOut(prog(t, segStart(8), segStart(8) + 1.0));
+  ctx.save(); ctx.globalAlpha = depA;
+  roundRect(ctx, 260, 750, 560, 140, 20);
+  ctx.fillStyle = 'rgba(167,139,250,0.18)';
+  ctx.fill();
+  ctx.strokeStyle = PURPLE;
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+  setFont(ctx, 42, 700);
+  ctx.fillStyle = PURPLE;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('Deployment', CX, 820);
+  setFont(ctx, 26, 400);
+  ctx.fillStyle = MUTED;
+  ctx.fillText('matchLabels: app=nginx', CX, 865);
+  ctx.restore();
+
+  // Outro tagline
+  const outA = easeOut(prog(t, segStart(10), segStart(10) + 1.0));
+  ctx.save(); ctx.globalAlpha = outA;
+  roundRect(ctx, 60, 970, 960, 140, 20);
+  ctx.fillStyle = 'rgba(50,108,229,0.1)';
+  ctx.fill();
+  ctx.strokeStyle = ACCENT;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  setFont(ctx, 40, 700);
+  ctx.fillStyle = TEXT;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('Labels identify.', CX, 1020);
+  ctx.fillStyle = ACCENT;
+  ctx.fillText('Selectors connect.', CX, 1075);
+  ctx.restore();
+
+  drawCaption(ctx, t);
+  drawFooter(ctx, 'kubernetes · labels & selectors');
+}
+
+// ── Scene dispatcher ──────────────────────────────────────────────────────
+window.renderFrame = function(frameNum) {
+  const ctx = document.getElementById('c').getContext('2d');
+  const t = frameNum / FPS;
+
+  // Scene boundaries driven by segment timing
+  const s4 = segStart(4);  // "There are two kinds..."
+  const s7 = segStart(7);  // "A Service uses..."
+
+  if (t < s4) {
+    drawScene1(ctx, t);
+  } else if (t < s7) {
+    drawScene2(ctx, t);
+  } else {
+    drawScene3(ctx, t);
+  }
+};
+</script>
+</body>
+</html>
