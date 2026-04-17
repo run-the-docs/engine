@@ -1,0 +1,84 @@
+{
+  "segments": [
+    {
+      "index": 0,
+      "text": "Labels are key-value pairs attached to any Kubernetes object.",
+      "start": 2.0,
+      "end": 6.4587,
+      "duration": 4.4587
+    },
+    {
+      "index": 1,
+      "text": "They don't mean anything to the system \u2014 but they're how you organize everything.",
+      "start": 6.8387,
+      "end": 11.5533,
+      "duration": 4.7147
+    },
+    {
+      "index": 2,
+      "text": "Environment: production. Tier: frontend. Release: canary.",
+      "start": 11.9333,
+      "end": 16.1573,
+      "duration": 4.224
+    },
+    {
+      "index": 3,
+      "text": "Any object can have multiple labels. Many objects can share the same label.",
+      "start": 16.5373,
+      "end": 21.7427,
+      "duration": 5.2053
+    },
+    {
+      "index": 4,
+      "text": "Label selectors let you query objects by those labels.",
+      "start": 22.1227,
+      "end": 26.24,
+      "duration": 4.1173
+    },
+    {
+      "index": 5,
+      "text": "Equality-based: environment equals production, tier not-equals frontend.",
+      "start": 26.62,
+      "end": 31.676,
+      "duration": 5.056
+    },
+    {
+      "index": 6,
+      "text": "Set-based: environment in production or Q-A. Tier not-in backend.",
+      "start": 32.056,
+      "end": 36.8987,
+      "duration": 4.8427
+    },
+    {
+      "index": 7,
+      "text": "In kubectl: kubectl get pods -l environment equals production.",
+      "start": 37.2787,
+      "end": 41.8867,
+      "duration": 4.608
+    },
+    {
+      "index": 8,
+      "text": "Services use selectors to route traffic to matching Pods.",
+      "start": 42.2667,
+      "end": 46.4693,
+      "duration": 4.2027
+    },
+    {
+      "index": 9,
+      "text": "ReplicaSets use them to track which Pods they own.",
+      "start": 46.8493,
+      "end": 50.6253,
+      "duration": 3.776
+    },
+    {
+      "index": 10,
+      "text": "Labels and selectors: the query language of Kubernetes.",
+      "start": 51.0053,
+      "end": 55.1653,
+      "duration": 4.16
+    }
+  ],
+  "total_voice_duration": 55.1653,
+  "total_duration": 59.1653,
+  "total_frames_30fps": 1775
+}

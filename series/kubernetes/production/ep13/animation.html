@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #080810; width: 1080px; height: 1920px; overflow: hidden; }
+canvas { display: block; }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script>
+const canvas = document.getElementById('c');
+const W = 1080, H = 1920;
+
+let timingSegments = [];
+let timingTotalDuration = 0;
+
+window.setTiming = (segments, totalDuration) => {
+    timingSegments = segments;
+    timingTotalDuration = totalDuration;
+};
+
+// ─── helpers ────────────────────────────────────────────────────────────────
+
+function drawBg(ctx) {
+    const grd = ctx.createLinearGradient(0, 0, 0, H);
+    grd.addColorStop(0, '#080810');
+    grd.addColorStop(1, '#0d0d1a');
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, W, H);
+}
+
+function drawTextFit(ctx, text, x, y, maxWidth, fontSize, color, bold) {
+    let size = fontSize;
+    const weight = bold ? 'bold' : '400';
+    ctx.font = `${weight} ${size}px 'JetBrains Mono'`;
+    while (ctx.measureText(text).width > maxWidth && size > 8) {
+        size -= 1;
+        ctx.font = `${weight} ${size}px 'JetBrains Mono'`;
+    }
+    ctx.fillStyle = color;
+    ctx.fillText(text, x, y);
+}
+
+function wrapText(ctx, text, x, y, maxWidth, lineHeight, color) {
+    const words = text.split(' ');
+    let line = '';
+    let lines = [];
+    for (const word of words) {
+        const test = line + word + ' ';
+        if (ctx.measureText(test).width > maxWidth && line !== '') {
+            lines.push(line.trim());
+            line = word + ' ';
+        } else {
+            line = test;
+        }
+    }
+    lines.push(line.trim());
+    ctx.fillStyle = color;
+    for (let i = 0; i < lines.length; i++) {
+        ctx.fillText(lines[i], x, y + i * lineHeight);
+    }
+    return lines.length;
+}
+
+function drawCaption(ctx, t) {
+    const seg = timingSegments.find(s => t >= s.start && t <= s.end + 0.15);
+    if (!seg) return;
+
+    const text = seg.text;
+    const cx = W / 2;
+    const pillCY = 1760;
+    const pillH = 76;
+    const maxTextW = W - 120;
+
+    let fontSize = 28;
+    ctx.font = `400 ${fontSize}px 'JetBrains Mono'`;
+    while (ctx.measureText(text).width > maxTextW && fontSize > 12) {
+        fontSize -= 1;
+        ctx.font = `400 ${fontSize}px 'JetBrains Mono'`;
+    }
+
+    // Truncate with ellipsis if still too wide
+    let displayText = text;
+    while (ctx.measureText(displayText + '…').width > maxTextW && displayText.length > 10) {
+        displayText = displayText.slice(0, -1);
+    }
+    if (displayText !== text) displayText += '…';
+
+    const textW = ctx.measureText(displayText).width;
+    const pillW = Math.min(textW + 60, W - 60);
+
+    // Pill background
+    ctx.fillStyle = 'rgba(0,0,0,0.82)';
+    ctx.beginPath();
+    ctx.roundRect(cx - pillW / 2, pillCY - pillH / 2, pillW, pillH, 14);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(50,108,229,0.4)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Text — left-align with manual centering to avoid clipping
+    ctx.fillStyle = '#f8fafc';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    const finalW = ctx.measureText(displayText).width;
+    ctx.fillText(displayText, cx - finalW / 2, pillCY);
+    ctx.textBaseline = 'alphabetic';
+    ctx.textAlign = 'left';
+}
+
+function drawLogoStrip(ctx) {
+    // K8s wheel icon left-aligned
+    ctx.save();
+    ctx.translate(60, 90);
+    ctx.strokeStyle = '#326CE5';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.arc(0, 0, 22, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(0, 0, 7, 0, Math.PI * 2);
+    ctx.stroke();
+    for (let i = 0; i < 7; i++) {
+        const a = (i / 7) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(Math.cos(a) * 8, Math.sin(a) * 8);
+        ctx.lineTo(Math.cos(a) * 21, Math.sin(a) * 21);
+        ctx.stroke();
+    }
+    ctx.restore();
+
+    ctx.font = `400 26px 'JetBrains Mono'`;
+    ctx.fillStyle = '#475569';
+    ctx.textAlign = 'left';
+    ctx.fillText('Run the Docs  ·  Kubernetes', 95, 98);
+}
+
+function drawSeparator(ctx) {
+    ctx.fillStyle = '#1e293b';
+    ctx.fillRect(60, 130, W - 120, 1);
+}
+
+function drawSceneTitle(ctx, title, y) {
+    ctx.textAlign = 'center';
+    ctx.font = `bold 64px 'JetBrains Mono'`;
+    ctx.fillStyle = '#f8fafc';
+    ctx.fillText(title, W / 2, y);
+    const tw = ctx.measureText(title).width;
+    ctx.fillStyle = '#326CE5';
+    ctx.fillRect(W / 2 - tw / 2, y + 14, tw, 4);
+    ctx.textAlign = 'left';
+}
+
+function drawCodeBox(ctx, lines, x, y, boxW, lineH, fontSize) {
+    const pad = 24;
+    const boxH = lines.length * lineH + pad * 2;
+    ctx.fillStyle = '#0d1117';
+    ctx.beginPath();
+    ctx.roundRect(x, y, boxW, boxH, 8);
+    ctx.fill();
+    ctx.strokeStyle = '#30363d';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.textBaseline = 'top';
+    for (let i = 0; i < lines.length; i++) {
+        const [color, text] = Array.isArray(lines[i]) ? lines[i] : ['#90ee90', lines[i]];
+        if (!text) continue;
+        let sz = fontSize;
+        ctx.font = `400 ${sz}px 'JetBrains Mono'`;
+        while (ctx.measureText(text).width > boxW - pad * 2 && sz > 8) {
+            sz -= 1;
+            ctx.font = `400 ${sz}px 'JetBrains Mono'`;
+        }
+        ctx.fillStyle = color;
+        ctx.fillText(text, x + pad, y + pad + i * lineH);
+    }
+    ctx.textBaseline = 'alphabetic';
+    return boxH;
+}
+
+// ─── scenes ─────────────────────────────────────────────────────────────────
+
+function sceneHook(ctx) {
+    const cx = W / 2;
+    // Large K8s wheel centered
+    ctx.save();
+    ctx.translate(cx, 780);
+    const r = 130;
+    ctx.strokeStyle = '#326CE5';
+    ctx.lineWidth = 6;
+    ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(0, 0, r * 0.33, 0, Math.PI * 2); ctx.stroke();
+    for (let i = 0; i < 7; i++) {
+        const a = (i / 7) * Math.PI * 2 - Math.PI / 2;
+        ctx.beginPath();
+        ctx.moveTo(Math.cos(a) * r * 0.37, Math.sin(a) * r * 0.37);
+        ctx.lineTo(Math.cos(a) * r * 0.93, Math.sin(a) * r * 0.93);
+        ctx.stroke();
+    }
+    ctx.restore();
+
+    ctx.textAlign = 'center';
+    ctx.font = `bold 88px 'JetBrains Mono'`;
+    ctx.fillStyle = '#f8fafc';
+    ctx.fillText('LABELS &', cx, 960);
+    ctx.fillText('SELECTORS', cx, 1074);
+    ctx.font = `400 38px 'JetBrains Mono'`;
+    ctx.fillStyle = '#326CE5';
+    ctx.fillText('Episode 13', cx, 1148);
+    ctx.textAlign = 'left';
+}
+
+function sceneLabels(ctx) {
+    const cx = W / 2;
+    drawSceneTitle(ctx, 'LABELS', 240);
+
+    // Pod box
+    const podX = cx - 150, podY = 290, podW = 300, podH = 150;
+    ctx.fillStyle = '#111827';
+    ctx.beginPath(); ctx.roundRect(podX, podY, podW, podH, 12); ctx.fill();
+    ctx.strokeStyle = '#326CE5';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.textAlign = 'center';
+    ctx.font = `bold 38px 'JetBrains Mono'`;
+    ctx.fillStyle = '#326CE5';
+    ctx.fillText('Pod', cx, podY + 58);
+    ctx.font = `400 26px 'JetBrains Mono'`;
+    ctx.fillStyle = '#94a3b8';
+    ctx.fillText('nginx-7d4f', cx, podY + 104);
+    ctx.textAlign = 'left';
+
+    // Label chips to the right
+    const chipLabels = [
+        { key: 'environment', val: 'production', cy: podY + 30 },
+        { key: 'tier', val: 'frontend', cy: podY + 90 },
+        { key: 'app', val: 'nginx', cy: podY + 150 },
+    ];
+    const chipX = podX + podW + 20;
+    const chipW = W - chipX - 50;
+
+    for (const chip of chipLabels) {
+        // Connector line
+        ctx.strokeStyle = '#326CE5';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(podX + podW, chip.cy);
+        ctx.lineTo(chipX, chip.cy);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Chip background
+        ctx.fillStyle = '#1a2540';
+        ctx.beginPath();
+        ctx.roundRect(chipX, chip.cy - 20, chipW, 40, 6);
+        ctx.fill();
+        ctx.strokeStyle = '#326CE5';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Chip text
+        const chipText = `${chip.key}: ${chip.val}`;
+        let sz = 22;
+        ctx.font = `400 ${sz}px 'JetBrains Mono'`;
+        while (ctx.measureText(chipText).width > chipW - 24 && sz > 8) {
+            sz -= 1;
+            ctx.font = `400 ${sz}px 'JetBrains Mono'`;
+        }
+        ctx.fillStyle = '#93c5fd';
+        ctx.fillText(chipText, chipX + 12, chip.cy + 8);
+    }
+
+    // Subtitle
+    ctx.font = `400 32px 'JetBrains Mono'`;
+    ctx.fillStyle = '#64748b';
+    ctx.textAlign = 'center';
+    ctx.fillText('key / value pairs on any', cx, 530);
+    ctx.fillText('Kubernetes object', cx, 576);
+    ctx.textAlign = 'left';
+
+    // Note box
+    const noteX = 60, noteY = 630, noteW = W - 120, noteH = 130;
+    ctx.fillStyle = '#0a1f0a';
+    ctx.beginPath(); ctx.roundRect(noteX, noteY, noteW, noteH, 8); ctx.fill();
+    ctx.strokeStyle = '#22c55e';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.textAlign = 'center';
+    ctx.font = `400 28px 'JetBrains Mono'`;
+    ctx.fillStyle = '#86efac';
+    ctx.fillText('No built-in meaning to the system.', cx, noteY + 48);
+    ctx.fillText('You define what labels mean.', cx, noteY + 94);
+    ctx.textAlign = 'left';
+}
+
+function sceneExamples(ctx) {
+    const cx = W / 2;
+    drawSceneTitle(ctx, 'COMMON LABELS', 240);
+
+    const examples = [
+        ['environment', 'production', '#326CE5'],
+        ['environment', 'qa',         '#6b7280'],
+        ['tier',        'frontend',   '#8b5cf6'],
+        ['tier',        'backend',    '#6b7280'],
+        ['release',     'stable',     '#22c55e'],
+        ['release',     'canary',     '#f59e0b'],
+        ['app',         'nginx',      '#326CE5'],
+        ['partition',   'customerA',  '#6b7280'],
+    ];
+
+    const cols = 2;
+    const marginX = 50;
+    const gapX = 16, gapY = 14;
+    const chipW = (W - marginX * 2 - gapX) / cols;
+    const chipH = 88;
+    const startY = 295;
+
+    for (let i = 0; i < examples.length; i++) {
+        const col = i % cols;
+        const row = Math.floor(i / cols);
+        const x = marginX + col * (chipW + gapX);
+        const y = startY + row * (chipH + gapY);
+        const [key, val, color] = examples[i];
+
+        ctx.fillStyle = '#111827';
+        ctx.beginPath(); ctx.roundRect(x, y, chipW, chipH, 8); ctx.fill();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Key
+        ctx.font = `400 20px 'JetBrains Mono'`;
+        ctx.fillStyle = '#64748b';
+        ctx.fillText(key + ':', x + 14, y + 32);
+
+        // Value (larger, colored)
+        drawTextFit(ctx, val, x + 14, y + 68, chipW - 28, 30, color, true);
+    }
+
+    // Note
+    ctx.font = `400 28px 'JetBrains Mono'`;
+    ctx.fillStyle = '#475569';
+    ctx.textAlign = 'center';
+    ctx.fillText('Labels are not unique.', cx, 1086);
+    ctx.fillText('Many objects can share them.', cx, 1128);
+    ctx.textAlign = 'left';
+}
+
+function sceneEqSelectors(ctx) {
+    const cx = W / 2;
+    drawSceneTitle(ctx, 'SELECTORS', 240);
+
+    ctx.font = `400 30px 'JetBrains Mono'`;
+    ctx.fillStyle = '#94a3b8';
+    ctx.textAlign = 'center';
+    ctx.fillText('Query objects by their labels', cx, 298);
+    ctx.textAlign = 'left';
+
+    // Badge
+    ctx.fillStyle = '#1a2a4a';
+    ctx.beginPath(); ctx.roundRect(cx - 190, 330, 380, 48, 24); ctx.fill();
+    ctx.font = `bold 24px 'JetBrains Mono'`;
+    ctx.fillStyle = '#326CE5';
+    ctx.textAlign = 'center';
+    ctx.fillText('EQUALITY-BASED', cx, 362);
+    ctx.textAlign = 'left';
+
+    drawCodeBox(ctx, [
+        ['#94a3b8', '# select matching:'],
+        ['#90ee90', 'environment = production'],
+        ['#f8fafc', ''],
+        ['#94a3b8', '# select non-matching:'],
+        ['#90ee90', 'tier != frontend'],
+        ['#f8fafc', ''],
+        ['#94a3b8', '# comma = AND logic:'],
+        ['#90ee90', 'environment=production,'],
+        ['#90ee90', 'tier!=frontend'],
+    ], 60, 400, W - 120, 50, 28);
+
+    // Operators row
+    const opY = 980;
+    ctx.font = `bold 28px 'JetBrains Mono'`;
+    ctx.fillStyle = '#64748b';
+    ctx.textAlign = 'center';
+    ctx.fillText('Operators', cx, opY);
+
+    const ops = [
+        { op: '=',  desc: 'equals' },
+        { op: '==', desc: 'also equals' },
+        { op: '!=', desc: 'not equals' },
+    ];
+    const opBoxW = 270;
+    const totalOpsW = ops.length * opBoxW + (ops.length - 1) * 16;
+    const opStartX = cx - totalOpsW / 2;
+    for (let i = 0; i < ops.length; i++) {
+        const bx = opStartX + i * (opBoxW + 16);
+        ctx.fillStyle = '#111827';
+        ctx.beginPath(); ctx.roundRect(bx, opY + 20, opBoxW, 80, 8); ctx.fill();
+        ctx.strokeStyle = '#fbbf24';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        ctx.font = `bold 36px 'JetBrains Mono'`;
+        ctx.fillStyle = '#fbbf24';
+        ctx.fillText(ops[i].op, bx + opBoxW / 2, opY + 62);
+        ctx.font = `400 19px 'JetBrains Mono'`;
+        ctx.fillStyle = '#64748b';
+        ctx.fillText(ops[i].desc, bx + opBoxW / 2, opY + 96);
+    }
+    ctx.textAlign = 'left';
+}
+
+function sceneSetSelectors(ctx) {
+    const cx = W / 2;
+    drawSceneTitle(ctx, 'SET-BASED', 240);
+
+    // Badge
+    ctx.fillStyle = '#1e1040';
+    ctx.beginPath(); ctx.roundRect(cx - 180, 278, 360, 48, 24); ctx.fill();
+    ctx.font = `bold 24px 'JetBrains Mono'`;
+    ctx.fillStyle = '#a78bfa';
+    ctx.textAlign = 'center';
+    ctx.fillText('MORE EXPRESSIVE', cx, 310);
+    ctx.textAlign = 'left';
+
+    drawCodeBox(ctx, [
+        ['#94a3b8', '# in: OR logic on values'],
+        ['#90ee90', 'environment in (production, qa)'],
+        ['#f8fafc', ''],
+        ['#94a3b8', '# notin:'],
+        ['#90ee90', 'tier notin (frontend, backend)'],
+        ['#f8fafc', ''],
+        ['#94a3b8', '# key exists:'],
+        ['#90ee90', 'partition'],
+        ['#94a3b8', '# key must not exist:'],
+        ['#90ee90', '!partition'],
+    ], 60, 350, W - 120, 46, 26);
+
+    // Separator
+    ctx.fillStyle = '#326CE5';
+    ctx.fillRect(60, 870, W - 120, 2);
+
+    // kubectl section title
+    ctx.textAlign = 'center';
+    ctx.font = `bold 32px 'JetBrains Mono'`;
+    ctx.fillStyle = '#f8fafc';
+    ctx.fillText('kubectl', cx, 920);
+    ctx.textAlign = 'left';
+
+    drawCodeBox(ctx, [
+        ['#94a3b8', '# equality-based:'],
+        ['#f8fafc', '$ kubectl get pods \\'],
+        ['#90ee90', '    -l environment=production'],
+        ['#f8fafc', ''],
+        ['#94a3b8', '# set-based:'],
+        ['#f8fafc', "$ kubectl get pods \\"],
+        ['#90ee90', "    -l 'environment in (prod)'"],
+    ], 60, 938, W - 120, 46, 26);
+}
+
+function scenePayoff(ctx) {
+    const cx = W / 2;
+    drawSceneTitle(ctx, 'WHY IT MATTERS', 240);
+
+    // Service box
+    const svcW = 340, svcH = 190, svcX = 52, svcY = 300;
+    ctx.fillStyle = '#0d1f3f';
+    ctx.beginPath(); ctx.roundRect(svcX, svcY, svcW, svcH, 12); ctx.fill();
+    ctx.strokeStyle = '#326CE5';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.textAlign = 'center';
+    ctx.font = `bold 34px 'JetBrains Mono'`;
+    ctx.fillStyle = '#326CE5';
+    ctx.fillText('Service', svcX + svcW / 2, svcY + 48);
+    ctx.font = `400 22px 'JetBrains Mono'`;
+    ctx.fillStyle = '#94a3b8';
+    ctx.fillText('selector:', svcX + svcW / 2, svcY + 84);
+    ctx.fillStyle = '#93c5fd';
+    ctx.font = `400 20px 'JetBrains Mono'`;
+    ctx.fillText('app: nginx', svcX + svcW / 2, svcY + 116);
+    ctx.fillText('tier: frontend', svcX + svcW / 2, svcY + 148);
+    ctx.textAlign = 'left';
+
+    // Arrow →
+    const arrY = svcY + svcH / 2;
+    const arrX1 = svcX + svcW + 8;
+    const arrX2 = svcX + svcW + 54;
+    ctx.strokeStyle = '#326CE5';
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(arrX1, arrY); ctx.lineTo(arrX2, arrY); ctx.stroke();
+    ctx.fillStyle = '#326CE5';
+    ctx.beginPath();
+    ctx.moveTo(arrX2 - 2, arrY - 10);
+    ctx.lineTo(arrX2 + 14, arrY);
+    ctx.lineTo(arrX2 - 2, arrY + 10);
+    ctx.fill();
+
+    // Pod grid
+    const pgX = svcX + svcW + 70;
+    const pgPodW = (W - pgX - 50) / 2 - 8;
+    const pgPodH = 90;
+    const pods = [
+        { lines: ['app:nginx', 'tier:frontend'], match: true },
+        { lines: ['app:nginx', 'tier:frontend'], match: true },
+        { lines: ['app:redis', 'tier:backend'],  match: false },
+        { lines: ['app:nginx', 'tier:frontend'], match: true },
+    ];
+    for (let i = 0; i < pods.length; i++) {
+        const c = i % 2, r = Math.floor(i / 2);
+        const px = pgX + c * (pgPodW + 8);
+        const py = svcY + r * (pgPodH + 8);
+        const { lines, match } = pods[i];
+        ctx.fillStyle = match ? '#0a2a14' : '#1e0a0a';
+        ctx.beginPath(); ctx.roundRect(px, py, pgPodW, pgPodH, 6); ctx.fill();
+        ctx.strokeStyle = match ? '#22c55e' : '#ef4444';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        ctx.font = `400 15px 'JetBrains Mono'`;
+        for (let j = 0; j < lines.length; j++) {
+            ctx.fillStyle = match ? '#86efac' : '#fca5a5';
+            drawTextFit(ctx, lines[j], px + 8, py + 26 + j * 22, pgPodW - 16, 15, match ? '#86efac' : '#fca5a5', false);
+        }
+        ctx.font = `bold 13px 'JetBrains Mono'`;
+        ctx.fillStyle = match ? '#22c55e' : '#ef4444';
+        ctx.fillText(match ? '✓ MATCH' : '✗ SKIP', px + 8, py + 76);
+    }
+
+    // ReplicaSet box
+    const rsY = 620;
+    ctx.fillStyle = '#1a0f30';
+    ctx.beginPath(); ctx.roundRect(52, rsY, W - 104, 130, 10); ctx.fill();
+    ctx.strokeStyle = '#8b5cf6';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.textAlign = 'center';
+    ctx.font = `bold 32px 'JetBrains Mono'`;
+    ctx.fillStyle = '#a78bfa';
+    ctx.fillText('ReplicaSet', cx, rsY + 46);
+    ctx.font = `400 24px 'JetBrains Mono'`;
+    ctx.fillStyle = '#c4b5fd';
+    ctx.fillText('uses selector to track Pod ownership', cx, rsY + 88);
+    ctx.fillStyle = '#475569';
+    ctx.font = `400 20px 'JetBrains Mono'`;
+    ctx.fillText('(not routing — that is Services)', cx, rsY + 122);
+
+    // Quote
+    const qY = 810;
+    ctx.font = `bold 38px 'JetBrains Mono'`;
+    ctx.fillStyle = '#f8fafc';
+    ctx.fillText('"The query language', cx, qY);
+    ctx.fillText('of Kubernetes."', cx, qY + 55);
+    ctx.font = `400 26px 'JetBrains Mono'`;
+    ctx.fillStyle = '#475569';
+    ctx.fillText('— labels + selectors', cx, qY + 106);
+    ctx.textAlign = 'left';
+}
+
+function sceneOutro(ctx) {
+    const cx = W / 2;
+    // Big K8s wheel
+    ctx.save();
+    ctx.translate(cx, 720);
+    const r = 110;
+    ctx.strokeStyle = '#326CE5';
+    ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(0, 0, r * 0.32, 0, Math.PI * 2); ctx.stroke();
+    for (let i = 0; i < 7; i++) {
+        const a = (i / 7) * Math.PI * 2 - Math.PI / 2;
+        ctx.beginPath();
+        ctx.moveTo(Math.cos(a) * r * 0.36, Math.sin(a) * r * 0.36);
+        ctx.lineTo(Math.cos(a) * r * 0.93, Math.sin(a) * r * 0.93);
+        ctx.stroke();
+    }
+    ctx.restore();
+
+    ctx.textAlign = 'center';
+    ctx.font = `bold 82px 'JetBrains Mono'`;
+    ctx.fillStyle = '#f8fafc';
+    ctx.fillText('LABELS &', cx, 892);
+    ctx.fillText('SELECTORS', cx, 988);
+    ctx.font = `400 34px 'JetBrains Mono'`;
+    ctx.fillStyle = '#326CE5';
+    ctx.fillText('Run the Docs · Kubernetes', cx, 1054);
+    ctx.font = `400 26px 'JetBrains Mono'`;
+    ctx.fillStyle = '#475569';
+    ctx.fillText('Episode 13', cx, 1100);
+    ctx.textAlign = 'left';
+}
+
+// ─── scene dispatcher ────────────────────────────────────────────────────────
+
+window.renderFrame = function(frameNum) {
+    const t = frameNum / 30;
+    const ctx = canvas.getContext('2d');
+
+    ctx.clearRect(0, 0, W, H);
+    drawBg(ctx);
+
+    ctx.save();
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+
+    if (t < 2.0) {
+        sceneHook(ctx, t);
+    } else if (t < 11.93) {
+        drawLogoStrip(ctx); drawSeparator(ctx);
+        sceneLabels(ctx, t);
+    } else if (t < 22.12) {
+        drawLogoStrip(ctx); drawSeparator(ctx);
+        sceneExamples(ctx, t);
+    } else if (t < 32.06) {
+        drawLogoStrip(ctx); drawSeparator(ctx);
+        sceneEqSelectors(ctx, t);
+    } else if (t < 42.27) {
+        drawLogoStrip(ctx); drawSeparator(ctx);
+        sceneSetSelectors(ctx, t);
+    } else if (t < 55.17) {
+        drawLogoStrip(ctx); drawSeparator(ctx);
+        scenePayoff(ctx, t);
+    } else {
+        sceneOutro(ctx, t);
+    }
+
+    ctx.restore();
+
+    // Caption pill (all scenes)
+    drawCaption(ctx, t);
+
+    // Footer
+    ctx.font = `400 20px 'JetBrains Mono'`;
+    ctx.fillStyle = '#1e293b';
+    ctx.textAlign = 'center';
+    ctx.fillText('runthedocs.dev', W / 2, 1896);
+    ctx.textAlign = 'left';
+};
+</script>
+</body>
+</html>
