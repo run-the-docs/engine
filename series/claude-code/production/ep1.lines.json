@@ -1,0 +1,42 @@
+{
+ "title": "EP 1 \u2014 YOUR FIRST SESSION",
+ "sub": "Understand any repo in plain English",
+ "lines": [
+  [
+   "Drop into any repo and understand it in 60 seconds \u2014 without reading a line.",
+   "Drop into any repo, and understand it in sixty seconds. Without reading a line."
+  ],
+  [
+   "This is Claude Code \u2014 an AI agent that lives in your terminal.",
+   "This is Clawd Code. An A.I. agent that lives in your terminal."
+  ],
+  [
+   "cd into your project, type claude, and you're in.",
+   "C D into your project, type clawd, and you're in."
+  ],
+  [
+   "No setup, no copy-paste \u2014 it already sees your whole repo.",
+   "No setup, no copy-paste. It already sees your whole repo."
+  ],
+  [
+   "Just ask: what does this repo do, and is this function correct?",
+   "Just ask. What does this repo do, and is this function correct?"
+  ],
+  [
+   "It reads your files and answers in plain English \u2014 no jargon.",
+   "It reads your files, and answers in plain English. No jargon."
+  ],
+  [
+   "Here it spots the bug: slugify never lowercases or trims spaces.",
+   "Here, it spots the bug. Slugify never lowercases, or trims spaces."
+  ],
+  [
+   "Read-only by default \u2014 it explains, you stay in control.",
+   "Read only by default. It explains, and you stay in control."
+  ],
+  [
+   "Follow Invotek for daily Claude Code tips.",
+   "Follow Invo Tech, for daily Clawd Code tips."
+  ]
+ ]
+}

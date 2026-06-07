@@ -1,0 +1,42 @@
+{
+ "title": "EP 4 \u2014 PLAN MODE",
+ "sub": "See the plan before Claude touches a single file",
+ "lines": [
+  [
+   "Let Claude rewrite half your codebase... unsupervised?",
+   "Letting Clawd rewrite half your codebase, unsupervised? There's a safer way."
+  ],
+  [
+   "Plan mode: see the plan before any file changes",
+   "Plan mode lets you see the whole plan, before a single file changes."
+  ],
+  [
+   "Shift+Tab to cycle into plan mode",
+   "Just press Shift Tab to cycle into plan mode."
+  ],
+  [
+   "Ask for the refactor \u2014 Claude only reads, never edits",
+   "Ask for your refactor, and Clawd only reads your code, it never edits."
+  ],
+  [
+   "You get a numbered, step-by-step plan",
+   "Seconds later, you get a clear, numbered, step by step plan."
+  ],
+  [
+   "Ctrl+G to tweak the plan in your editor",
+   "Want a tweak? Press Control G, and edit the plan right in your editor."
+  ],
+  [
+   "Approve \u2014 then it executes exactly that",
+   "Approve, and Clawd executes exactly that, no surprises on the big stuff."
+  ],
+  [
+   "Stay in control of every real change",
+   "You stay in full control of every real change to your code."
+  ],
+  [
+   "Follow Invotek for daily Claude Code tips",
+   "Follow Invo Tech for daily Clawd Code tips."
+  ]
+ ]
+}

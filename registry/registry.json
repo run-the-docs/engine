@@ -20,6 +20,12 @@
         "baseUrl": "https://kubernetes.io/docs/",
         "llmsTxt": null,
         "notes": "No llms.txt \u2014 episodes curated manually"
+      },
+      {
+        "name": "Claude Code",
+        "baseUrl": "https://code.claude.com/docs/en/",
+        "llmsTxt": "https://code.claude.com/docs/llms.txt",
+        "notes": "Product docs; checker populates entries from llms.txt"
       }
     ]
   },

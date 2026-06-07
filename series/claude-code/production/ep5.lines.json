@@ -1,0 +1,42 @@
+{
+ "title": "EP 5 \u2014 SLASH COMMANDS",
+ "sub": "Turn your best prompts into one-keystroke team shortcuts",
+ "lines": [
+  [
+   "Stop re-typing the same prompt every day",
+   "Tired of pasting the same prompt every single day?"
+  ],
+  [
+   "Type / to see your shortcuts",
+   "In Clawd Code, just type a slash, and your shortcuts appear."
+  ],
+  [
+   "Built-ins: /review, /resume, /clear",
+   "Built ins like, slash review, slash resume, and slash clear, are ready instantly."
+  ],
+  [
+   ".claude/commands/test.md",
+   "But the real win, is saving your own, in dot Clawd slash commands."
+  ],
+  [
+   "One markdown file = one command",
+   "One markdown file, becomes one reusable command, for your whole team."
+  ],
+  [
+   "$ARGUMENTS passes input through",
+   "Drop in dollar ARGUMENTS, and you can pass a test name straight through."
+  ],
+  [
+   "Run /test \u2014 your prompt fires",
+   "Now type slash test, and your saved prompt fires, in one keystroke."
+  ],
+  [
+   "Your best prompts, shared and versioned",
+   "Your best workflows get committed to git, shared, and run by everyone."
+  ],
+  [
+   "Follow Invotek for daily Claude Code tips",
+   "Follow Invo Tech, for daily Clawd Code tips."
+  ]
+ ]
+}
