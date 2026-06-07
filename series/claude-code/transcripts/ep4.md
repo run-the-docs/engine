@@ -1,6 +1,6 @@
 # EP 4 — PLAN MODE
 
-_See the plan before Claude touches a single file_
+_See the plan before Claude touches a single file_  ·  artifact: `slugify.py`
 
 1. Let Claude rewrite half your codebase... unsupervised?
 2. Plan mode: see the plan before any file changes

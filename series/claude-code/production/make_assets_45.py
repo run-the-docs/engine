@@ -55,3 +55,22 @@ for i in range(1,len(segs)):
     for ln in lines: cd.text(((W-tw(cd,ln,fcap))//2,y),ln,font=fcap,fill=col); y+=lh
     cimg.save(os.path.join(REC,f"cap_{i}.png"))
 print("ASSETS45_OK n=%d thgt=%d"%(len(segs),THGT))
+
+# --- ARTIFACT CARD (show a real file: filename header + contents) ---
+art=_m.get("artifact")
+if art:
+    apath=os.path.join(os.path.expanduser("~/runthedocs/series/claude-code/demo/cc-demo-repo"), art)
+    try: content=open(apath).read().rstrip("\n")
+    except Exception: content="(file not found)"
+    aimg=Image.new("RGBA",(W,H),(0,0,0,0)); ad=ImageDraw.Draw(aimg)
+    ad.rounded_rectangle([TX-6,TY-6,TX+TWID+6,TY+THGT+6],12,fill=(13,13,18,255))
+    ad.rounded_rectangle([TX-6,TY-6,TX+TWID+6,TY+THGT+6],12,outline=ACCENT,width=2)
+    fhdr=font(26,1); ad.ellipse([TX+16,TY+18,TX+30,TY+32],fill=ACCENT)
+    ad.text((TX+44,TY+14),art,font=fhdr,fill=ACCENT)
+    ad.line([TX+14,TY+52,TX+TWID-14,TY+52],fill=(218,119,86,90),width=1)
+    cf=font(24,0); y=TY+66
+    for ln in content.split("\n")[:17]:
+        ad.text((TX+20,y),ln[:94],font=cf,fill=TEXT); y+=30
+    aimg.save(os.path.join(REC,"artifact.png")); print("ARTIFACT CARD:",art)
+else:
+    import pathlib; pathlib.Path(os.path.join(REC,"artifact.png")).unlink(missing_ok=True)

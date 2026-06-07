@@ -12,8 +12,10 @@ A=float(meta.get("total") or dur(narr))     # video length = narration length
 TAIL=0.8                                      # small breath after last word
 DUR=A+TAIL
 factor=DUR/VRAW                               # <1 -> speed terminal up to fit
-ff=[FF,"-y","-loop","1","-i",bg,"-i",term,"-loop","1","-i",hook]
-cap_in={}; nxt=3
+artpath=os.path.join(REC,"artifact.png"); has_art=os.path.exists(artpath)
+ff=[FF,"-y","-loop","1","-i",bg,"-i",term,"-loop","1","-i",hook]+( ["-loop","1","-i",artpath] if has_art else [] )
+ART_IN=3  # index of artifact input (after bg,term,hook)
+cap_in={}; nxt=(4 if has_art else 3)
 for i in range(1,n):
     ff+=["-loop","1","-i",os.path.join(REC,f"cap_{i}.png")]; cap_in[i]=nxt; nxt+=1
 ff+=["-i",narr]; audio_idx=nxt
@@ -22,6 +24,9 @@ fc=[(f"[1:v]scale={TWID}:-2,tpad=stop_mode=clone:stop_duration={DUR:.2f}[term]" 
 prev="b0"; k=0
 hk_end=segs[1]["start"] if n>1 else DUR
 k+=1; fc.append(f"[{prev}][2:v]overlay=0:0:enable='between(t,0,{hk_end:.2f})'[s{k}]"); prev=f"s{k}"
+if has_art:  # ARTIFACT_OVERLAY: show the file card for ~5s after the hook
+    a_s=hk_end; a_e=hk_end+5.0
+    k+=1; fc.append(f"[{prev}][{ART_IN}:v]overlay=0:0:enable='between(t,{a_s:.2f},{a_e:.2f})'[s{k}]"); prev=f"s{k}"
 for i in range(1,n):
     s=segs[i]["start"]; e=(segs[i+1]["start"] if i+1<n else DUR)
     k+=1; fc.append(f"[{prev}][{cap_in[i]}:v]overlay=0:0:enable='between(t,{s:.2f},{e:.2f})'[s{k}]"); prev=f"s{k}"

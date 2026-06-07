@@ -33,5 +33,5 @@ for disp,spk in LINES:
 parts.append(np.zeros(int(OUTRO*SR),dtype=np.float32))
 a=np.concatenate(parts); pk=float(np.max(np.abs(a))) or 1.0; a=a/pk*(10**(-3/20))
 sf.write(os.path.join(REC,"narration.wav"),a,SR)
-json.dump({"segments":segs,"total":len(a)/SR,"title":EP.get("title"),"sub":EP.get("sub")},open(os.path.join(REC,"narration.json"),"w"),indent=1)
+json.dump({"segments":segs,"total":len(a)/SR,"title":EP.get("title"),"sub":EP.get("sub"),"artifact":EP.get("artifact")},open(os.path.join(REC,"narration.json"),"w"),indent=1)
 print("CHATTERBOX_NARR_OK total=%.2f WPM=%.0f segs=%d"%(len(a)/SR, words/(speech/60.0), len(segs)),flush=True)

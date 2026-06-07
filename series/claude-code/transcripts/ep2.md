@@ -1,6 +1,6 @@
 # EP 2 — THE AGENTIC LOOP
 
-_Fix a failing test, hands-free_
+_Fix a failing test, hands-free_  ·  artifact: `test_slugify.py`
 
 1. What if you could fix a failing test without writing a line of code?
 2. This is Claude Code — an AI agent that lives in your terminal.

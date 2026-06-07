@@ -1,15 +1,43 @@
 {
- "title": "EP 2 — THE AGENTIC LOOP",
+ "title": "EP 2 \u2014 THE AGENTIC LOOP",
  "sub": "Fix a failing test, hands-free",
  "lines": [
-  ["What if you could fix a failing test without writing a line of code?", "What if you could fix a failing test, without writing a line of code?"],
-  ["This is Claude Code — an AI agent that lives in your terminal.", "This is Clawd Code. An A.I. agent that lives in your terminal."],
-  ["You describe the task in plain English: fix the failing test.", "You describe the task, in plain English. Fix the failing test."],
-  ["It reads the relevant files to understand your code.", "It reads the relevant files, to understand your code."],
-  ["It finds the bug and proposes a fix — shown as a diff you review.", "It finds the bug, and proposes a fix. Shown as a diff you review."],
-  ["You stay in control: nothing changes until you approve.", "You stay in control. Nothing changes until you approve."],
-  ["Then it runs your tests to prove the fix actually works.", "Then it runs your tests, to prove the fix actually works."],
-  ["All green — bug fixed in seconds, not minutes.", "All green. Bug fixed in seconds, not minutes."],
-  ["Follow Invotek for a new Claude Code tip every day.", "Follow Invo Tech, for a new Clawd Code tip, every day."]
- ]
+  [
+   "What if you could fix a failing test without writing a line of code?",
+   "What if you could fix a failing test, without writing a line of code?"
+  ],
+  [
+   "This is Claude Code \u2014 an AI agent that lives in your terminal.",
+   "This is Clawd Code. An A.I. agent that lives in your terminal."
+  ],
+  [
+   "You describe the task in plain English: fix the failing test.",
+   "You describe the task, in plain English. Fix the failing test."
+  ],
+  [
+   "It reads the relevant files to understand your code.",
+   "It reads the relevant files, to understand your code."
+  ],
+  [
+   "It finds the bug and proposes a fix \u2014 shown as a diff you review.",
+   "It finds the bug, and proposes a fix. Shown as a diff you review."
+  ],
+  [
+   "You stay in control: nothing changes until you approve.",
+   "You stay in control. Nothing changes until you approve."
+  ],
+  [
+   "Then it runs your tests to prove the fix actually works.",
+   "Then it runs your tests, to prove the fix actually works."
+  ],
+  [
+   "All green \u2014 bug fixed in seconds, not minutes.",
+   "All green. Bug fixed in seconds, not minutes."
+  ],
+  [
+   "Follow Invotek for a new Claude Code tip every day.",
+   "Follow Invo Tech, for a new Clawd Code tip, every day."
+  ]
+ ],
+ "artifact": "test_slugify.py"
 }

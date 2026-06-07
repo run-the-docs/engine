@@ -1,6 +1,6 @@
 # EP 5 — SLASH COMMANDS
 
-_Turn your best prompts into one-keystroke team shortcuts_
+_Turn your best prompts into one-keystroke team shortcuts_  ·  artifact: `.claude/commands/test.md`
 
 1. Stop re-typing the same prompt every day
 2. Type / to see your shortcuts

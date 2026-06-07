@@ -1,6 +1,6 @@
 # EP 1 — YOUR FIRST SESSION
 
-_Understand any repo in plain English_
+_Understand any repo in plain English_  ·  artifact: `slugify.py`
 
 1. Drop into any repo and understand it in 60 seconds — without reading a line.
 2. This is Claude Code — an AI agent that lives in your terminal.

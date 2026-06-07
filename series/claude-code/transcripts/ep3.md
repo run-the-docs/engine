@@ -1,6 +1,6 @@
 # EP 3 — GIVE CLAUDE A MEMORY
 
-_CLAUDE.md keeps your conventions every session_
+_CLAUDE.md keeps your conventions every session_  ·  artifact: `CLAUDE.md`
 
 1. Tired of re-explaining your project to Claude every single session?
 2. Give it a memory with one file: CLAUDE.md.
