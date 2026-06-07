@@ -6,14 +6,17 @@ LOG=~/rec_${EP}.log; : > "$LOG"; exec > >(tee -a "$LOG") 2>&1
 TM=/opt/homebrew/bin/tmux; TOKEN=~/.config/claude/oauth-token
 DEMO=~/runthedocs/series/claude-code/demo; REPO=$DEMO/cc-demo-repo; REC=$DEMO/rec; W=110; H=30
 case "$EP" in
- 1) ARTIFACTS="slugify.py"; CLAUDE='claude --allowedTools Read "Bash(python3 *)" --disallowedTools WebFetch WebSearch'; MODE=prompt; TEXT="What does this project do, and what is the bug in slugify.py? Explain briefly. Do not change any files."; COMPLETE=stable ;;
- 2) ARTIFACTS="test_slugify.py slugify.py"; CLAUDE='claude --allowedTools Read Edit Write "Bash(python3 *)" --disallowedTools WebFetch WebSearch'; MODE=prompt; TEXT="Fix slugify.py so the failing test passes, then run it."; COMPLETE=testpass ;;
- 3) ARTIFACTS="CLAUDE.md"; CLAUDE='claude --allowedTools Read Edit Write "Bash(python3 *)" --disallowedTools WebFetch WebSearch'; MODE=prompt; TEXT="Add a titlecase(text) helper and a test for it, following our conventions."; COMPLETE=stable ;;
- 4) ARTIFACTS="slugify.py titlecase.py"; CLAUDE='claude --permission-mode plan --effort low --allowedTools Read "Bash(python3 *)" --disallowedTools WebFetch WebSearch'; MODE=prompt; TEXT="Plan how to reorganize slugify and titlecase into one shared textkit module with a single test file. Just the plan, do not edit."; COMPLETE=menu ;;
- 5) ARTIFACTS=".claude/commands/test.md"; CLAUDE='claude --allowedTools Read "Bash(python3 *)" --disallowedTools WebFetch WebSearch --effort low'; MODE=slash; TEXT="/test"; COMPLETE=stable ;;
+ 1) RESET=5411d3b; ARTIFACTS="slugify.py"; CLAUDE='claude --allowedTools Read "Bash(python3 *)" --disallowedTools WebFetch WebSearch'; MODE=prompt; TEXT="What does this project do, and what is the bug in slugify.py? Explain briefly. Do not change any files."; COMPLETE=stable ;;
+ 2) RESET=5411d3b; ARTIFACTS="test_slugify.py slugify.py"; CLAUDE='claude --allowedTools Read Edit Write "Bash(python3 *)" --disallowedTools WebFetch WebSearch'; MODE=prompt; TEXT="Fix slugify.py so the failing test passes, then run it."; COMPLETE=testpass ;;
+ 3) RESET=6a8d07c; ARTIFACTS="CLAUDE.md"; CLAUDE='claude --allowedTools Read Edit Write "Bash(python3 *)" --disallowedTools WebFetch WebSearch'; MODE=prompt; TEXT="Add a titlecase(text) helper and a test for it, following our conventions."; COMPLETE=stable ;;
+ 4) RESET=29299f9; ARTIFACTS="slugify.py titlecase.py"; CLAUDE='claude --permission-mode plan --effort low --allowedTools Read "Bash(python3 *)" --disallowedTools WebFetch WebSearch'; MODE=prompt; TEXT="Plan how to reorganize slugify and titlecase into one shared textkit module with a single test file. Just the plan, do not edit."; COMPLETE=menu ;;
+ 5) RESET=0b6488a; ARTIFACTS=".claude/commands/test.md"; CLAUDE='claude --allowedTools Read "Bash(python3 *)" --disallowedTools WebFetch WebSearch --effort low'; MODE=slash; TEXT="/test"; COMPLETE=stable ;;
 esac
+# reset the demo repo to this episode's correct starting state (so file cards + claude see the right files)
+git -C "$REPO" reset --hard "$RESET" >/dev/null 2>&1 && git -C "$REPO" clean -fdq >/dev/null 2>&1 && echo "repo reset to $RESET"
 $TM kill-session -t cclive 2>/dev/null; $TM kill-session -t ccrec2 2>/dev/null
 $TM new-session -d -s cclive -x $W -y $H; $TM set-option -t cclive status off
+$TM set-option -g focus-events on 2>/dev/null; $TM set-option -g mouse on 2>/dev/null   # suppress claude's tmux hint chrome
 $TM send-keys -t cclive "export PATH=/opt/homebrew/bin:\$HOME/.local/bin:\$PATH; export CLAUDE_CODE_OAUTH_TOKEN=\$(cat $TOKEN); cd $REPO; clear" Enter
 sleep 1
 # recorder FIRST so it captures the shell + the artifact + claude launch
@@ -25,7 +28,14 @@ for a in $ARTIFACTS; do $TM send-keys -t cclive "cat $a" Enter; sleep 3.5; done
 # launch claude
 $TM send-keys -t cclive "$CLAUDE" Enter
 sleep 9
-$TM send-keys -t cclive "$TEXT"; sleep 1; $TM send-keys -t cclive Enter; echo "action sent ($MODE)"
+if [ "$MODE" = "slash" ]; then
+  rest="${TEXT#/}"
+  $TM send-keys -t cclive "/"; sleep 3                                   # reveal the slash-command menu on screen
+  $TM send-keys -t cclive "$rest"; sleep 1; $TM send-keys -t cclive Enter
+else
+  $TM send-keys -t cclive "$TEXT"; sleep 1; $TM send-keys -t cclive Enter
+fi
+echo "action sent ($MODE)"
 case "$COMPLETE" in
  testpass) for i in $(seq 1 40); do sleep 3; ( cd "$REPO" && python3 test_slugify.py >/dev/null 2>&1 ) && { echo "testpass $i"; break; }; done; sleep 5 ;;
  menu) for i in $(seq 1 30); do sleep 3; p=$($TM capture-pane -pt cclive 2>/dev/null); echo "$p"|grep -qiE "keep planning|auto-accept|manually approve|Yes, and|proceed\?" && { echo "menu $i"; break; }; done; sleep 1.5 ;;
