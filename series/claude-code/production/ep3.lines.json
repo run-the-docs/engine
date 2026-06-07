@@ -1,0 +1,43 @@
+{
+ "title": "EP 3 \u2014 GIVE CLAUDE A MEMORY",
+ "sub": "CLAUDE.md keeps your conventions every session",
+ "lines": [
+  [
+   "Tired of re-explaining your project to Claude every single session?",
+   "Tired of re-explaining your project to Clawd, every single session?"
+  ],
+  [
+   "Give it a memory with one file: CLAUDE.md.",
+   "Give it a memory, with one file. The Clawd dot M D file."
+  ],
+  [
+   "No file yet? Run /init and Claude writes one for you.",
+   "No file yet? Run slash init, and Clawd writes one for you."
+  ],
+  [
+   "Drop in your conventions: where code lives, how tests run.",
+   "Drop in your conventions. Where code lives, how tests run."
+  ],
+  [
+   "Now just ask: add a titlecase helper and a test.",
+   "Now just ask. Add a title case helper, and a test."
+  ],
+  [
+   "Claude reads CLAUDE.md and follows your rules unprompted.",
+   "Clawd reads the Clawd dot M D file, and follows your rules, unprompted."
+  ],
+  [
+   "Right module, your test style \u2014 no nagging required.",
+   "Right module, your test style. No nagging required."
+  ],
+  [
+   "It runs the test and it passes \u2014 in your project's style.",
+   "It runs the test, and it passes. Your way, every time."
+  ],
+  [
+   "Follow Invotek for a fresh Claude Code tip every day.",
+   "Follow Invo Tech, for a fresh Clawd Code tip, every day."
+  ]
+ ],
+ "artifact": "CLAUDE.md"
+}
