@@ -3,6 +3,19 @@ DEMO=os.path.expanduser("~/runthedocs/series/claude-code/demo"); REC=os.path.joi
 term=os.path.join(REC, os.environ.get("CC_TERM","claude-clean.mp4")); bg=os.path.join(REC,"bg45.png")
 hook=os.path.join(REC,"hook.png"); narr=os.path.join(REC,"narration.wav")
 out=os.path.join(REC, os.environ.get("CC_OUT","claude-ep2-45.mp4"))
+
+# rc(2026-06-07) COMPOSE GUARD: refuse to compose one episode's terminal over another episode's
+# assets/narration. rec/narration.json drives ALL assets+audio; CC_OUT names the episode. This is
+# the root cause of the EP1/EP2-rendered-as-EP5 bug — run build-ep.sh <N>, never compose alone.
+import re as _re
+_want = _re.search(r"ep(\d+)", os.environ.get("CC_OUT","") or os.environ.get("CC_TERM",""))
+if _want:
+    _title = json.load(open(os.path.join(REC,"narration.json"))).get("title","")
+    _got = _re.search(r"EP\s*(\d+)", _title, _re.I)
+    if _got and _got.group(1) != _want.group(1):
+        raise SystemExit("COMPOSE GUARD: CC_OUT=ep%s but rec/narration.json is '%s' (ep%s). "
+                         "Assets/audio belong to a different episode — run build-ep.sh %s, not compose alone."
+                         % (_want.group(1), _title, _got.group(1), _want.group(1)))
 TX,TY,TWID=40,170,1000
 FF="/opt/homebrew/bin/ffmpeg"; FP="/opt/homebrew/bin/ffprobe"
 def dur(p): return float(subprocess.check_output([FP,"-v","error","-show_entries","format=duration","-of","csv=p=0",p]).decode().strip())
@@ -59,7 +72,7 @@ for i in range(1,n):
     k+=1; fc.append(f"[{prev}][{cap_in[i]}:v]overlay=0:0:enable='between(t,{s:.2f},{e:.2f})'[s{k}]"); prev=f"s{k}"
 ff+=["-filter_complex",";".join(fc),"-map",f"[{prev}]","-map",f"{audio_idx}:a",
      "-t",f"{DUR:.2f}","-r","30","-c:v","libx264","-pix_fmt","yuv420p","-preset","fast","-crf","20",
-     "-c:a","aac","-b:a","192k","-movflags","+faststart",out]
+     "-c:a","aac","-b:a","192k","-ar","48000","-ac","2","-movflags","+faststart",out]
 print("VRAW=%.2f VEFF=%.2f narration=%.2f DUR=%.2f termSpeed=%.2fx"%(VRAW,VEFF,A,DUR,1/factor),flush=True)
 r=subprocess.run(ff,capture_output=True,text=True)
 if r.returncode!=0: print("FFMPEG_FAIL"); print(r.stderr[-1800:]); raise SystemExit(1)
