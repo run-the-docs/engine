@@ -6,7 +6,7 @@ LOG=~/rec_${EP}.log; : > "$LOG"; exec > >(tee -a "$LOG") 2>&1
 TM=/opt/homebrew/bin/tmux; TOKEN=~/.config/claude/oauth-token
 DEMO=~/runthedocs/series/claude-code/demo; REPO=$DEMO/cc-demo-repo; REC=$DEMO/rec; W=110; H=30
 case "$EP" in
- 1) RESET=5411d3b; ARTIFACTS="slugify.py"; CLAUDE='claude --allowedTools Read "Bash(python3 *)" --disallowedTools WebFetch WebSearch'; MODE=prompt; TEXT="What does this project do, and what is the bug in slugify.py? Explain briefly. Do not change any files."; COMPLETE=stable ;;
+ 1) RESET=5411d3b; ARTIFACTS="slugify.py"; CLAUDE='claude --effort low --allowedTools Read "Bash(python3 *)" --disallowedTools WebFetch WebSearch'; MODE=prompt; TEXT="In two sentences: what does this repo do, and what is the bug in slugify.py? Do not change any files."; COMPLETE=stable ;;
  2) RESET=5411d3b; ARTIFACTS="test_slugify.py slugify.py"; CLAUDE='claude --allowedTools Read Edit Write "Bash(python3 *)" --disallowedTools WebFetch WebSearch'; MODE=prompt; TEXT="Fix slugify.py so the failing test passes, then run it."; COMPLETE=testpass ;;
  3) RESET=6a8d07c; ARTIFACTS="CLAUDE.md"; CLAUDE='claude --allowedTools Read Edit Write "Bash(python3 *)" --disallowedTools WebFetch WebSearch'; MODE=prompt; TEXT="Add a titlecase(text) helper and a test for it, following our conventions."; COMPLETE=stable ;;
  4) RESET=29299f9; ARTIFACTS="slugify.py titlecase.py"; CLAUDE='claude --permission-mode plan --effort low --allowedTools Read "Bash(python3 *)" --disallowedTools WebFetch WebSearch'; MODE=prompt; TEXT="Plan how to reorganize slugify and titlecase into one shared textkit module with a single test file. Just the plan, do not edit."; COMPLETE=menu ;;
