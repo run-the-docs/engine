@@ -29,7 +29,7 @@ d.text((50,118),EP,font=font(40,1),fill=TEXT)
 d.text((52,166),SUB,font=font(22,0),fill=DIM)
 d.line([50,200,1030,200],fill=(218,119,86,90),width=2)   # divider below subtitle
 # footer CTA strip
-ff=font(32,1); cta="↳  Follow Invotek — daily Claude Code tips"
+ff=font(32,1); cta="↳  Run the Docs — daily Claude Code tips"
 d.text(((W-tw(d,cta,ff))//2,1770),cta,font=ff,fill=ACCENT)
 ft2=font(24,0); tip="Try it:  claude  → describe a task"
 d.text(((W-tw(d,tip,ft2))//2,1828),tip,font=ft2,fill=DIM)
