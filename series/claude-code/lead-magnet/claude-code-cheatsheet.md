@@ -11,7 +11,7 @@ cd your-project && claude                          # start — you'll log in on 
 Also runs in VS Code, JetBrains, the Desktop app, the web (claude.ai/code), and Slack.
 
 ## The mental model
-Claude Code is an **agent**, not autocomplete. Each turn it loops: **gather context → plan → act with tools (read, edit, run) → verify → repeat.** It works across many files and runs commands, so you describe the **outcome**, not the steps.
+Claude Code is an **agent**, not autocomplete. Each turn it loops: **gather context → take action (read, edit, run) → verify → repeat.** It works across many files and runs commands, so you describe the **outcome**, not the steps.
 
 ## Everyday moves
 | You want | Do this |
@@ -35,7 +35,7 @@ Claude Code is an **agent**, not autocomplete. Each turn it loops: **gather cont
 ## Power features
 **Checkpointing** — `/rewind` or `Esc Esc` on an empty prompt. Claude checkpoints your code before every edit; restore the **code**, the **conversation**, or **both**. *Caveat:* it tracks Claude's file edits only — **not** `bash`/`rm` changes or edits made outside the session. Keep Git for permanent history.
 
-**Plan mode** — `Shift+Tab` cycles permission modes (default → accept-edits → **plan** → bypass). In plan mode Claude researches and proposes a plan but makes **no edits** until you approve.
+**Plan mode** — `Shift+Tab` cycles permission modes (default → accept-edits → **plan**). In plan mode Claude researches and proposes a plan but makes **no edits** until you approve. *(bypass mode only joins the cycle if you start with `--permission-mode bypassPermissions`.)*
 
 **Subagents** — `.claude/agents/<name>.md` (or `/agents`). Each runs in its **own context window** with its own tools/model — spin up several in **parallel** and keep the noise out of your main chat. Frontmatter: `name`, `description`, `tools`, `model`. *(A subagent can't spawn more subagents.)*
 
@@ -43,7 +43,7 @@ Claude Code is an **agent**, not autocomplete. Each turn it loops: **gather cont
 
 **MCP** — connect external tools (docs, Jira, Postgres, the browser) in one command:
 ```
-claude mcp add --transport http <name> <url>     # then:  claude mcp list  →  ✔ Connected
+claude mcp add --transport http <name> <url>     # then:  claude mcp list  →  ✓ Connected
 ```
 Commit a `.mcp.json` to share a server with your team. Scopes: local / project / user.
 
@@ -52,7 +52,7 @@ Commit a `.mcp.json` to share a server with your team. Scopes: local / project /
 **Headless / scripting** — `claude -p "..."` prints the answer and exits. Pipe stdin in, get text or `--output-format json` out. Perfect for CI and one-liners.
 
 ## Keyboard
-`Esc` interrupt · `Esc Esc` rewind · `Shift+Tab` cycle permission modes · `@` mention a file · `/` commands · `↑` prompt history · `Ctrl+C` quit
+`Esc` interrupt · `Esc Esc` rewind · `Shift+Tab` cycle permission modes · `@` mention a file · `/` commands · `↑` prompt history · `Ctrl+C` interrupt/clear · `Ctrl+D` quit
 
 ## Three habits that pay off
 1. **Write a real `CLAUDE.md`.** Specific beats vague — "use pnpm, not npm" > "follow best practices". Commit it so your whole team (and every agent) shares one memory.
