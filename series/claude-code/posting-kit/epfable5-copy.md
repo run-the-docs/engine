@@ -24,7 +24,7 @@ My honest take: it's one bounded fix, not the 50M-line claim — but the *diagno
 If a model can read your *intent* and not just your symptom — what's the first real bug you'd hand it?
 
 **First comment:**
-> Watch it: [YouTube link]
+> Watch it: https://youtu.be/8AoM8EP-wYY
 > I write up one Claude Code tip every weekday — [newsletter link]
 > I am Stig; I build dev/AI tooling at Invotek.
 
