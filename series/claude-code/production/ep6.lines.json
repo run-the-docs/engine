@@ -1,0 +1,39 @@
+{
+ "title": "EP 6 \u2014 UNDO ANYTHING CLAUDE DOES",
+ "sub": "Rewind a bad edit instantly with /rewind or Esc Esc",
+ "lines": [
+  [
+   "Claude broke your working file. What if you could undo it instantly?",
+   "Clawd just broke your working file. What if you could undo it, instantly?"
+  ],
+  [
+   "Claude Code checkpoints your code before every single edit.",
+   "Clawd Code quietly checkpoints your code, before every single edit."
+  ],
+  [
+   "Every prompt you send becomes a checkpoint you can rewind to.",
+   "Every prompt you send, becomes a checkpoint you can rewind to."
+  ],
+  [
+   "Press Esc twice on an empty prompt, or run /rewind.",
+   "Press escape twice on an empty prompt, or just run slash rewind."
+  ],
+  [
+   "Pick the moment to go back to from the list of your prompts.",
+   "Pick the moment to go back to, from the list of your prompts."
+  ],
+  [
+   "Restore code, the conversation, or both \u2014 your call.",
+   "Restore the code, the conversation, or both. Your call."
+  ],
+  [
+   "One catch: it tracks Claude's edits, not bash deletes. Git still rules.",
+   "One catch. It tracks Clawd's file edits, not bash deletes. Git still rules permanent history."
+  ],
+  [
+   "Follow Invotek for a fresh Claude Code tip every day.",
+   "Follow Invo Tech, for a fresh Clawd Code tip, every day."
+  ]
+ ],
+ "artifact": "slugify.py"
+}

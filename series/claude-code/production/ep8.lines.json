@@ -1,0 +1,39 @@
+{
+ "title": "EP 8 \u2014 AUTO-FORMAT EVERY FILE CLAUDE EDITS",
+ "sub": "A PostToolUse hook runs your formatter on every edit",
+ "lines": [
+  [
+   "Still reformatting every file Claude touches by hand?",
+   "Still reformatting every file Clawd touches, by hand?"
+  ],
+  [
+   "What if your formatter just ran itself the instant Claude saves?",
+   "What if your formatter just ran itself, the instant Clawd saves?"
+  ],
+  [
+   "Add a hook in .claude/settings.json.",
+   "Add a hook, in the dot Clawd settings dot json file."
+  ],
+  [
+   "A PostToolUse hook with an Edit-or-Write matcher fires after every edit.",
+   "A post tool use hook, with an edit or write matcher, fires after every edit."
+  ],
+  [
+   "It runs your formatter on the exact file Claude just changed.",
+   "It runs your formatter, on the exact file Clawd just changed."
+  ],
+  [
+   "No prompting, no nagging \u2014 it just happens after each edit.",
+   "No prompting, no nagging. It just happens, after each edit."
+  ],
+  [
+   "Ask Claude to write the hook for you, then check /hooks to confirm it.",
+   "Ask Clawd to write the hook for you, then check slash hooks to confirm it."
+  ],
+  [
+   "Follow Invotek for a fresh Claude Code tip every day.",
+   "Follow Invo Tech, for a fresh Clawd Code tip, every day."
+  ]
+ ],
+ "artifact": ".claude/settings.json"
+}

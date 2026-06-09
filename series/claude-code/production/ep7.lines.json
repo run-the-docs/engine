@@ -1,0 +1,39 @@
+{
+ "title": "EP 7 \u2014 CLAUDE RUNS A TEAM IN PARALLEL",
+ "sub": "Subagents each get their own context window and tools",
+ "lines": [
+  [
+   "One Claude, working on three parts of your codebase at the same time.",
+   "One Clawd, working on three parts of your codebase, at the same time."
+  ],
+  [
+   "Meet subagents: each one gets its own context window, tools, and prompt.",
+   "Meet subagents. Each one gets its own context window, its own tools, and its own prompt."
+  ],
+  [
+   "Define one as a tiny file in .claude/agents, or just run /agents.",
+   "Define one as a tiny file in dot Clawd slash agents. Or just run slash agents."
+  ],
+  [
+   "Then say: research the auth, database, and API modules in parallel.",
+   "Then say. Research the auth, database, and A.P.I. modules, in parallel."
+  ],
+  [
+   "Claude spawns a subagent per module \u2014 they run at once, then report back.",
+   "Clawd spawns a subagent per module. They run at once, then report back."
+  ],
+  [
+   "The noisy work stays in their context, so your main chat stays clean.",
+   "The noisy work stays in their context. So your main chat stays clean."
+  ],
+  [
+   "Heads up: subagents can't spawn more subagents, and big results cost context.",
+   "Heads up. Subagents can't spawn more subagents. And big results still cost you context."
+  ],
+  [
+   "Follow Invotek for a fresh Claude Code tip every day.",
+   "Follow Invo Tech, for a fresh Clawd Code tip, every day."
+  ]
+ ],
+ "artifact": ".claude/agents/module-researcher.md"
+}

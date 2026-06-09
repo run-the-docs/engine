@@ -1,0 +1,43 @@
+{
+ "title": "EP 10 \u2014 TURN ANY WORKFLOW INTO A REUSABLE SKILL",
+ "sub": "A SKILL.md packages a repeatable workflow as a capability Claude can reuse",
+ "lines": [
+  [
+   "Pasting the same multi-step instructions into Claude over and over?",
+   "Pasting the same multi-step instructions, into Clawd, over and over?"
+  ],
+  [
+   "Package that workflow once as a reusable skill.",
+   "Package that workflow once, as a reusable skill."
+  ],
+  [
+   "A skill is just one file: .claude/skills/<name>/SKILL.md.",
+   "A skill is just one file. The skill dot M D file, under dot Clawd slash skills."
+  ],
+  [
+   "Frontmatter says when to use it; the body says what to do.",
+   "Frontmatter says when to use it. The body says what to do."
+  ],
+  [
+   "Add !`git diff HEAD` and the live diff is pulled in before Claude reads it.",
+   "Add a git diff command, and the live diff gets pulled in, before Clawd reads it."
+  ],
+  [
+   "The folder name is the command: this one becomes /summarize-changes.",
+   "The folder name is the command. This one becomes slash summarize changes."
+  ],
+  [
+   "Now just ask what changed \u2014 Claude loads the skill on its own.",
+   "Now just ask what changed. Clawd loads the skill on its own."
+  ],
+  [
+   "One file. Reused every session, by you or by Claude.",
+   "One file. Reused every session. By you, or by Clawd."
+  ],
+  [
+   "Follow Invotek for a fresh Claude Code tip every day.",
+   "Follow Invo Tech, for a fresh Clawd Code tip, every day."
+  ]
+ ],
+ "artifact": ".claude/skills/summarize-changes/SKILL.md"
+}
