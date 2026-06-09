@@ -35,8 +35,8 @@
    "All green. Bug fixed in seconds, not minutes."
   ],
   [
-   "Follow Invotek for a new Claude Code tip every day.",
-   "Follow Invo Tech, for a new Clawd Code tip, every day."
+   "Follow for a fresh Claude Code tip every day.",
+   "Follow for a fresh Clawd Code tip, every day."
   ]
  ],
  "artifact": "test_slugify.py"

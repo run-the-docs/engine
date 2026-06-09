@@ -1,0 +1,43 @@
+{
+ "title": "Fable 5 fixing a real bug in my terminal",
+ "sub": "Anthropic's most capable model \u2014 now in Claude Code",
+ "lines": [
+  [
+   "Claude Code just got a new flagship model \u2014 here's Fable 5 fixing a bug in my terminal.",
+   "Clawd Code just got a new flagship model. Here is Fable five, fixing a bug in my terminal."
+  ],
+  [
+   "Claude Fable 5 \u2014 Anthropic says it is their most capable model yet.",
+   "Clawd Fable five. Anthropic says it is their most capable model yet."
+  ],
+  [
+   "One subtle off-by-one in a business-days counter \u2014 and a test that fails.",
+   "One subtle off by one, in a business days counter. And a test that fails."
+  ],
+  [
+   "claude --model claude-fable-5 \u2014 I just point it at the failing test.",
+   "I launch clawd, dash dash model clawd fable five, and point it at the failing test."
+  ],
+  [
+   "It traces the loop boundary \u2014 the inclusive end day was never counted.",
+   "It traces the loop boundary. The inclusive end day, was never being counted."
+  ],
+  [
+   "One-character fix, less-than to less-than-or-equal \u2014 all tests pass.",
+   "One character fix. Less than, becomes less than or equal. All tests pass."
+  ],
+  [
+   "Anthropic says the longer and more complex the task, the bigger its lead.",
+   "Anthropic says, the longer and more complex the task, the bigger Fable five's lead."
+  ],
+  [
+   "In risky domains, Anthropic says it falls back to Opus 4.8 \u2014 and it's free on Pro until June 22.",
+   "In risky domains, Anthropic says it falls back to Opus four point eight. And it is free on Pro, until June twenty second."
+  ],
+  [
+   "Follow for a fresh Claude Code tip every day.",
+   "Follow for a fresh Clawd Code tip, every day."
+  ]
+ ],
+ "artifact": "date_range.py"
+}

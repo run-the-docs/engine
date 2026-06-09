@@ -1,0 +1,43 @@
+{
+ "title": "EP 11 \u2014 NEVER LOSE A LONG SESSION",
+ "sub": "Context management: /context, /compact, /clear",
+ "lines": [
+  [
+   "A full context window does NOT end your Claude Code session.",
+   "A full context window does not end your Clawd Code session."
+  ],
+  [
+   "As you near the limit, Claude Code auto-compacts for you \u2014 no panic, no lost work.",
+   "As you near the limit, Clawd Code auto compacts for you. No panic, no lost work."
+  ],
+  [
+   "/compact replaces the chat with a structured summary that keeps your intent and changes.",
+   "Slash compact replaces the chat with a structured summary that keeps your intent and changes."
+  ],
+  [
+   "And CLAUDE.md, your memory, and MCP tools all reload automatically after it.",
+   "And the Clawd dot M D file, your memory, and M C P tools all reload automatically after it."
+  ],
+  [
+   "Want control? /compact focus on the auth bug keeps exactly what you choose.",
+   "Want control? Slash compact, focus on the auth bug, keeps exactly what you choose."
+  ],
+  [
+   "Switching to unrelated work? /clear wipes the slate so old context stops crowding you out.",
+   "Switching to unrelated work? Slash clear wipes the slate so old context stops crowding you out."
+  ],
+  [
+   "And /context shows a live breakdown of what is filling your window, with tips to trim it.",
+   "And slash context shows a live breakdown of what is filling your window, with tips to trim it."
+  ],
+  [
+   "Read your window, /compact with focus, /clear between tasks \u2014 never lose a session again.",
+   "Read your window, slash compact with focus, slash clear between tasks. Never lose a session again."
+  ],
+  [
+   "Follow for a fresh Claude Code tip every day.",
+   "Follow for a fresh Clawd Code tip, every day."
+  ]
+ ],
+ "artifact": "context-cheat.txt"
+}

@@ -31,8 +31,8 @@
    "Heads up. Subagents can't spawn more subagents. And big results still cost you context."
   ],
   [
-   "Follow Invotek for a fresh Claude Code tip every day.",
-   "Follow Invo Tech, for a fresh Clawd Code tip, every day."
+   "Follow for a fresh Claude Code tip every day.",
+   "Follow for a fresh Clawd Code tip, every day."
   ]
  ],
  "artifact": ".claude/agents/module-researcher.md"
