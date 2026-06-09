@@ -1,0 +1,43 @@
+{
+ "title": "EP 9 \u2014 GIVE CLAUDE A NEW SUPERPOWER IN ONE COMMAND",
+ "sub": "Connect external tools to Claude Code with MCP",
+ "lines": [
+  [
+   "What if Claude could search your docs, your issue tracker, your browser?",
+   "What if Clawd could search your docs, your issue tracker, even your browser?"
+  ],
+  [
+   "Give it a new superpower in one command, with MCP.",
+   "Give it a new superpower, in one command. With M C P."
+  ],
+  [
+   "claude mcp add --transport http claude-code-docs <url>",
+   "Run, Clawd M C P add, point it at a hosted server, and you're done."
+  ],
+  [
+   "Run claude mcp list \u2014 look for the green check, Connected.",
+   "Run, Clawd M C P list, and look for the green check that says, Connected."
+  ],
+  [
+   "Then just ask Claude to use it by name.",
+   "Then start a session, and ask Clawd to use the server, by name."
+  ],
+  [
+   "First call asks permission \u2014 approve it once.",
+   "The first call asks for permission. Approve it once, and the tool is live."
+  ],
+  [
+   "Want it shared? Commit a .mcp.json to your repo.",
+   "Want your whole team to have it? Commit a dot M C P dot json file, to your repo."
+  ],
+  [
+   "Heads up: every server uses context \u2014 remove ones you don't use.",
+   "One heads up. Each server uses context window, so remove the ones you don't use."
+  ],
+  [
+   "Follow Invotek for a fresh Claude Code tip every day.",
+   "Follow Invo Tech, for a fresh Clawd Code tip, every day."
+  ]
+ ],
+ "artifact": ".mcp.json"
+}
