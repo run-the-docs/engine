@@ -8,37 +8,41 @@
 
 ---
 ## LinkedIn  (upload `ep7-linkedin-4x5.mp4` natively — no link in the post body)
-Big refactor, and one Claude has to read your whole codebase to start? That's slow — and it fills the chat with search results you'll never look at again.
+When I kick off a big refactor, I don't want one Claude reading my whole codebase just to get started. It's slow, and it fills the chat with search results I'll never look at again.
 
-Subagents fix it. Each subagent runs in its own context window, with its own tools and its own system prompt.
+So I lean on subagents. Each one runs in its own context window, with its own tools and its own system prompt.
 
-Define one as a tiny file in `.claude/agents/` (or run `/agents`), then ask Claude to research the auth, database, and API modules in parallel. It spawns a subagent per module — they run at once and report back a short summary.
+I define one as a tiny file in `.claude/agents/` (or run `/agents`), then ask Claude to research the auth, database, and API modules in parallel. It spawns a subagent per module — they run at once and report back a short summary.
 
-The noisy exploration stays in their context, so your main chat stays clean.
+The noisy exploration stays in their context, so my main chat stays clean.
 
-Two honest caveats: subagents can't spawn more subagents, and a pile of detailed results still costs you main-context tokens — so keep what they return tight.
+Two honest caveats I've hit: subagents can't spawn more subagents, and a pile of detailed results still costs you main-context tokens — so I keep what they return tight.
 
 What would you parallelize first?
 
-▶ Full series + episode links in the first comment.
+**First comment (post yourself within ~1 min):**
+> Pro-tip: give research subagents read-only tools (`tools: Read, Grep, Glob`) and put them on `model: haiku` — fast, cheap, and they can't touch your files. Ask each one to "report only a one-line summary" so three parallel results don't flood your main context. Full episode: [YouTube link]
+>
+> I write up one Claude Code tip every weekday — [newsletter link]
+>
+> I'm Stig; I build dev/AI tooling at Invotek — DM me if you want something like this built.
 
 #ClaudeCode #AICoding #DevTools #DeveloperProductivity #Coding
 
-**First comment (post yourself within ~1 min):**
-> Pro-tip: give research subagents read-only tools (`tools: Read, Grep, Glob`) and put them on `model: haiku`. The docs' built-in Explore agent does exactly this — fast, cheap, and it can't touch your files. Ask each one to "report only a one-line summary" so three parallel results don't flood your main context.
-
 ---
 ## TikTok / Instagram Reels  (upload `ep7-vertical-9x16.mp4`)
-one claude, three modules, all at the same time. subagents each get their own context window + tools — define one tiny file in .claude/agents, then say "research auth, db and api in parallel." the messy searching stays in their context, your chat stays clean. (they can't spawn more subagents, fyi) #claudecode #aicoding #devtok #coding #programming #devtools
+one claude, three modules, all at the same time. i give each subagent its own context window + tools, define one tiny file in .claude/agents, then say "research auth, db and api in parallel." the messy searching stays in their context, my chat stays clean. (heads up — they can't spawn more subagents) follow for a claude code tip a day. #claudecode #aicoding #devtok #coding #programming #devtools
 
 ---
 ## YouTube Shorts  (upload `ep7-vertical-9x16.mp4`)
 **Title:** Claude Code runs a team of subagents in parallel
-**Description:** Subagents let Claude Code work on several parts of your codebase at once — each in its own context window, with its own tools. Define one in `.claude/agents/`, then run them in parallel.
-Run the Docs — Claude Code series. Full series: https://code.claude.com/docs/en/sub-agents
+**Description:** I use subagents to make Claude Code work on several parts of my codebase at once — each in its own context window, with its own tools. I define one in `.claude/agents/`, then run them in parallel so the noisy searching stays out of my main chat.
+[newsletter link]
+Run the Docs — Claude Code series. A project by Invotek.
 #Shorts #ClaudeCode #AICoding #DevTools
 
 ---
 ## X / Twitter  (upload `ep7-linkedin-4x5.mp4`)
-One Claude, three modules, all at once. Subagents each get their own context window + tools — so the noisy searching stays out of your main chat. Define one file in `.claude/agents/`, then say "research these in parallel."
+One Claude, three modules, all at once. I give each subagent its own context window + tools, so the noisy searching stays out of my main chat. I define one file in `.claude/agents/`, then say "research these in parallel."
+(link in reply)
 #ClaudeCode #AIcoding
