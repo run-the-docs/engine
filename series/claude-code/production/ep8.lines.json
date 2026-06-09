@@ -31,8 +31,8 @@
    "Ask Clawd to write the hook for you, then check slash hooks to confirm it."
   ],
   [
-   "Follow Invotek for a fresh Claude Code tip every day.",
-   "Follow Invo Tech, for a fresh Clawd Code tip, every day."
+   "Follow for a fresh Claude Code tip every day.",
+   "Follow for a fresh Clawd Code tip, every day."
   ]
  ],
  "artifact": ".claude/settings.json"

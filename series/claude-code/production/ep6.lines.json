@@ -31,8 +31,8 @@
    "One catch. It tracks Clawd's file edits, not bash deletes. Git still rules permanent history."
   ],
   [
-   "Follow Invotek for a fresh Claude Code tip every day.",
-   "Follow Invo Tech, for a fresh Clawd Code tip, every day."
+   "Follow for a fresh Claude Code tip every day.",
+   "Follow for a fresh Clawd Code tip, every day."
   ]
  ],
  "artifact": "slugify.py"

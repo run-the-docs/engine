@@ -1,5 +1,5 @@
 {
- "title": "EP 5 — SLASH COMMANDS",
+ "title": "EP 5 \u2014 SLASH COMMANDS",
  "sub": "Turn your best prompts into one-keystroke team shortcuts",
  "lines": [
   [
@@ -19,12 +19,12 @@
    "The real win: save your own in dot Clawd slash commands."
   ],
   [
-   "Run /test — your prompt fires",
+   "Run /test \u2014 your prompt fires",
    "Add dollar ARGUMENTS, commit, and slash test fires your prompt."
   ],
   [
-   "Follow Invotek for daily Claude Code tips",
-   "Follow Invo Tech for daily Clawd Code tips."
+   "Follow for a fresh Claude Code tip every day.",
+   "Follow for a fresh Clawd Code tip, every day."
   ]
  ],
  "artifact": ".claude/commands/test.md"
