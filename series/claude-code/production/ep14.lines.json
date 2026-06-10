@@ -1,0 +1,35 @@
+{
+ "title": "EP 14 — STOP MAKING CLAUDE HUNT FOR FILES",
+ "sub": "Reference any file instantly with @",
+ "lines": [
+  [
+   "Watching Claude grep around for the file you meant?",
+   "Watching Clawd grep around, for the file you meant?"
+  ],
+  [
+   "Skip it. Type @ and the filename.",
+   "Skip all that. Type the at sign, and the filename."
+  ],
+  [
+   "@slugify.py drops the whole file into the chat.",
+   "At slugify dot py, drops the whole file straight into the chat."
+  ],
+  [
+   "No searching, no waiting for it to read around.",
+   "No searching. No waiting for it to read around."
+  ],
+  [
+   "@ a folder instead, and you get its file listing.",
+   "At sign a folder instead, and you get its file listing."
+  ],
+  [
+   "Chain a few: @file1 and @file2 in one message.",
+   "Or chain a few. At file one, and at file two, in one message."
+  ],
+  [
+   "Follow for a fresh Claude Code tip every day.",
+   "Follow for a fresh Clawd Code tip, every day."
+  ]
+ ],
+ "artifact": "slugify.py"
+}
