@@ -46,7 +46,7 @@ kept = frames[:last_good + 1]
 HOLD = 2.5
 TARGET = 17.0
 per = (TARGET - HOLD) / max(len(kept), 1)
-per = max(0.12, min(per, 0.9))
+per = max(0.05, min(per, 0.9))   # low floor so high-frame demos (e.g. interactive UIs) still hit ~TARGET
 listf = os.path.join(tmp, 'list.txt')
 with open(listf, 'w') as fh:
     for f in kept:
