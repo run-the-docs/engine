@@ -1,0 +1,35 @@
+{
+ "title": "EP 13 — CLAUDE IN ONE LINE, NO SESSION",
+ "sub": "Headless mode: pipe anything into claude -p",
+ "lines": [
+  [
+   "Forgot what you actually shipped this week?",
+   "Forgot what you actually shipped this week?"
+  ],
+  [
+   "Claude Code isn't only an interactive session.",
+   "Clawd Code isn't only an interactive session."
+  ],
+  [
+   "claude -p runs one prompt, prints it, and exits.",
+   "Claude, dash p, runs one prompt, prints the answer, and exits."
+  ],
+  [
+   "It reads stdin, so you can pipe anything in.",
+   "It reads standard input, so you can pipe anything into it."
+  ],
+  [
+   "Pipe your git log in for an instant summary.",
+   "Pipe your git log straight in, for an instant summary."
+  ],
+  [
+   "Drop it in any script or your CI pipeline.",
+   "Drop it in any script, or your C I pipeline."
+  ],
+  [
+   "Follow for a fresh Claude Code tip every day.",
+   "Follow for a fresh Clawd Code tip, every day."
+  ]
+ ],
+ "artifact": "headless"
+}
