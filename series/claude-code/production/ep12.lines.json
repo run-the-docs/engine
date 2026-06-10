@@ -1,0 +1,39 @@
+{
+ "title": "EP 12 — PICK UP RIGHT WHERE YOU LEFT OFF",
+ "sub": "Resume a session: --continue, --resume, /resume",
+ "lines": [
+  [
+   "Closed your terminal and lost the whole conversation with Claude?",
+   "Closed your terminal, and lost the whole conversation with Clawd?"
+  ],
+  [
+   "You didn't. Claude saves every session to disk as you work.",
+   "You didn't. Clawd saves every session to disk, as you work."
+  ],
+  [
+   "claude --continue picks the most recent one back up.",
+   "Claude, dash dash continue, picks the most recent one back up. Right where you left off."
+  ],
+  [
+   "claude --resume opens a picker of your past sessions.",
+   "Claude, dash dash resume, opens a picker of all your past sessions."
+  ],
+  [
+   "Name one with -n, then resume it by name later.",
+   "Name one with dash n, then resume it by name, later."
+  ],
+  [
+   "Already in a session? /resume switches you to another.",
+   "Already in a session? Slash resume switches you to another one."
+  ],
+  [
+   "Even after /clear, the old conversation is still there.",
+   "Even after slash clear, the old conversation is still saved, and resumable."
+  ],
+  [
+   "Follow for a fresh Claude Code tip every day.",
+   "Follow for a fresh Clawd Code tip, every day."
+  ]
+ ],
+ "artifact": "resumedemo"
+}
