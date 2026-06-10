@@ -1,0 +1,31 @@
+{
+ "title": "EP 15 — CATCH THE BUG BEFORE YOU SHIP IT",
+ "sub": "Review your diff with /code-review",
+ "lines": [
+  [
+   "About to commit code nobody looked at twice?",
+   "About to commit code, nobody looked at twice?"
+  ],
+  [
+   "Run /code-review first.",
+   "Run slash code dash review, first."
+  ],
+  [
+   "It reviews your current diff for bugs.",
+   "It reviews your current git diff, for bugs."
+  ],
+  [
+   "In a fresh subagent, not grading its own work.",
+   "In a fresh subagent. So it isn't grading its own work."
+  ],
+  [
+   "The findings drop straight back into your session.",
+   "And the findings drop straight back, into your session."
+  ],
+  [
+   "Follow for a fresh Claude Code tip every day.",
+   "Follow for a fresh Clawd Code tip, every day."
+  ]
+ ],
+ "artifact": "slugify.py"
+}
