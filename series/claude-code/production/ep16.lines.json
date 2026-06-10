@@ -1,0 +1,35 @@
+{
+ "title": "EP 16 — LET CLAUDE INTERVIEW YOU",
+ "sub": "Make Claude ask the hard questions before it builds",
+ "lines": [
+  [
+   "Claude built the wrong thing because you rushed the prompt?",
+   "Clawd built the wrong thing, because you rushed the prompt?"
+  ],
+  [
+   "For a big feature, flip it. Make Claude interview you.",
+   "For a big feature, flip it. Make Clawd interview, you."
+  ],
+  [
+   "Ask it to interview you with the AskUserQuestion tool.",
+   "Ask it to interview you, using the ask user question tool."
+  ],
+  [
+   "It digs into the edge cases and tradeoffs you skipped.",
+   "It digs into the edge cases, and the tradeoffs, you skipped."
+  ],
+  [
+   "Then have it write the full spec to a file.",
+   "Then have it write the full spec, to a file."
+  ],
+  [
+   "Open a fresh session and build from that.",
+   "Open a fresh session, and build from that."
+  ],
+  [
+   "Follow for a fresh Claude Code tip every day.",
+   "Follow for a fresh Clawd Code tip, every day."
+  ]
+ ],
+ "artifact": "interview"
+}
