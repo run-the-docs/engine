@@ -22,6 +22,7 @@ case "$EP" in
  13) RESET=5411d3b; ARTIFACTS=""; CLAUDE='git log --oneline -10 | claude --strict-mcp-config -p "Summarize what these commits changed, in 3 short bullets." --disallowedTools WebFetch WebSearch'; MODE=prompt; TEXT=""; COMPLETE=stable ;;
  14) RESET=5411d3b; ARTIFACTS="slugify.py"; CLAUDE='claude --strict-mcp-config --allowedTools Read "Bash(python3 *)" --disallowedTools WebFetch WebSearch --effort low'; MODE=prompt; TEXT="What does @slugify.py do, in one sentence?"; COMPLETE=stable ;;
  15) RESET=5411d3b; ARTIFACTS="slugify.py"; PRESTEP='bash "$DEMO/codereview-prep.sh"'; CLAUDE='claude --strict-mcp-config --allowedTools Read Grep Glob Task "Bash(git *)" --disallowedTools WebFetch WebSearch --effort low'; MODE=slash; TEXT="/code-review"; COMPLETE=skill ;;
+ 16) RESET=5411d3b; ARTIFACTS=""; CLAUDE='claude --strict-mcp-config --allowedTools Read --disallowedTools WebFetch WebSearch --effort low'; MODE=prompt; TEXT="I want to add rate limiting to our API. Interview me about the design using the AskUserQuestion tool. Dig into the hard tradeoffs I might not have considered, not the obvious stuff."; COMPLETE=stable ;;
 esac
 # reset the demo repo to this episode's correct starting state (so file cards + claude see the right files)
 git -C "$REPO" reset --hard "$RESET" >/dev/null 2>&1 && git -C "$REPO" clean -fdq >/dev/null 2>&1 && echo "repo reset to $RESET"
