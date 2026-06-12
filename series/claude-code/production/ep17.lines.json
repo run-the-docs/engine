@@ -1,0 +1,31 @@
+{
+ "title": "EP 17 — LET CLAUDE WRITE ITS OWN ONBOARDING",
+ "sub": "Run /init and Claude writes your CLAUDE.md for you",
+ "lines": [
+  [
+   "Zero code. Claude writes its own onboarding.",
+   "Zero code in this project. Clawd writes its own onboarding."
+  ],
+  [
+   "My move-abroad plan — a site and some markdown.",
+   "My move abroad plan. A site, and some markdown."
+  ],
+  [
+   "Type /init. Claude scans the whole project.",
+   "Type slash init. Clawd scans the whole project."
+  ],
+  [
+   "It writes the CLAUDE.md itself.",
+   "It writes the Clawd dot M D file, itself."
+  ],
+  [
+   "Auto-loaded every session after.",
+   "Auto loaded, every session after."
+  ],
+  [
+   "Follow for a fresh Claude Code tip every day.",
+   "Follow for a fresh Clawd Code tip, every day."
+  ]
+ ],
+ "artifact": "CLAUDE.md"
+}
