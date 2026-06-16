@@ -23,25 +23,49 @@ case "$EP" in
  14) RESET=5411d3b; ARTIFACTS="slugify.py"; CLAUDE='claude --strict-mcp-config --allowedTools Read "Bash(python3 *)" --disallowedTools WebFetch WebSearch --effort low'; MODE=prompt; TEXT="What does @slugify.py do, in one sentence?"; COMPLETE=stable ;;
  15) RESET=5411d3b; ARTIFACTS="slugify.py"; PRESTEP='bash "$DEMO/codereview-prep.sh"'; CLAUDE='claude --strict-mcp-config --allowedTools Read Grep Glob Task "Bash(git *)" --disallowedTools WebFetch WebSearch --effort low'; MODE=slash; TEXT="/code-review"; COMPLETE=skill ;;
  16) RESET=5411d3b; ARTIFACTS=""; CLAUDE='claude --strict-mcp-config --allowedTools Read --disallowedTools WebFetch WebSearch --effort low'; MODE=prompt; TEXT="I want to add rate limiting to our API. Interview me about the design using the AskUserQuestion tool. Dig into the hard tradeoffs I might not have considered, not the obvious stuff."; COMPLETE=stable ;;
+ 17) STANDIN_DIR=~/runthedocs/scratch/cc-ep17-demo; ARTIFACTS=""; CLAUDE='claude --strict-mcp-config --allowedTools Read Write Edit Glob Grep "Bash(ls *)" "Bash(find *)" "Bash(cat *)" "Bash(git *)" --disallowedTools WebFetch WebSearch'; MODE=slash; TEXT="/init"; PRECMD="ls"; COMPLETE=init ;;
 esac
 # reset the demo repo to this episode's correct starting state (so file cards + claude see the right files)
-git -C "$REPO" reset --hard "$RESET" >/dev/null 2>&1 && git -C "$REPO" clean -fdq >/dev/null 2>&1 && echo "repo reset to $RESET"
+if [ -n "$STANDIN_DIR" ]; then
+  # ep17 / synthetic stand-in: rebuild a fresh clean repo (NO CLAUDE.md yet) from the committed fixture.
+  # NEVER points at the real gran-canaria-plan repo — only $DEMO/ep17-standin/ (verified PII-clean).
+  REPO="$STANDIN_DIR"; rm -rf "$REPO"; mkdir -p "$REPO"; cp "$DEMO/ep17-standin/"* "$REPO/"
+  git -C "$REPO" init -q
+  git -C "$REPO" -c user.email=demo@local -c user.name=demo add -A
+  git -C "$REPO" -c user.email=demo@local -c user.name=demo commit -qm "synthetic ep17 demo project" >/dev/null 2>&1
+  echo "standin rebuilt at $REPO (no CLAUDE.md yet)"
+else
+  git -C "$REPO" reset --hard "$RESET" >/dev/null 2>&1 && git -C "$REPO" clean -fdq >/dev/null 2>&1 && echo "repo reset to $RESET"
+fi
 [ -n "$PRESTEP" ] && eval "$PRESTEP" && echo "prestep done"
 $TM kill-session -t cclive 2>/dev/null; $TM kill-session -t ccrec2 2>/dev/null
 $TM new-session -d -s cclive -x $W -y $H; $TM set-option -t cclive status off
 $TM set-option -g focus-events on 2>/dev/null; $TM set-option -g mouse on 2>/dev/null   # suppress claude's tmux hint chrome
 $TM send-keys -t cclive "export PATH=/opt/homebrew/bin:\$HOME/.local/bin:\$PATH; export CLAUDE_CODE_OAUTH_TOKEN=\$(cat $TOKEN); cd $REPO; clear" Enter
 sleep 1
-# recorder FIRST so it captures the shell + the artifact + claude launch
-$TM new-session -d -s ccrec2 -x $W -y $H; $TM set-option -t ccrec2 status off
-$TM send-keys -t ccrec2 "export PATH=/opt/homebrew/bin:\$HOME/.local/bin:\$PATH; asciinema rec $REC/claude-ep${EP}.cast --overwrite --idle-time-limit 1.0 --command 'tmux attach -t cclive -r'" Enter
-sleep 3
-# show the artifact(s) — the "more detail"
-for a in $ARTIFACTS; do $TM send-keys -t cclive "cat $a" Enter; sleep 3.5; done
-# launch claude
-[ -n "$PRECMD" ] && { $TM send-keys -t cclive "$PRECMD" Enter; sleep 9; }
-$TM send-keys -t cclive "$CLAUDE" Enter
-sleep 22
+if [ -n "$STANDIN_DIR" ]; then
+  # ep17 clean-launch: claude's startup prints a transient account toast with the logged-in
+  # email/org (e.g. "<acct>'s Organization /release-notes"). It auto-dismisses in ~14s. Launch
+  # claude FIRST, let the toast clear, THEN start the recorder so the email never enters the
+  # cast or the rendered video (RtD is a neutral brand; Invotek stays the silent owner).
+  # Trade-off: no pre-claude shell/ls shot for ep17 — the recording opens on the clean claude prompt.
+  $TM send-keys -t cclive "$CLAUDE" Enter
+  sleep 16
+  $TM new-session -d -s ccrec2 -x $W -y $H; $TM set-option -t ccrec2 status off
+  $TM send-keys -t ccrec2 "export PATH=/opt/homebrew/bin:\$HOME/.local/bin:\$PATH; asciinema rec $REC/claude-ep${EP}.cast --overwrite --idle-time-limit 1.0 --command 'tmux attach -t cclive -r'" Enter
+  sleep 3
+else
+  # recorder FIRST so it captures the shell + the artifact + claude launch
+  $TM new-session -d -s ccrec2 -x $W -y $H; $TM set-option -t ccrec2 status off
+  $TM send-keys -t ccrec2 "export PATH=/opt/homebrew/bin:\$HOME/.local/bin:\$PATH; asciinema rec $REC/claude-ep${EP}.cast --overwrite --idle-time-limit 1.0 --command 'tmux attach -t cclive -r'" Enter
+  sleep 3
+  # show the artifact(s) — the "more detail"
+  for a in $ARTIFACTS; do $TM send-keys -t cclive "cat $a" Enter; sleep 3.5; done
+  # launch claude
+  [ -n "$PRECMD" ] && { $TM send-keys -t cclive "$PRECMD" Enter; sleep 9; }
+  $TM send-keys -t cclive "$CLAUDE" Enter
+  sleep 22
+fi
 if [ "$MODE" = "slash" ]; then
   rest="${TEXT#/}"
   $TM send-keys -t cclive "/"; sleep 3                                   # reveal the slash-command menu on screen
@@ -58,10 +82,11 @@ case "$COMPLETE" in
  f5test) for i in $(seq 1 40); do sleep 3; p=$($TM capture-pane -pt cclive 2>/dev/null); echo "$p"|grep -qiE "Do you want|1\. Yes|allow|proceed" && $TM send-keys -t cclive "1"; ( cd "$REPO" && python3 test_date_range.py >/dev/null 2>&1 ) && { echo "f5test pass $i"; break; }; done; sleep 4 ;;
  testpass) for i in $(seq 1 40); do sleep 3; ( cd "$REPO" && python3 test_slugify.py >/dev/null 2>&1 ) && { echo "testpass $i"; break; }; done; sleep 5 ;;
  menu) for i in $(seq 1 30); do sleep 3; p=$($TM capture-pane -pt cclive 2>/dev/null); echo "$p"|grep -qiE "keep planning|auto-accept|manually approve|Yes, and|proceed\?" && { echo "menu $i"; break; }; done; sleep 1.5 ;;
+ init) for i in $(seq 1 50); do sleep 3; p=$($TM capture-pane -pt cclive 2>/dev/null); echo "$p"|grep -qE "Do you want to|❯ 1\. Yes" && $TM send-keys -t cclive "1"; if [ -f "$REPO/CLAUDE.md" ] && ! echo "$p"|grep -qiE "esc to interrupt"; then echo "init done $i (CLAUDE.md written)"; break; fi; done; sleep 4 ;;
  *) prev="";st=0; for i in $(seq 1 50); do sleep 3; p=$($TM capture-pane -pt cclive 2>/dev/null); h=$(echo "$p"|md5); [ "$h" = "$prev" ]&&st=$((st+1))||st=0; prev=$h; [ $i -ge 6 ]&&[ $st -ge 3 ]&&{ echo "stable $i"; break; }; done; sleep 1 ;;
 esac
 sleep 4; $TM kill-session -t ccrec2 2>/dev/null; sleep 1; $TM kill-session -t cclive 2>/dev/null   # recorder stops at result, then close claude
-grep -qiE "sk-ant|oat01" "$REC/claude-ep${EP}.cast" && { echo FATAL token; exit 3; }
+grep -qiE "sk-ant|oat01|invotek|hasleveien|f(ø|o)dselsnummer|brønnøysund|skattemelding|\bNHN\b|godøya|1bedrift" "$REC/claude-ep${EP}.cast" && { echo FATAL secret-or-PII-in-cast; exit 3; }
 agg "$REC/claude-ep${EP}.cast" "$REC/claude-ep${EP}.gif" --theme asciinema --font-size 22 2>&1 | tail -1
 ~/voicebox-venv/bin/python "$DEMO/fix_term.py" "$REC/claude-ep${EP}.gif" "$REC/claude-ep${EP}-term.mp4"   # auto-drop tmux-teardown [terminated] frame
 echo "dur:"; ffprobe -v error -show_entries format=duration -of csv=p=0 "$REC/claude-ep${EP}-term.mp4" 2>/dev/null

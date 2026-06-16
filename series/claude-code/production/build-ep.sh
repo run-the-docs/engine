@@ -33,6 +33,13 @@ if [ -n "$RESET" ]; then
     && echo "repo reset to $RESET (ep$N)" || echo "WARN: repo reset to $RESET failed"
 fi
 
+# ep17 (/init): the artifact card is the GENERATED CLAUDE.md, which lives in the synthetic stand-in
+# scratch repo (NOT cc-demo-repo). CC_REPO redirects make_assets's artifact lookup there.
+if [ "$N" = "17" ]; then
+  export CC_REPO=~/runthedocs/scratch/cc-ep17-demo
+  echo "ep17: artifact card sourced from $CC_REPO (synthetic stand-in)"
+fi
+
 if [ "$RENDER_ONLY" = "1" ] && [ -f "$REC/narration-ep${N}.json" ]; then
   echo "=== RENDER_ONLY: reuse cached narration-ep$N (no TTS re-roll) ==="
   cp "$REC/narration-ep${N}.json" "$REC/narration.json"; cp "$REC/narration-ep${N}.wav" "$REC/narration.wav"
