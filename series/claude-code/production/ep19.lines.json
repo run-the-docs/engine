@@ -1,0 +1,32 @@
+{
+ "title": "EP 19 — SET A GOAL, WALK AWAY",
+ "sub": "/goal — Claude keeps working until your condition is true",
+ "lines": [
+  [
+   "Stop re-prompting Claude every turn.",
+   "Stop re prompting Clawd every turn."
+  ],
+  [
+   "Give it a finish line instead.",
+   "Give it a finish line, instead."
+  ],
+  [
+   "/goal test_slugify.py passes when run.",
+   "Slash goal. test slugify dot pie, passes when run."
+  ],
+  [
+   "Claude works, runs the test, keeps going.",
+   "Clawd works, runs the test, keeps going."
+  ],
+  [
+   "A checker confirms the goal — then it stops.",
+   "A checker confirms the goal. Then it stops."
+  ],
+  [
+   "Follow for a fresh Claude Code tip every day.",
+   "Follow for a fresh Clawd Code tip, every day."
+  ]
+ ],
+ "command": "/goal test_slugify.py passes",
+ "artifact": ""
+}

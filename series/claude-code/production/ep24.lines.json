@@ -1,0 +1,32 @@
+{
+ "title": "EP 24 — RUN COMMANDS INSIDE CLAUDE",
+ "sub": "Prefix with ! — the command and its output join the chat",
+ "lines": [
+  [
+   "Don't leave Claude to run a quick command.",
+   "Don't leave Clawd, to run a quick command."
+  ],
+  [
+   "Just prefix it with a bang.",
+   "Just prefix it, with a bang."
+  ],
+  [
+   "! python3 test_slugify.py runs right there.",
+   "Bang. python 3 test slugify dot pie. Runs right there."
+  ],
+  [
+   "The command AND its output join the chat.",
+   "The command, and its output, join the chat."
+  ],
+  [
+   "Now just ask: why did that test fail?",
+   "Now just ask. Why did that test fail?"
+  ],
+  [
+   "Follow for a fresh Claude Code tip every day.",
+   "Follow for a fresh Clawd Code tip, every day."
+  ]
+ ],
+ "command": "! python3 test_slugify.py",
+ "artifact": ""
+}
