@@ -1,0 +1,32 @@
+{
+ "title": "EP 21 — RUN COMMANDS IN A SANDBOX",
+ "sub": "/sandbox — Claude runs shell commands in an OS-enforced box, no prompts",
+ "lines": [
+  [
+   "Let Claude run commands — without the prompts.",
+   "Let Clawd run commands. Without the prompts."
+  ],
+  [
+   "Run /sandbox and pick auto-allow.",
+   "Run slash sandbox, and pick auto allow."
+  ],
+  [
+   "Shell commands now run inside an OS sandbox.",
+   "Shell commands now run inside an O S sandbox."
+  ],
+  [
+   "They execute with no approval prompt.",
+   "They execute, with no approval prompt."
+  ],
+  [
+   "The OS draws the line — not just trust.",
+   "The O S draws the line. Not just trust."
+  ],
+  [
+   "Follow for a fresh Claude Code tip every day.",
+   "Follow for a fresh Clawd Code tip, every day."
+  ]
+ ],
+ "command": "/sandbox",
+ "artifact": ""
+}

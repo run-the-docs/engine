@@ -1,0 +1,32 @@
+{
+ "title": "EP 18 — STOP APPROVING EVERY COMMAND",
+ "sub": "Shift+Tab to auto mode — a classifier guards each action",
+ "lines": [
+  [
+   "Stop clicking 'yes' on every command.",
+   "Stop clicking yes on every command."
+  ],
+  [
+   "Give Claude a multi-step task.",
+   "Give Clawd a multi step task."
+  ],
+  [
+   "Press Shift+Tab — it switches to auto mode.",
+   "Press shift tab. It switches to auto mode."
+  ],
+  [
+   "It edits, runs shell, hits the network — no prompts.",
+   "It edits, runs shell, hits the network. No prompts."
+  ],
+  [
+   "A safety classifier checks each action and blocks anything risky.",
+   "A safety classifier checks each action, and blocks anything risky."
+  ],
+  [
+   "Follow for a fresh Claude Code tip every day.",
+   "Follow for a fresh Clawd Code tip, every day."
+  ]
+ ],
+ "command": "Shift+Tab",
+ "artifact": ""
+}

@@ -1,0 +1,32 @@
+{
+ "title": "EP 23 — SEE CONTEXT + COST LIVE",
+ "sub": "/statusline — describe it, Claude writes the script",
+ "lines": [
+  [
+   "Stop guessing how much context you have left.",
+   "Stop guessing how much context you have left."
+  ],
+  [
+   "Run /statusline and just describe it.",
+   "Run slash statusline, and just describe it."
+  ],
+  [
+   "Claude writes the script and wires it up.",
+   "Clawd writes the script, and wires it up."
+  ],
+  [
+   "Model, branch, context % — always on screen.",
+   "Model, branch, context percent. Always on screen."
+  ],
+  [
+   "No config files to hand-edit.",
+   "No config files, to hand edit."
+  ],
+  [
+   "Follow for a fresh Claude Code tip every day.",
+   "Follow for a fresh Clawd Code tip, every day."
+  ]
+ ],
+ "command": "/statusline",
+ "artifact": ""
+}

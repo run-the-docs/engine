@@ -1,0 +1,32 @@
+{
+ "title": "EP 25 — TURN ON FAST MODE",
+ "sub": "/fast — same Opus, faster output (uses usage credits)",
+ "lines": [
+  [
+   "Claude feels slow? Flip one switch.",
+   "Clawd feels slow? Flip one switch."
+  ],
+  [
+   "Type /fast to turn on fast mode.",
+   "Type slash fast, to turn on fast mode."
+  ],
+  [
+   "Same Opus — up to 2.5x the speed.",
+   "Same Opus. Up to two and a half times the speed."
+  ],
+  [
+   "Perfect for live, back-and-forth work.",
+   "Perfect for live, back and forth work."
+  ],
+  [
+   "It draws on usage credits — toggle off after.",
+   "It draws on usage credits. Toggle off, after."
+  ],
+  [
+   "Follow for a fresh Claude Code tip every day.",
+   "Follow for a fresh Clawd Code tip, every day."
+  ]
+ ],
+ "command": "/fast",
+ "artifact": ""
+}
