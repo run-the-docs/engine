@@ -24,3 +24,4 @@ EP1/EP2 → `5411d3b` (baseline, buggy slugify) · EP3 → `6a8d07c` (CLAUDE.md)
 ## Notes
 - Tooling installed via `uv` + managed CPython 3.12 (brew `python@3.12` has a broken pyexpat). ffmpeg/asciinema/agg via homebrew (see approved-tools).
 - Posting copy: `../posting-kit/` (per-episode) + `../linkedin-posting-plan.md` (strategy).
+- **R2 video hosting:** rendered cuts live in the `runthedocs-videos` R2 bucket (OpenTofu-managed bucket + public r2.dev domain — `dashecorp/infra` `cloudflare/dashecorp.com/runthedocs-r2.tf`, infra#262). `build-ep.sh` auto-uploads each episode's 4:5 + 9:16 after a successful build; backfill older episodes with `bash r2-sync.sh [N...]`. Auth = `CLOUDFLARE_API_TOKEN` from the env (OpenTofu-managed; surfaced out-of-band via Ops-E/SOPS — **never commit it**). The public run-the-docs/website Share-kit links these for the 9:16 vertical downloads.
