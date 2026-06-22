@@ -66,13 +66,13 @@ echo "EP${N}BUILD_OK"
 
 # --- R2 sync (gitops) ---------------------------------------------------------
 # Push this episode's 4:5 + 9:16 cuts to the runthedocs-videos R2 bucket so the
-# website Share-kit downloads stay complete. Auth = CLOUDFLARE_API_TOKEN from the
-# env (OpenTofu-managed; surfaced out-of-band via Ops-E/SOPS — never committed).
-# Guarded: skips cleanly if wrangler/token are absent, so a build never fails on
-# the upload. Backfill older episodes with r2-sync.sh.
-if command -v wrangler >/dev/null 2>&1 && [ -n "${CLOUDFLARE_API_TOKEN:-}" ]; then
+# website Share-kit downloads stay complete. Auth = wrangler's own session
+# (a `wrangler login` OAuth session OR CLOUDFLARE_API_TOKEN in the env).
+# Guarded: skips cleanly if wrangler is absent or not authenticated, so a build
+# never fails on the upload. Backfill older episodes with r2-sync.sh.
+if command -v wrangler >/dev/null 2>&1 && wrangler whoami >/dev/null 2>&1; then
   echo "=== R2 sync ep$N ==="
   bash "$(dirname "$0")/r2-sync.sh" "$N" || echo "WARN: R2 sync failed for ep$N (run r2-sync.sh later)"
 else
-  echo "R2 sync skipped (no wrangler / CLOUDFLARE_API_TOKEN); run r2-sync.sh once provisioned"
+  echo "R2 sync skipped (wrangler missing or not authenticated; run 'wrangler login' or set CLOUDFLARE_API_TOKEN, then r2-sync.sh)"
 fi
