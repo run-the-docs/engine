@@ -19,6 +19,7 @@
 set -euo pipefail
 
 BUCKET="runthedocs-videos"
+PUBLIC_BASE="${RTD_R2_PUBLIC_BASE:-https://pub-8745206116f440c6b36f5e6bd0eb1905.r2.dev}"
 REC="${REC:-$HOME/runthedocs/series/claude-code/demo/rec}"
 
 command -v wrangler >/dev/null 2>&1 || { echo "FATAL: wrangler not found on PATH"; exit 1; }
@@ -42,12 +43,40 @@ fi
 
 [ "${#files[@]}" -gt 0 ] || { echo "nothing to sync (no matching cuts in $REC)"; exit 0; }
 
-n=0
+# Upload one object with a 3-try backoff, then VERIFY it is publicly reachable at
+# the right size before declaring success (tolerant of r2.dev edge propagation, so
+# a fresh put isn't falsely flagged). wrangler reads CLOUDFLARE_API_TOKEN from the
+# env; the token is never on the command line and never echoed.
+put_and_verify() {
+  local f="$1" key local_size hdr http_status remote_size try v
+  key="$(basename "$f")"
+  local_size=$(stat -f%z "$f" 2>/dev/null || stat -c%s "$f" 2>/dev/null || echo 0)
+  for try in 1 2 3; do
+    if wrangler r2 object put "${BUCKET}/${key}" --file "$f" --remote; then
+      for v in 1 2 3 4 5; do
+        hdr=$(curl -sI -m 15 "${PUBLIC_BASE}/${key}" 2>/dev/null || true)
+        http_status=$(printf '%s\n' "$hdr" | awk 'toupper($1) ~ /^HTTP/{print $2; exit}')
+        remote_size=$(printf '%s\n' "$hdr" | awk 'tolower($1)=="content-length:"{gsub(/\r/,"",$2); print $2}')
+        if [ "$http_status" = "200" ] && [ -n "$remote_size" ] && [ "$remote_size" = "$local_size" ]; then
+          echo "R2: uploaded + verified ${key} (${remote_size} bytes)"
+          return 0
+        fi
+        sleep $((v * 3))
+      done
+      echo "WARN: ${key} put but public readback not yet 200/${local_size} bytes; retrying put"
+    fi
+    sleep $((try * try * 2))
+  done
+  echo "FATAL: R2 upload/verify failed for ${key} after retries"
+  return 1
+}
+
+n=0; failed=()
 for f in "${files[@]}"; do
-  # wrangler reads CLOUDFLARE_API_TOKEN from the env; the token is never passed
-  # on the command line, never echoed.
-  wrangler r2 object put "${BUCKET}/$(basename "$f")" --file "$f" --remote
-  echo "R2: uploaded $(basename "$f")"
-  n=$((n + 1))
+  put_and_verify "$f" && n=$((n + 1)) || failed+=("$(basename "$f")")
 done
-echo "R2 sync complete: $n object(s) -> $BUCKET"
+if [ "${#failed[@]}" -gt 0 ]; then
+  echo "FATAL: ${#failed[@]} object(s) failed upload/verify: ${failed[*]}"
+  exit 1
+fi
+echo "R2 sync complete: $n object(s) -> $BUCKET (all verified)"
