@@ -9,6 +9,18 @@ DEMO=~/runthedocs/series/claude-code/demo; REPO=$DEMO/cc-demo-repo; REC=$DEMO/re
 CVPY=~/chatterbox-venv/bin/python; VVPY=~/voicebox-venv/bin/python; PY=/opt/homebrew/bin/python3
 LOG=~/ep${N}build.log; : > "$LOG"; exec > >(tee -a "$LOG") 2>&1
 
+# Mandatory fail-loud alert: on ANY non-zero exit, ping Discord (webhook from the
+# environment, never echoed) so a failed or credential-lapsed build is loud within
+# seconds instead of scrolling past in a log nobody tails. No-op if the webhook is
+# unset. Ops-E sets RTD_DISCORD_WEBHOOK in the render host's env.
+notify_fail() {
+  [ -n "${RTD_DISCORD_WEBHOOK:-}" ] || return 0
+  curl -sf -m 10 -H 'Content-Type: application/json' \
+    -d "{\"content\":\"RtD build FAILED: ep${N} exited $1 on $(hostname -s 2>/dev/null). Rendered but NOT fully uploaded — check ~/ep${N}build.log, then run r2-sync.sh ${N}.\"}" \
+    "$RTD_DISCORD_WEBHOOK" >/dev/null 2>&1 || true
+}
+trap 'rc=$?; [ "$rc" -ne 0 ] && notify_fail "$rc"' EXIT
+
 # rc(2026-06-07 ep1-card fix): reset the demo repo to THIS episode's starting commit BEFORE
 # rendering assets, so the file-card (make_assets_45 reads the live file) reflects the episode's
 # own file state — not whatever a later episode's build/recording left behind.
@@ -62,17 +74,32 @@ echo "=== compose 4:5 (term=claude-ep${N}-term.mp4) ==="; CC_TERM="claude-ep${N}
 echo "=== assets 9:16 ==="; $VVPY "$DEMO/make_assets_916.py" || { echo FATAL assets916; exit 4; }
 echo "=== compose 9:16 ==="; CC_TERM="claude-ep${N}-term.mp4" CC_OUT="claude-ep${N}-916.mp4" $VVPY "$DEMO/compose_916.py" || { echo FATAL compose916; exit 5; }
 ls -la "$REC/claude-ep${N}-45.mp4" "$REC/claude-ep${N}-916.mp4"
-echo "EP${N}BUILD_OK"
 
-# --- R2 sync (gitops) ---------------------------------------------------------
+# --- R2 sync (gitops) — REQUIRED, fail-loud --------------------------------------
 # Push this episode's 4:5 + 9:16 cuts to the runthedocs-videos R2 bucket so the
-# website Share-kit downloads stay complete. Auth = wrangler's own session
+# website Share-kit / cockpit downloads stay complete. Auth = wrangler's own session
 # (a `wrangler login` OAuth session OR CLOUDFLARE_API_TOKEN in the env).
-# Guarded: skips cleanly if wrangler is absent or not authenticated, so a build
-# never fails on the upload. Backfill older episodes with r2-sync.sh.
-if command -v wrangler >/dev/null 2>&1 && wrangler whoami >/dev/null 2>&1; then
+#
+# The upload is a REQUIRED terminal stage: a missing/lapsed credential FAILS the
+# build loudly. (The old silent-skip here was the root cause of ep17/19/21/23/24
+# shipping with no cuts on R2.) Use RTD_SKIP_R2=1 ONLY for a deliberate offline
+# rerun — it still warns and drops a durable PENDING_UPLOAD breadcrumb so the gap
+# is never silent. REQUIRE_R2=0 downgrades a missing credential to a warning.
+REQUIRE_R2="${REQUIRE_R2:-1}"
+if [ "${RTD_SKIP_R2:-0}" = "1" ]; then
+  echo "WARN: RTD_SKIP_R2=1 — ep$N rendered but NOT uploaded to R2."
+  mkdir -p "$REC/PENDING_UPLOAD" && : > "$REC/PENDING_UPLOAD/ep$N"
+  echo "WARN: wrote $REC/PENDING_UPLOAD/ep$N — run 'r2-sync.sh $N' before ep$N can appear in the cockpit."
+elif command -v wrangler >/dev/null 2>&1 && wrangler whoami >/dev/null 2>&1; then
   echo "=== R2 sync ep$N ==="
-  bash "$(dirname "$0")/r2-sync.sh" "$N" || echo "WARN: R2 sync failed for ep$N (run r2-sync.sh later)"
+  bash "$(dirname "$0")/r2-sync.sh" "$N" || { echo "FATAL: R2 sync failed for ep$N"; exit 6; }
+elif [ "$REQUIRE_R2" = "1" ]; then
+  echo "FATAL: R2 upload unavailable for ep$N (wrangler missing or not authenticated)."
+  echo "       Run 'wrangler login' or set CLOUDFLARE_API_TOKEN, then re-run — or RTD_SKIP_R2=1 to render only."
+  exit 6
 else
-  echo "R2 sync skipped (wrangler missing or not authenticated; run 'wrangler login' or set CLOUDFLARE_API_TOKEN, then r2-sync.sh)"
+  echo "WARN: R2 upload skipped for ep$N (REQUIRE_R2=0, wrangler missing/unauthenticated)."
+  mkdir -p "$REC/PENDING_UPLOAD" && : > "$REC/PENDING_UPLOAD/ep$N"
 fi
+
+echo "EP${N}BUILD_OK"
