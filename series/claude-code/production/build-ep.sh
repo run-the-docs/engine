@@ -63,3 +63,16 @@ echo "=== assets 9:16 ==="; $VVPY "$DEMO/make_assets_916.py" || { echo FATAL ass
 echo "=== compose 9:16 ==="; CC_TERM="claude-ep${N}-term.mp4" CC_OUT="claude-ep${N}-916.mp4" $VVPY "$DEMO/compose_916.py" || { echo FATAL compose916; exit 5; }
 ls -la "$REC/claude-ep${N}-45.mp4" "$REC/claude-ep${N}-916.mp4"
 echo "EP${N}BUILD_OK"
+
+# --- R2 sync (gitops) ---------------------------------------------------------
+# Push this episode's 4:5 + 9:16 cuts to the runthedocs-videos R2 bucket so the
+# website Share-kit downloads stay complete. Auth = CLOUDFLARE_API_TOKEN from the
+# env (OpenTofu-managed; surfaced out-of-band via Ops-E/SOPS — never committed).
+# Guarded: skips cleanly if wrangler/token are absent, so a build never fails on
+# the upload. Backfill older episodes with r2-sync.sh.
+if command -v wrangler >/dev/null 2>&1 && [ -n "${CLOUDFLARE_API_TOKEN:-}" ]; then
+  echo "=== R2 sync ep$N ==="
+  bash "$(dirname "$0")/r2-sync.sh" "$N" || echo "WARN: R2 sync failed for ep$N (run r2-sync.sh later)"
+else
+  echo "R2 sync skipped (no wrangler / CLOUDFLARE_API_TOKEN); run r2-sync.sh once provisioned"
+fi
