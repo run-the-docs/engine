@@ -6,11 +6,12 @@
 # the upload logic (instead of an ad-hoc terminal command); run it on the host
 # that holds the rendered cuts (the pipeline host).
 #
-# Auth: wrangler reads CLOUDFLARE_API_TOKEN from the environment. That token is
-# OpenTofu-managed (dashecorp/infra) and surfaced to this host out-of-band
-# (Ops-E / SOPS) — it is NEVER committed here or printed. The bucket + its
-# public r2.dev domain are OpenTofu-managed too (cloudflare/dashecorp.com/
-# runthedocs-r2.tf, infra#262).
+# Auth: uses wrangler's own session — EITHER a stored `wrangler login` (OAuth)
+# OR CLOUDFLARE_API_TOKEN in the env. We do NOT require the env token (the
+# pipeline host is typically wrangler-logged-in). The token, if used, is
+# OpenTofu-managed (dashecorp/infra) and surfaced out-of-band (Ops-E / SOPS) —
+# NEVER committed here or printed. The bucket + its public r2.dev domain are
+# OpenTofu-managed too (cloudflare/dashecorp.com/runthedocs-r2.tf, infra#262).
 #
 # Usage:
 #   bash r2-sync.sh                 # sync all rendered cuts found in $REC
@@ -20,8 +21,10 @@ set -euo pipefail
 BUCKET="runthedocs-videos"
 REC="${REC:-$HOME/runthedocs/series/claude-code/demo/rec}"
 
-: "${CLOUDFLARE_API_TOKEN:?CLOUDFLARE_API_TOKEN must be set in the env (OpenTofu-managed R2 token; never commit it) before syncing}"
 command -v wrangler >/dev/null 2>&1 || { echo "FATAL: wrangler not found on PATH"; exit 1; }
+# Accept EITHER auth method: a stored `wrangler login` (OAuth) or a
+# CLOUDFLARE_API_TOKEN in the env. whoami succeeds for both; never prints the token.
+wrangler whoami >/dev/null 2>&1 || { echo "FATAL: wrangler is not authenticated — run 'wrangler login' or set CLOUDFLARE_API_TOKEN, then retry"; exit 1; }
 
 # Build the file list: explicit episode numbers if given, else all rendered cuts.
 files=()
