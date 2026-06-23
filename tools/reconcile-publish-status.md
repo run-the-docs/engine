@@ -41,6 +41,34 @@ Run on a schedule (daily is plenty for a daily drip — see cadence below):
 
 If `summary.to_post == 0`, stop after step 2 — nothing changed.
 
+## Automated (GitHub Action) — the always-on path
+
+`.github/workflows/reconcile-publish-status.yml` runs the whole routine server-side on a
+daily cron (`7 6 * * *`) + `workflow_dispatch`, so it no longer depends on an
+orchestrator session being live. It mirrors the steps above but does the D1 read/write
+over the Cloudflare **D1 REST `/query` endpoint** (via `tools/reconcile-d1.sh`) instead of
+the MCP, then regenerates `videos/posted.json` in run-the-docs/website via a squash-merged
+PR (website `main` is unprotected → the merge lands and the existing Pages deploy
+republishes it).
+
+**Activation — one operator/Ops-E step.** The workflow is **inert** until its only net-new
+secret exists; the guard step skips cleanly (a `::notice::`) until then:
+
+- **`RTD_SOCIAL_D1_TOKEN`** — a Cloudflare API token, scope **Account · D1 · Edit** on the
+  dashecorp account `59710bf016d417f860051f1f00b00258` (D1 can't be dashboard-scoped to one
+  DB → account-wide D1 is the minimum; make it a **dedicated** token, store only in
+  Bitwarden, rotate on a schedule). Provision it onto `run-the-docs/engine` **via OpenTofu**
+  in `dashecorp/infra` (`TF_VAR_rtd_social_d1_token` → `github_actions_secret`), **not**
+  `gh secret set`. (`REVIEW_E_BOT_PEM`, the org-level review-e-bot App key used for the
+  website commit, is already inherited — no provisioning.)
+
+After it lands, smoke-test via **Actions → Reconcile publish status → Run workflow**.
+
+**Safety baked in:** the D1 token is read from the env only and never echoed (no `set -x`
+in `reconcile-d1.sh`); UPDATEs are parameterized (`?` + jq-built params); the posted.json
+change goes via a PR (never a direct push to main); `concurrency` serializes overlapping
+runs; UPDATEs are idempotent (`WHERE status='scheduled'` is a no-op once posted).
+
 ## Cadence
 
 The public RSS lists only the ~15 most recent uploads, so run at least once per ~15

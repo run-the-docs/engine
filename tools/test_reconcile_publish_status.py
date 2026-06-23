@@ -33,8 +33,18 @@ class TestVidOf(unittest.TestCase):
     def test_parsed_from_url(self):
         self.assertEqual(rps.vid_of({"url": "https://www.youtube.com/watch?v=AAA111"}), "AAA111")
 
+    def test_parsed_from_shorts_url(self):
+        self.assertEqual(rps.vid_of({"url": "https://www.youtube.com/shorts/AAA111"}), "AAA111")
+
+    def test_parsed_from_youtu_be_url(self):
+        self.assertEqual(rps.vid_of({"url": "https://youtu.be/AAA111"}), "AAA111")
+
     def test_none_when_unparseable(self):
         self.assertIsNone(rps.vid_of({"url": "https://example.com/nope"}))
+
+    def test_timestamp_normalized_to_z(self):
+        self.assertEqual(rps._norm_ts("2026-06-23T13:00:05+00:00"), "2026-06-23T13:00:05Z")
+        self.assertIsNone(rps._norm_ts(None))
 
 
 class TestRowsFrom(unittest.TestCase):
@@ -58,7 +68,7 @@ class TestReconcile(unittest.TestCase):
         t = trans[0]
         self.assertEqual(t["video_id"], "cc-ep5")
         self.assertEqual(t["new_status"], "posted")
-        self.assertEqual(t["new_publish_at"], "2026-06-23T13:00:05+00:00")  # RSS time, not the estimate
+        self.assertEqual(t["new_publish_at"], "2026-06-23T13:00:05Z")  # RSS time, normalized +00:00 -> Z
         self.assertEqual(t["old_publish_at"], "2026-06-23T13:00:00Z")
         self.assertEqual(t["source"], "rss")
 
