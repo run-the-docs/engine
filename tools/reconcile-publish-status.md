@@ -57,10 +57,18 @@ secret exists; the guard step skips cleanly (a `::notice::`) until then:
 - **`RTD_SOCIAL_D1_TOKEN`** — a Cloudflare API token, scope **Account · D1 · Edit** on the
   dashecorp account `59710bf016d417f860051f1f00b00258` (D1 can't be dashboard-scoped to one
   DB → account-wide D1 is the minimum; make it a **dedicated** token, store only in
-  Bitwarden, rotate on a schedule). Provision it onto `run-the-docs/engine` **via OpenTofu**
-  in `dashecorp/infra` (`TF_VAR_rtd_social_d1_token` → `github_actions_secret`), **not**
-  `gh secret set`. (`REVIEW_E_BOT_PEM`, the org-level review-e-bot App key used for the
-  website commit, is already inherited — no provisioning.)
+  Bitwarden, rotate on a schedule). Provision it as a repo-level Actions secret on
+  `run-the-docs/engine` with a **direct** `gh secret set` (pipe from Bitwarden, omit
+  `--body`, never `--body -`):
+  ```
+  gh secret set RTD_SOCIAL_D1_TOKEN --repo run-the-docs/engine < <(bw get password "RTD Social D1 reconcile token")
+  ```
+  NOT OpenTofu: `dashecorp/infra` has `github/` modules only for `dashecorp` + `stig-johnny`
+  (no `github/run-the-docs` target), and the run-the-docs repos' existing secrets
+  (e.g. website's `CLOUDFLARE_API_TOKEN`) are set manually, so a direct `gh secret set` is the
+  consistent path — it is not modifying an OpenTofu-managed resource. (`REVIEW_E_BOT_PEM`, the
+  org-level review-e-bot App key used for the website commit, is already inherited — no
+  provisioning.)
 
 After it lands, smoke-test via **Actions → Reconcile publish status → Run workflow**.
 
