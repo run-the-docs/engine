@@ -46,11 +46,23 @@ def parse_rss(xml):
 
 
 def vid_of(row):
-    """The YouTube id of a posting row: explicit youtube_id, else parsed from the watch url."""
+    """The YouTube id of a posting row: explicit youtube_id, else parsed from the url —
+    watch (?v=), Shorts (/shorts/<id>), or youtu.be short links. The Claude Code drip is
+    published as Shorts, so the /shorts/ form must be handled even though the D1 currently
+    stores watch?v= urls."""
     if row.get("youtube_id"):
         return row["youtube_id"]
-    m = re.search(r"[?&]v=([A-Za-z0-9_-]+)", row.get("url") or "")
+    url = row.get("url") or ""
+    m = (re.search(r"[?&]v=([A-Za-z0-9_-]+)", url)
+         or re.search(r"/shorts/([A-Za-z0-9_-]+)", url)
+         or re.search(r"youtu\.be/([A-Za-z0-9_-]+)", url))
     return m.group(1) if m else None
+
+
+def _norm_ts(ts):
+    """Canonicalise an ISO-8601 UTC time to the `...Z` spelling used elsewhere in the
+    publish_at column (the RSS emits `+00:00`)."""
+    return ts.replace("+00:00", "Z") if ts else ts
 
 
 def reconcile(scheduled, rss_pub):
@@ -66,7 +78,7 @@ def reconcile(scheduled, rss_pub):
                 "video_id": row["video_id"],
                 "youtube_id": vid,
                 "new_status": "posted",
-                "new_publish_at": rss_pub[vid],
+                "new_publish_at": _norm_ts(rss_pub[vid]),
                 "old_publish_at": row.get("publish_at"),
                 "source": "rss",
             })

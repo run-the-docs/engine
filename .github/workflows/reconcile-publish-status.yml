@@ -1,0 +1,135 @@
+name: Reconcile publish status
+
+# Server-side half of the cockpit publish-status reconciler (engine#40 Phase 5).
+# Daily: flips rtd-social D1 youtube postings scheduled -> posted as the drip publishes
+# (detected from the public channel RSS — auth-free check), then re-derives
+# run-the-docs/website videos/posted.json from current D1 state and lands it via a
+# squash-merged PR (website main is unprotected -> the merge fires the existing Pages deploy).
+#
+# INERT until the RTD_SOCIAL_D1_TOKEN secret is provisioned (Cloudflare Account.D1.Edit,
+# via OpenTofu in dashecorp/infra). The orchestrator MCP routine in
+# tools/reconcile-publish-status.md remains the manual fallback.
+
+on:
+  schedule:
+    - cron: '7 6 * * *'        # ~06:07 UTC daily; daily keeps every publish inside the ~15-entry RSS window
+  workflow_dispatch:
+
+concurrency:
+  group: reconcile-publish-status
+  cancel-in-progress: false
+
+permissions:
+  contents: read               # engine side is read-only; the website write uses the App token
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout engine (reconcile tooling)
+        uses: actions/checkout@v4
+
+      - name: Guard — inert until the D1 token is provisioned
+        id: guard
+        env:
+          TOKEN_SET: ${{ secrets.RTD_SOCIAL_D1_TOKEN != '' }}
+        run: |
+          if [ "$TOKEN_SET" = "true" ]; then
+            echo "skip=0" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::RTD_SOCIAL_D1_TOKEN not set — reconciler is inert until provisioned via OpenTofu (dashecorp/infra). Skipping cleanly."
+            echo "skip=1" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Reconcile scheduled rows against the public RSS
+        id: reconcile
+        if: steps.guard.outputs.skip == '0'
+        env:
+          RTD_SOCIAL_D1_TOKEN: ${{ secrets.RTD_SOCIAL_D1_TOKEN }}
+        run: |
+          bash tools/reconcile-d1.sh query \
+            "SELECT p.video_id, v.episode, p.url, p.publish_at FROM postings p JOIN videos v ON v.id=p.video_id WHERE p.platform='youtube' AND p.status='scheduled' AND v.series='claude-code'" \
+            > scheduled.json
+          python3 tools/reconcile-publish-status.py scheduled.json > plan.json
+          to_post="$(jq '.summary.to_post' plan.json)"
+          echo "to_post=${to_post}" >> "$GITHUB_OUTPUT"
+          printf '### Reconcile publish status\nchecked %s · to_post %s · still_scheduled %s\n' \
+            "$(jq '.summary.checked' plan.json)" "$to_post" "$(jq '.summary.still_scheduled' plan.json)" \
+            >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Apply transitions to the D1
+        if: steps.guard.outputs.skip == '0' && steps.reconcile.outputs.to_post != '0'
+        env:
+          RTD_SOCIAL_D1_TOKEN: ${{ secrets.RTD_SOCIAL_D1_TOKEN }}
+        run: |
+          jq -c '.transitions[]' plan.json | while read -r t; do
+            vid="$(jq -r '.video_id' <<<"$t")"
+            pub="$(jq -r '.new_publish_at' <<<"$t")"
+            bash tools/reconcile-d1.sh exec \
+              "UPDATE postings SET status='posted', publish_at=? WHERE platform='youtube' AND video_id=? AND status='scheduled'" \
+              "$(jq -nc --arg p "$pub" --arg v "$vid" '[$p,$v]')" >/dev/null
+            bash tools/reconcile-d1.sh exec \
+              "UPDATE videos SET youtube_privacy='public' WHERE id=? AND youtube_privacy='private'" \
+              "$(jq -nc --arg v "$vid" '[$v]')" >/dev/null
+            echo "flipped ${vid} -> posted (${pub})"
+          done
+
+      # The regenerate steps below run on EVERY non-inert run (not only when there are new
+      # transitions): posted.json is re-derived from current D1 state, so a prior run that
+      # flipped the D1 but whose website PR failed self-heals here. `git diff` no-ops when
+      # posted.json is already current, so a quiet day commits nothing.
+      - name: Mint review-e-bot token (least-privilege, website only)
+        id: app
+        if: steps.guard.outputs.skip == '0'
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: '3068795'
+          private-key: ${{ secrets.REVIEW_E_BOT_PEM }}
+          owner: run-the-docs
+          repositories: website
+          permission-contents: write          # push the posted.json commit
+          permission-pull-requests: write      # open + squash-merge the PR
+
+      - name: Checkout website (App token)
+        if: steps.guard.outputs.skip == '0'
+        uses: actions/checkout@v4
+        with:
+          repository: run-the-docs/website
+          token: ${{ steps.app.outputs.token }}
+          path: web
+
+      - name: Re-derive posted.json from D1 + PR-merge if changed
+        if: steps.guard.outputs.skip == '0'
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          RTD_SOCIAL_D1_TOKEN: ${{ secrets.RTD_SOCIAL_D1_TOKEN }}
+        run: |
+          bash tools/reconcile-d1.sh query \
+            "SELECT v.episode, p.platform, p.status, p.url, p.posted_at, p.publish_at FROM videos v JOIN postings p ON p.video_id=v.id WHERE v.series='claude-code' AND p.platform IN ('youtube','tiktok','linkedin','x') AND p.status!='none' ORDER BY CAST(v.episode AS INTEGER), p.platform" \
+            > rows.json
+          python3 web/videos/build-posted.py rows.json > web/videos/posted.json
+          jq empty web/videos/posted.json     # fail loudly if build produced invalid JSON
+          cd web
+          if git diff --quiet -- videos/posted.json; then
+            echo "posted.json already current — nothing to commit"; exit 0
+          fi
+          BR="reconcile/posted-$(date -u +%Y%m%d-%H%M%S)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$BR"
+          git add videos/posted.json
+          git commit -m "chore(videos): reconcile publish-status (scheduled->posted)" \
+                     -m "Automated by run-the-docs/engine reconcile-publish-status.yml. Refs run-the-docs/engine#40 + run-the-docs/website#24."
+          git push -u origin "$BR"
+          # website main is unprotected -> honor 'never push to main' via a PR we squash-merge with the App token.
+          # (website/request-review.yml also fires on this PR and arms enablePullRequestAutoMerge — a harmless
+          #  no-op on unprotected main.) Retry to ride out the post-create 'mergeable_state: unknown' window.
+          gh pr create --repo run-the-docs/website --base main --head "$BR" \
+            --title "chore(videos): reconcile publish-status (scheduled->posted)" \
+            --body "Automated publish-status reconcile (run-the-docs/engine#40 Phase 5). Refs run-the-docs/website#24 (standing tracking issue)."
+          merged=0
+          for i in 1 2 3 4 5 6; do
+            if gh pr merge "$BR" --repo run-the-docs/website --squash --delete-branch; then merged=1; break; fi
+            echo "merge not ready, retry ${i}…"; sleep 5
+          done
+          [ "$merged" = 1 ] || { echo "::error::reconcile PR opened but did not merge after retries — needs a look"; exit 1; }
