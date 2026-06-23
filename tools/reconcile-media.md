@@ -35,8 +35,21 @@ Cloudflare MCP and can open `run-the-docs/website` PRs — it never handles the 
 2. Fetch the live `run-the-docs/website` `videos/catalog.json`.
 3. `python3 tools/reconcile-media.py --catalog catalog.json --r2-json r2.json --lines-dir series/claude-code/production --write catalog.healed.json --report report.json`.
 4. If wiring changed (`catalog.healed.json` differs): open a `run-the-docs/website` PR `chore: reconcile R2 media catalog (Closes #N)` (file a tracking issue first to satisfy the `Closes #N` norm) → auto-merges via `request-review.yml` → deploys via `deploy.yml`.
-5. If `needs-upload` is non-empty: alert Discord `#admin` with the exact `r2-sync.sh` line; after 3 consecutive ticks, raise urgency + a deadline-tracker entry.
-6. A weekly **green heartbeat** to `#tasks` (and a deadline-tracker dead-man's-switch) so silence is verified-healthy, not assumed.
+5. **Alert (Phase 4)** — format the report and post via the Discord MCP:
+   `python3 tools/reconcile-alert.py --report report.json --occurrences <N> [--heartbeat-due]`
+   (`<N>` = consecutive prior ticks this gap has persisted — read from the dead-man's-switch
+   deadline's notes, the durable cross-run state). It returns `{admin_alert, heartbeat, escalate}`:
+   - `admin_alert` (gap) → `mcp__discord__discord_send` to **#admin** — carries the exact
+     `r2-sync.sh <eps>` line for rendered-but-unuploaded cuts, and `build-ep.sh`-first for
+     un-carded ones. On `escalate` (≥3 consecutive) also `mcp__deadline-tracker__add_deadline`
+     a "RtD media gap: epN" entry so the gap can't be lost in chat.
+   - `heartbeat` (clean + due) → `discord_send` to **#tasks**.
+6. **Dead-man's-switch** — on every clean run, renew the recurring deadline
+   **"RtD media reconcile heartbeat"** (`mcp__deadline-tracker__snooze_deadline` +7d) and reset
+   its notes counter to 0; on a gap run, bump the counter. If the routine ever stops, that
+   deadline goes overdue and surfaces in `deadline_summary` (checked on `/load-memory`) — a
+   *different* system catching a silent reconciler (epic must-fix #6). Pass the counter as
+   step 5's `--occurrences`.
 
 `testdata/r2-snapshot.json` is a point-in-time presence snapshot (ep1–16 × {45,916}) used by the demo/tests.
 
