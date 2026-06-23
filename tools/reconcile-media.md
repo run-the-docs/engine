@@ -31,7 +31,7 @@ The tool is **pure and secret-free** (no network, no credentials) so it is CI-te
 The reconciler runs **orchestrator-side** (claude-3 has authenticated R2 read via the
 Cloudflare MCP and can open `run-the-docs/website` PRs — it never handles the R2 token):
 
-1. `mcp__cloudflare__r2_list_objects(bucket="runthedocs-videos")` (paginate by prefix) → write the listing to `r2.json`.
+1. Build the ON-R2 list (auth-free): `python3 tools/r2-probe.py --lines-dir series/claude-code/production > r2.json` — HEAD-probes the expected keys on r2.dev, sidestepping the Cloudflare MCP's ~20-object/no-cursor list cap and the manifest-404. Once the in-bucket `manifest.json` exists (Phase 2), `curl -s r2.dev/manifest.json > r2.json` is the faster equivalent; `mcp__cloudflare__r2_list_objects` works only with per-episode `prefix=claude-ep<N>-` sharding.
 2. Fetch the live `run-the-docs/website` `videos/catalog.json`.
 3. `python3 tools/reconcile-media.py --catalog catalog.json --r2-json r2.json --lines-dir series/claude-code/production --write catalog.healed.json --report report.json`.
 4. If wiring changed (`catalog.healed.json` differs): open a `run-the-docs/website` PR `chore: reconcile R2 media catalog (Closes #N)` (file a tracking issue first to satisfy the `Closes #N` norm) → auto-merges via `request-review.yml` → deploys via `deploy.yml`.

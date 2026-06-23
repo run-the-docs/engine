@@ -88,16 +88,17 @@ emit_manifest() {
   echo "R2: rebuilding ${MANIFEST_KEY} (in-bucket listing — r2.dev can't list)…"
   local out="$REC/$MANIFEST_KEY"
   python3 - "$REC" "$PUBLIC_BASE" "$BUCKET" "$out" <<'PY' || return 1
-import glob, json, sys, urllib.request
+import glob, json, os, sys, urllib.request
 rec, base, bucket, out = sys.argv[1], sys.argv[2].rstrip("/"), sys.argv[3], sys.argv[4]
-import os
+UA = "rtd-reconcile/1.0 (run-the-docs media reconciler)"  # CF WAF 403s the default urllib UA
 keys = sorted({os.path.basename(p) for p in
                glob.glob(os.path.join(rec, "claude-ep*-45.mp4")) +
                glob.glob(os.path.join(rec, "claude-ep*-916.mp4"))})
 objs = []
 for k in keys:
     try:
-        with urllib.request.urlopen(urllib.request.Request(f"{base}/{k}", method="HEAD"), timeout=15) as r:
+        with urllib.request.urlopen(urllib.request.Request(
+                f"{base}/{k}", method="HEAD", headers={"User-Agent": UA}), timeout=15) as r:
             if r.status != 200:
                 continue
             size = r.headers.get("Content-Length")
