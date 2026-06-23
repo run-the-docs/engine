@@ -13,7 +13,7 @@ Diffs three sets and emits a report + a reconciled catalogue:
 | Set | Source |
 |-----|--------|
 | **EXPECTED** | every `series/claude-code/production/ep*.lines.json` (skips `published:false`) → keys `claude-ep<ID>-{45,916}.mp4` |
-| **ON-R2** | the authenticated `r2_list_objects` result (fed in as JSON) |
+| **ON-R2** | the authenticated `r2_list_objects` result, **or** the auth-free in-bucket `manifest.json` (`r2.dev/manifest.json`, emitted by `r2-sync.sh` — Phase 2) — both feed `--r2-json` as a `[{key,bytes,etag}]` list |
 | **IN-CATALOG** | `videos/catalog.json` episodes' `v916` |
 
 Drift classes:
@@ -39,6 +39,20 @@ Cloudflare MCP and can open `run-the-docs/website` PRs — it never handles the 
 6. A weekly **green heartbeat** to `#tasks` (and a deadline-tracker dead-man's-switch) so silence is verified-healthy, not assumed.
 
 `testdata/r2-snapshot.json` is a point-in-time presence snapshot (ep1–16 × {45,916}) used by the demo/tests.
+
+### In-bucket manifest + `published` flag (Phase 2)
+
+`r2-sync.sh`, after a successful sync, (re)emits **`manifest.json`** to the bucket root — a
+public listing of every cut actually live on R2 (`{key, bytes, etag}` per object), because
+the public r2.dev domain cannot list objects. It always reflects the **full** bucket (probed
+from all local cuts), even when only a subset is synced. Step 1 above can therefore be replaced
+by an **auth-free** `curl -s r2.dev/manifest.json > r2.json` when the orchestrator can't reach
+the authed MCP — the `objects` array is exactly the `--r2-json` shape (and its `etag`/`bytes`
+are what the future content-verification will check).
+
+The **`published`** flag on `ep*.lines.json` (default `true` when absent) marks an episode as
+*not* expected on R2 — set `published:false` on the deliberate holes (`ep18` unrecorded, `ep25`
+skipped) so the reconciler doesn't fire permanent `needs-upload` false-positives for them.
 
 ## Phase 5 / follow-ups (tracked in #40)
 

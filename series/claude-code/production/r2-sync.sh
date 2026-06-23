@@ -6,6 +6,12 @@
 # the upload logic (instead of an ad-hoc terminal command); run it on the host
 # that holds the rendered cuts (the pipeline host).
 #
+# After a successful sync it (re)emits an in-bucket `manifest.json` — a public listing
+# of every cut actually live on R2 (key + bytes + ETag), since the public r2.dev domain
+# cannot list objects. That manifest is the steady-state "what's on R2" truth the
+# reconciler/site consume (run-the-docs/engine#40 Phase 2). It always reflects the FULL
+# bucket (re-probed from all local cuts), even when only a subset of episodes is synced.
+#
 # Auth: uses wrangler's own session — EITHER a stored `wrangler login` (OAuth)
 # OR CLOUDFLARE_API_TOKEN in the env. We do NOT require the env token (the
 # pipeline host is typically wrangler-logged-in). The token, if used, is
@@ -21,6 +27,7 @@ set -euo pipefail
 BUCKET="runthedocs-videos"
 PUBLIC_BASE="${RTD_R2_PUBLIC_BASE:-https://pub-8745206116f440c6b36f5e6bd0eb1905.r2.dev}"
 REC="${REC:-$HOME/runthedocs/series/claude-code/demo/rec}"
+MANIFEST_KEY="manifest.json"   # Phase 2: in-bucket listing — public r2.dev can't list objects
 
 command -v wrangler >/dev/null 2>&1 || { echo "FATAL: wrangler not found on PATH"; exit 1; }
 # Accept EITHER auth method: a stored `wrangler login` (OAuth) or a
@@ -71,6 +78,47 @@ put_and_verify() {
   return 1
 }
 
+# Re-emit the in-bucket manifest.json: probe the FULL set of local cuts against the public
+# r2.dev domain (HEAD), record every one that is live (key + bytes + ETag), and upload the
+# listing to the bucket root. Python builds the JSON (always present on the pipeline host;
+# avoids a jq dependency + hand-rolled escaping). ETag/bytes let the reconciler verify bytes
+# (r2.dev exposes ETag, serves no cache-control). Fail-loud: a manifest upload failure fails
+# the run, consistent with the upload rail.
+emit_manifest() {
+  echo "R2: rebuilding ${MANIFEST_KEY} (in-bucket listing — r2.dev can't list)…"
+  local out="$REC/$MANIFEST_KEY"
+  python3 - "$REC" "$PUBLIC_BASE" "$BUCKET" "$out" <<'PY' || return 1
+import glob, json, sys, urllib.request
+rec, base, bucket, out = sys.argv[1], sys.argv[2].rstrip("/"), sys.argv[3], sys.argv[4]
+import os
+keys = sorted({os.path.basename(p) for p in
+               glob.glob(os.path.join(rec, "claude-ep*-45.mp4")) +
+               glob.glob(os.path.join(rec, "claude-ep*-916.mp4"))})
+objs = []
+for k in keys:
+    try:
+        with urllib.request.urlopen(urllib.request.Request(f"{base}/{k}", method="HEAD"), timeout=15) as r:
+            if r.status != 200:
+                continue
+            size = r.headers.get("Content-Length")
+            objs.append({"key": k,
+                         "bytes": int(size) if size and size.isdigit() else None,
+                         "etag": (r.headers.get("ETag") or "").strip('"') or None})
+    except Exception:
+        continue  # not live on R2 (yet) -> omitted from the manifest
+json.dump({"bucket": bucket, "public_base": base,
+           "generated_by": "r2-sync.sh", "count": len(objs), "objects": objs},
+          open(out, "w"), indent=2)
+print(f"  {len(objs)} object(s) live on R2")
+PY
+  if wrangler r2 object put "${BUCKET}/${MANIFEST_KEY}" --file "$out" \
+       --remote --content-type application/json; then
+    echo "R2: ${MANIFEST_KEY} uploaded -> ${PUBLIC_BASE}/${MANIFEST_KEY}"
+  else
+    echo "FATAL: failed to upload ${MANIFEST_KEY}"; return 1
+  fi
+}
+
 n=0; failed=()
 for f in "${files[@]}"; do
   put_and_verify "$f" && n=$((n + 1)) || failed+=("$(basename "$f")")
@@ -79,4 +127,5 @@ if [ "${#failed[@]}" -gt 0 ]; then
   echo "FATAL: ${#failed[@]} object(s) failed upload/verify: ${failed[*]}"
   exit 1
 fi
-echo "R2 sync complete: $n object(s) -> $BUCKET (all verified)"
+emit_manifest || { echo "FATAL: manifest emission failed"; exit 1; }
+echo "R2 sync complete: $n object(s) -> $BUCKET (all verified; ${MANIFEST_KEY} refreshed)"
