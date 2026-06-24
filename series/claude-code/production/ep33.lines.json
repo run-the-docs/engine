@@ -1,0 +1,14 @@
+{
+ "title": "EP 33 — MODULAR CLAUDE.MD",
+ "sub": "Split CLAUDE.md with @path imports",
+ "lines": [
+  ["CLAUDE.md getting huge?", "Your CLAUDE.md is getting huge. A long file means weaker adherence. Clawd lets you split it."],
+  ["@path imports a file", "Reference another file with at path. Clawd expands it and loads it into context at launch, alongside the CLAUDE.md that points to it."],
+  ["Relative + absolute, 4 hops", "Both relative and absolute paths work. Relative resolves next to the importing file. Imports nest up to four hops."],
+  ["Backtick it to keep it literal", "Import parsing skips code spans. Wrap it in backticks to mention a path without importing it."],
+  ["Claude follows the imported rule", "Ask about a rule that only lives in the imported file, and Clawd answers from it. Proof the import loaded."],
+  ["Modular beats monolithic", "Modular memory beats one giant file. Follow for a daily Clawd tip."]
+ ],
+ "command": "git workflow @docs/git-instructions.md",
+ "artifact": "CLAUDE.md"
+}

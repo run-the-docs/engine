@@ -1,0 +1,32 @@
+{
+ "title": "EP 36 — STOP HOOK",
+ "sub": "Run a command the moment Claude finishes a turn",
+ "lines": [
+  [
+   "Stop fires when Claude finishes",
+   "The Stop hook runs the instant Clawd finishes responding, at the end of a turn."
+  ],
+  [
+   "Add it to .claude/settings.json",
+   "Add a Stop entry under hooks in dot claude slash settings dot json. Stop takes no matcher, so it fires every time."
+  ],
+  [
+   "type: command runs your shell",
+   "Give it a hook of type command, pointed at a script. Mine appends a finished line to a log when the turn ends."
+  ],
+  [
+   "It gets session + transcript on stdin",
+   "On standard input your script gets the session id, the transcript path, and a stop hook active flag to guard loops."
+  ],
+  [
+   "Exit 2 keeps Claude working",
+   "Exit zero lets it stop. Exit two keeps Clawd working until your check passes."
+  ],
+  [
+   "Notify, log, or gate on finish",
+   "Wire it to a ping, a test run, or a lint gate. Follow for a daily Clawd tip."
+  ]
+ ],
+ "command": "Stop hook in .claude/settings.json runs .claude/done.sh",
+ "artifact": ""
+}

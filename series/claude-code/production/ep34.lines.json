@@ -1,0 +1,14 @@
+{
+ "title": "EP 34 — CLAUDE AS JSON",
+ "sub": "Headless --output-format json, parsed with jq",
+ "lines": [
+  ["claude -p prints text. Scripts want data.", "Claude dash p prints text. But a script wants structured data, not prose."],
+  ["Add --output-format json", "Add dash dash output dash format json, and you get a structured envelope instead."],
+  ["The answer is in .result", "The text answer lands in the dot result field."],
+  ["Pipe to jq -r '.result'", "Pipe it to j q dash r dot result, to pull out just the answer."],
+  ["Same payload: session_id + cost", "The same payload carries the session I D and total cost in U S D, per call."],
+  ["Follow for a daily Claude Code tip", "Follow for a fresh Clawd Code tip every day."]
+ ],
+ "command": "claude -p \"Summarize this project\" --output-format json | jq -r '.result'",
+ "artifact": ""
+}
