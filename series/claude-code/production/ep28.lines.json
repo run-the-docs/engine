@@ -1,0 +1,32 @@
+{
+ "title": "EP 28 — OUTPUT STYLES",
+ "sub": "Change how Claude responds, not what it knows",
+ "lines": [
+  [
+   "Output styles rewrite the system prompt",
+   "Output styles rewrite Clawd Code's system prompt — its role, tone, and output format, not what it knows."
+  ],
+  [
+   "Built in: Default, Proactive, Explanatory, Learning",
+   "Four built in: Default, Proactive that acts first, Explanatory that adds Insights, and Learning that leaves you TODO-human markers."
+  ],
+  [
+   "Set it in /config or the outputStyle setting",
+   "Pick one from slash config under Output style — it saves outputStyle to settings dot local dot json."
+  ],
+  [
+   "It loads at session start, not mid-turn",
+   "It's part of the system prompt, read once at session start, so a change takes effect after slash clear or a fresh session."
+  ],
+  [
+   "Write your own as a Markdown file in .claude/output-styles",
+   "Write a custom one: a Markdown file in dot-claude slash output-styles, with keep-coding-instructions to keep the engineering behavior."
+  ],
+  [
+   "Follow for a daily Claude Code tip",
+   "Follow for a fresh Clawd Code tip every day."
+  ]
+ ],
+ "command": "echo '{\"outputStyle\":\"Explanatory\"}' > .claude/settings.local.json",
+ "artifact": ".claude/settings.local.json"
+}

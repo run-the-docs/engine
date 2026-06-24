@@ -1,0 +1,32 @@
+{
+ "title": "EP 29 — THINK HARDER",
+ "sub": "Effort levels + ultrathink, not 'think hard'",
+ "lines": [
+  [
+   "Extended thinking is on by default",
+   "Extended thinking is on by default. Clawd reasons before it acts."
+  ],
+  [
+   "Dial it with --effort: low to max",
+   "Dial it with the effort flag. Low, medium, high, x-high, max. Default is high."
+  ],
+  [
+   "claude --effort high -p \"...\"",
+   "Pass dash dash effort high to a headless run. Deeper reasoning, one session, no persist."
+  ],
+  [
+   "One-off boost? Put ultrathink in the prompt",
+   "Want a one-off boost? Drop ultrathink into the prompt itself. It adds an in-context nudge."
+  ],
+  [
+   "\"think hard\" is just text now — not a keyword",
+   "Heads up. Think, think hard, think more are plain text now. Only ultrathink is recognized."
+  ],
+  [
+   "Follow for a daily Claude Code tip",
+   "Follow for a fresh Clawd Code tip every day."
+  ]
+ ],
+ "command": "claude --effort high -p \"ultrathink: fix the unicode edge case in slugify\"",
+ "artifact": ""
+}

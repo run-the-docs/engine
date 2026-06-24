@@ -1,0 +1,32 @@
+{
+ "title": "EP 31 — BACKGROUND TASKS",
+ "sub": "Run a long command without blocking the chat",
+ "lines": [
+  [
+   "A long command shouldn't freeze your chat",
+   "A long command shouldn't freeze your chat with Clawd Code."
+  ],
+  [
+   "Just ask Claude to run it in the background",
+   "Just ask Clawd to run it in the background."
+  ],
+  [
+   "It returns a task ID and keeps working",
+   "It runs async, returns a background task ID, and Clawd keeps working."
+  ],
+  [
+   "Output goes to a file Claude reads back",
+   "Output is written to a file Clawd reads back with the Read tool."
+  ],
+  [
+   "Or press Ctrl+B to background a running command",
+   "Or press Control-B to push a running Bash command into the background."
+  ],
+  [
+   "Follow for a fresh Claude Code tip every day",
+   "Follow for a fresh Clawd Code tip every day."
+  ]
+ ],
+ "command": "run the test suite in the background, then read me the results",
+ "artifact": ""
+}

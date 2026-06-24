@@ -1,0 +1,32 @@
+{
+ "title": "EP 26 — INSTALL A PLUGIN",
+ "sub": "Add a marketplace, install a plugin, done",
+ "lines": [
+  [
+   "A marketplace is a catalog of plugins someone shared",
+   "A marketplace is a catalog of plugins someone else shared."
+  ],
+  [
+   "Add the catalog: claude plugin marketplace add owner/repo",
+   "Step one. Claude plugin marketplace add, owner slash repo."
+  ],
+  [
+   "Install: claude plugin install name@marketplace",
+   "Step two. Claude plugin install, name at marketplace. Installs to user scope."
+  ],
+  [
+   "Both run as one-line CLI commands — no menu",
+   "Both run as one-line CLI commands. No menu needed."
+  ],
+  [
+   "Plugin skills are namespaced — commit-commands:commit",
+   "Plugin skills are namespaced by plugin name, like commit-commands colon commit."
+  ],
+  [
+   "Follow for a fresh Claude Code tip every day",
+   "Follow for a fresh Clawd Code tip every day."
+  ]
+ ],
+ "command": "claude plugin install commit-commands@claude-code-plugins",
+ "artifact": ""
+}
