@@ -1,0 +1,14 @@
+{
+ "title": "EP 32 — --ADD-DIR",
+ "sub": "Give Claude a second working directory at launch",
+ "lines": [
+  ["One repo isn't enough", "Clawd only sees the directory you launched it in. But real work spans repos."],
+  ["claude --add-dir ../lib", "Pass dash dash add dash dir at startup. Now Clawd can read and edit that sibling directory too."],
+  ["Reads and edits, no prompt", "Files in the added directory follow the same rules as your main one. Readable without prompts."],
+  ["Each path is validated", "Clawd checks every path exists before it starts. Bad path, it tells you up front."],
+  ["Files, not config", "It grants file access, not a config root. It's reach, not setup."],
+  ["Make it stick in settings", "Want it every session? Add the paths to permissions dot additional Directories. Follow for a daily Clawd tip."]
+ ],
+ "command": "claude --add-dir ../lib -p \"read ../lib/strings.py\"",
+ "artifact": ""
+}

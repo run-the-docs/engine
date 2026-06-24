@@ -1,0 +1,14 @@
+{
+ "title": "EP 35 — EXPORT A CHAT",
+ "sub": "Save the conversation to a plain-text file",
+ "lines": [
+  ["Need a record of the chat?", "Need a record of what Clawd just did? The slash export command saves the conversation as plain text."],
+  ["/export saved-chat.txt", "Pass a filename and Clawd writes the whole conversation straight to that file. No dialog."],
+  ["Plain text, every turn", "You get the full transcript. Your prompts and Clawd's replies, in order."],
+  ["Bare /export opens a dialog", "Run slash export with no filename and it opens a dialog instead. Copy to clipboard, or save."],
+  ["Share it anywhere", "Drop the file in a P R, a ticket, or a teammate's inbox. Reproducible context, not a screenshot."],
+  ["Follow for a daily Claude Code tip", "That's slash export. Follow for a daily Clawd Code tip."]
+ ],
+ "command": "/export saved-chat.txt",
+ "artifact": ""
+}

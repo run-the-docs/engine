@@ -31,6 +31,11 @@ case "$N" in
   30) RESET=6a8d07c ;;
   31) RESET=5411d3b ;;
   26) RESET=5411d3b ;;
+  32) RESET=5411d3b ;;
+  33) RESET=6a8d07c ;;
+  34) RESET=5411d3b ;;
+  35) RESET=5411d3b ;;
+  36) RESET=5411d3b ;;
   *) RESET="" ;;
 esac
 if [ -n "$RESET" ]; then
