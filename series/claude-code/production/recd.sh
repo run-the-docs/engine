@@ -29,6 +29,7 @@ case "$EP" in
  21) RESET=5411d3b; LAUNCH_FIRST=1; ARTIFACTS=""; CLAUDE='claude --strict-mcp-config --disallowedTools WebFetch WebSearch'; MODE=slash; TEXT="/sandbox"; SBCMD="Run python3 test_slugify.py and tell me in one line whether it passes"; COMPLETE=sandbox ;;
  23) RESET=5411d3b; LAUNCH_FIRST=1; ARTIFACTS=""; CLAUDE='claude --strict-mcp-config --allowedTools Read Edit Write "Bash(*)" --disallowedTools WebFetch WebSearch'; MODE=slash; TEXT="/statusline show the model, the git branch, and the context percentage"; COMPLETE=skill ;;
  25) RESET=5411d3b; LAUNCH_FIRST=1; ARTIFACTS=""; CLAUDE='claude --strict-mcp-config --allowedTools Read --disallowedTools WebFetch WebSearch'; MODE=slash; TEXT="/fast"; FOLLOWUP="What does slugify.py do? Answer in one sentence."; COMPLETE=shellmode ;;
+ 29) RESET=5411d3b; LAUNCH_FIRST=1; ARTIFACTS="test_slugify.py slugify.py"; CLAUDE='claude --strict-mcp-config --allowedTools Read Edit Write "Bash(python3 *)" --disallowedTools WebFetch WebSearch --effort high'; MODE=prompt; TEXT="ultrathink: fix slugify.py so the failing test passes, then run it."; COMPLETE=testpass ;;
 esac
 # reset the demo repo to this episode's correct starting state (so file cards + claude see the right files)
 if [ -n "$STANDIN_DIR" ]; then

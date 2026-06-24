@@ -80,7 +80,8 @@ fresh session reads at boot. Write it BEFORE the `claude -p` run:
 - **Probe:** PRECMD must run AFTER `recd.sh` resets the repo to RESET (the pipeline auto-resets first); then `cat .claude/settings.local.json` shows `{"outputStyle":"Explanatory"}` and `.claude/` + `slugify.py` exist at the sha. `claude --version` ≥ 2.1.91.
 - **Caveat:** the Explanatory "Insights" block is a strong tendency, not a per-response contract — record 2-3 takes, keep the one where the aside renders.
 
-### ep29 — Think harder  (stop on the effort label + tests, not on visible reasoning)
+### ep29 — Think harder  ✅ RECORDED + built 2026-06-24 (both formats, QA-clean)
+**Shipped recipe (proven, now in `recd.sh`/`build-ep.sh`):** reused the `prompt → edit → testpass` path — `LAUNCH_FIRST=1` (clears the account toast), `--effort high`, `TEXT="ultrathink: fix slugify.py so the failing test passes, then run it."`, `COMPLETE=testpass`. The "with high effort" label renders in-terminal; 30.2s cut. The earlier concern below (gating on visible reasoning) was sidestepped by stopping on the test pass.
 Plain `--verbose` is NOT documented to print reasoning in `-p` mode, so don't gate on it:
 ```
 29) RESET=5411d3b; ARTIFACTS="slugify.py test_slugify.py"; MODE=prompt; \
