@@ -105,10 +105,14 @@ def statistics(token, ids):
 
 
 def analytics(token, ids):
-    """Lifetime per-video analytics. Returns {} on any failure (graceful degrade)."""
+    """Lifetime per-video analytics (needs the yt-analytics.readonly scope on the channel token).
+    Returns {} if the scope is absent. The two metric groups degrade INDEPENDENTLY: a missing/empty
+    'reach' (impressions/CTR) report still yields the core watch metrics, and vice-versa."""
     if not ids:
         return {}
-    try:
+    res = {}
+
+    def query(metrics):
         data = _get(
             ANALYTICS_API,
             token,
@@ -116,24 +120,45 @@ def analytics(token, ids):
                 "ids": "channel==MINE",
                 "startDate": "2005-01-01",
                 "endDate": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
-                "metrics": "estimatedMinutesWatched,averageViewDuration,averageViewPercentage",
+                "metrics": metrics,
                 "dimensions": "video",
                 "filters": "video==" + ",".join(ids[:500]),
                 "maxResults": 500,
             },
         )
         idx = {h["name"]: i for i, h in enumerate(data.get("columnHeaders", []))}
-        res = {}
-        for row in data.get("rows", []):
-            res[row[idx["video"]]] = {
-                "watch_time_minutes": row[idx["estimatedMinutesWatched"]],
-                "avg_view_duration_seconds": row[idx["averageViewDuration"]],
-                "avg_view_percentage": row[idx["averageViewPercentage"]],
-            }
-        return res
-    except Exception as e:  # noqa: BLE001 — degrade to public-only on any analytics error
-        print(f"# analytics unavailable ({e}); emitting public stats only", file=sys.stderr)
-        return {}
+        return idx, data.get("rows", [])
+
+    # core watch metrics + subscribers gained
+    try:
+        idx, rows = query("estimatedMinutesWatched,averageViewDuration,averageViewPercentage,subscribersGained")
+        for row in rows:
+            res.setdefault(row[idx["video"]], {}).update(
+                {
+                    "watch_time_minutes": row[idx["estimatedMinutesWatched"]],
+                    "avg_view_duration_seconds": row[idx["averageViewDuration"]],
+                    "avg_view_percentage": row[idx["averageViewPercentage"]],
+                    "subscribers_gained": row[idx["subscribersGained"]],
+                }
+            )
+    except Exception as e:  # noqa: BLE001
+        print(f"# core analytics unavailable ({e}); emitting public stats only", file=sys.stderr)
+
+    # reach metrics (impressions + click-through rate) — a separate metric group that may not be
+    # available even when core analytics is; degrade on its own without losing the core metrics.
+    try:
+        idx, rows = query("impressions,impressionClickThroughRate")
+        for row in rows:
+            res.setdefault(row[idx["video"]], {}).update(
+                {
+                    "impressions": row[idx["impressions"]],
+                    "ctr": row[idx["impressionClickThroughRate"]],
+                }
+            )
+    except Exception as e:  # noqa: BLE001
+        print(f"# reach metrics (impressions/ctr) unavailable ({e})", file=sys.stderr)
+
+    return res
 
 
 def main():
@@ -157,9 +182,9 @@ def main():
                 "watch_time_minutes": a.get("watch_time_minutes"),
                 "avg_view_duration_seconds": a.get("avg_view_duration_seconds"),
                 "avg_view_percentage": a.get("avg_view_percentage"),
-                "impressions": None,
-                "ctr": None,
-                "subscribers_gained": None,
+                "impressions": a.get("impressions"),
+                "ctr": a.get("ctr"),
+                "subscribers_gained": a.get("subscribers_gained"),
             }
         )
     json.dump(rows, sys.stdout, indent=2)

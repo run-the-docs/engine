@@ -29,9 +29,9 @@ d.text((50,118),EP,font=font(40,1),fill=TEXT)
 d.text((52,166),SUB,font=font(22,0),fill=DIM)
 d.line([50,200,1030,200],fill=(218,119,86,90),width=2)   # divider below subtitle
 # footer CTA strip
-ff=font(32,1); cta="↳  Run the Docs — daily Claude Code tips"
+ff=font(32,1); cta="↳  Subscribe — a Claude Code tip every weekday"
 d.text(((W-tw(d,cta,ff))//2,1770),cta,font=ff,fill=ACCENT)
-ft2=font(24,0); tip="Try it:  claude  → describe a task"
+ft2=font(24,0); tip="Try it:  "+(_m.get("command") or "claude  → describe a task")
 d.text(((W-tw(d,tip,ft2))//2,1828),tip,font=ft2,fill=DIM)
 img.save(os.path.join(REC,"bg916.png"))
 # ---- segments ----
@@ -53,12 +53,24 @@ for i in range(1,len(segs)):
     for ln in lines: cd.text(((W-tw(cd,ln,fcap))//2,y),ln,font=fcap,fill=col); y+=lh
     cimg.save(os.path.join(REC,f"cap916_{i}.png"))
 print("ASSETS916_OK n=%d thgt=%d"%(len(segs),THGT))
-# --- ARTIFACT CARD (show a real file: filename header + contents) ---
-art=_m.get("artifact")
-if art:
-    apath=os.path.join(os.path.expanduser("~/runthedocs/series/claude-code/demo/cc-demo-repo"), art)
-    try: content=open(apath).read().rstrip("\n")
-    except Exception: content="(file not found)"
+# --- ARTIFACT CARD: a real file -> its contents; otherwise -> the command to type ---
+art=_m.get("artifact"); cmd=_m.get("command")
+apath=os.path.join(os.environ.get("CC_REPO") or os.path.expanduser("~/runthedocs/series/claude-code/demo/cc-demo-repo"), art or "")
+if not (art and os.path.exists(apath)) and cmd:
+    aimg=Image.new("RGBA",(W,H),(0,0,0,0)); ad=ImageDraw.Draw(aimg)
+    ad.rounded_rectangle([TX-6,TY-6,TX+TWID+6,TY+THGT+6],12,fill=(13,13,18,255))
+    ad.rounded_rectangle([TX-6,TY-6,TX+TWID+6,TY+THGT+6],12,outline=ACCENT,width=2)
+    fhdr=font(26,1); ad.ellipse([TX+16,TY+18,TX+30,TY+32],fill=ACCENT)
+    ad.text((TX+44,TY+14),"the command",font=fhdr,fill=ACCENT)
+    ad.line([TX+14,TY+52,TX+TWID-14,TY+52],fill=(218,119,86,90),width=1)
+    _p="$ " if (cmd.split()[:1] and cmd.split()[0] in ("git","claude","cat","python3","npm","gh","ls")) else ""
+    cmdf=font(40,1); clines=wrap(ad,_p+cmd,cmdf,TWID-60); lh=56
+    y=TY+66+max(0,((THGT-72)-lh*len(clines))//2)
+    for ln in clines:
+        ad.text((TX+30,y),ln,font=cmdf,fill=TEXT); y+=lh
+    aimg.save(os.path.join(REC,"artifact916.png")); print("COMMAND CARD 916:",cmd)
+elif art and os.path.exists(apath):
+    content=open(apath).read().rstrip("\n")
     aimg=Image.new("RGBA",(W,H),(0,0,0,0)); ad=ImageDraw.Draw(aimg)
     ad.rounded_rectangle([TX-6,TY-6,TX+TWID+6,TY+THGT+6],12,fill=(13,13,18,255))
     ad.rounded_rectangle([TX-6,TY-6,TX+TWID+6,TY+THGT+6],12,outline=ACCENT,width=2)
