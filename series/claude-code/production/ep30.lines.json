@@ -1,0 +1,32 @@
+{
+ "title": "EP 30 — TELL IT TO REMEMBER",
+ "sub": "Add to CLAUDE.md mid-chat, no detour",
+ "lines": [
+  [
+   "Need a rule to stick? Don't leave the chat",
+   "Need a project rule to stick across sessions? Don't leave the chat."
+  ],
+  [
+   "Just say: add this to CLAUDE.md",
+   "Just tell Clawd directly. Add this to CLAUDE.md."
+  ],
+  [
+   "Claude writes it straight into the file",
+   "Clawd writes it straight into the project CLAUDE.md. No menus."
+  ],
+  [
+   "Loaded fresh into every future session",
+   "And CLAUDE.md is read at the start of every session from then on."
+  ],
+  [
+   "\"remember that...\" goes to auto memory instead",
+   "Tip. Remember that, routes to auto memory. Add this to CLAUDE.md targets the project file."
+  ],
+  [
+   "Follow for a fresh Claude Code tip every day",
+   "Follow for a fresh Clawd Code tip, every day."
+  ]
+ ],
+ "command": "Always run pytest before committing. Add this to CLAUDE.md.",
+ "artifact": "CLAUDE.md"
+}
