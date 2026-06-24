@@ -30,6 +30,10 @@ case "$EP" in
  23) RESET=5411d3b; LAUNCH_FIRST=1; ARTIFACTS=""; CLAUDE='claude --strict-mcp-config --allowedTools Read Edit Write "Bash(*)" --disallowedTools WebFetch WebSearch'; MODE=slash; TEXT="/statusline show the model, the git branch, and the context percentage"; COMPLETE=skill ;;
  25) RESET=5411d3b; LAUNCH_FIRST=1; ARTIFACTS=""; CLAUDE='claude --strict-mcp-config --allowedTools Read --disallowedTools WebFetch WebSearch'; MODE=slash; TEXT="/fast"; FOLLOWUP="What does slugify.py do? Answer in one sentence."; COMPLETE=shellmode ;;
  29) RESET=5411d3b; LAUNCH_FIRST=1; ARTIFACTS="test_slugify.py slugify.py"; CLAUDE='claude --strict-mcp-config --allowedTools Read Edit Write "Bash(python3 *)" --disallowedTools WebFetch WebSearch --effort high'; MODE=prompt; TEXT="ultrathink: fix slugify.py so the failing test passes, then run it."; COMPLETE=testpass ;;
+ 28) RESET=5411d3b; LAUNCH_FIRST=1; ARTIFACTS=""; PRESTEP='mkdir -p "$REPO/.claude" && cp "$DEMO/ep28-settings.json" "$REPO/.claude/settings.local.json"'; CLAUDE='claude --strict-mcp-config --allowedTools Read Grep Glob --disallowedTools WebFetch WebSearch --effort low'; MODE=prompt; TEXT="Explain what slugify.py does today and where it falls short for real-world titles."; COMPLETE=stable ;;
+ 30) RESET=6a8d07c; LAUNCH_FIRST=1; ARTIFACTS="CLAUDE.md"; CLAUDE='claude --strict-mcp-config --allowedTools Read Edit Write --disallowedTools WebFetch WebSearch --effort low'; MODE=prompt; TEXT="Always run python3 -m pytest before committing. Add this to CLAUDE.md."; COMPLETE=memwrite ;;
+ 26) RESET=5411d3b; ARTIFACTS=""; PRECMD='claude plugin marketplace add anthropics/claude-code'; CLAUDE=':'; MODE=bash; TEXT='claude plugin install commit-commands@claude-code-plugins'; COMPLETE=plugininstall ;;
+ 31) RESET=5411d3b; LAUNCH_FIRST=1; ARTIFACTS=""; CLAUDE='claude --strict-mcp-config --allowedTools Bash Read --disallowedTools WebFetch WebSearch --effort low'; MODE=prompt; TEXT="Run the test suite (python3 test_slugify.py) in the background so you do not block, tell me the background task ID, then read the output and report pass or fail."; COMPLETE=stable ;;
 esac
 # reset the demo repo to this episode's correct starting state (so file cards + claude see the right files)
 if [ -n "$STANDIN_DIR" ]; then
@@ -47,7 +51,7 @@ fi
 $TM kill-session -t cclive 2>/dev/null; $TM kill-session -t ccrec2 2>/dev/null
 $TM new-session -d -s cclive -x $W -y $H; $TM set-option -t cclive status off
 $TM set-option -g focus-events on 2>/dev/null; $TM set-option -g mouse on 2>/dev/null   # suppress claude's tmux hint chrome
-$TM send-keys -t cclive "export PATH=/opt/homebrew/bin:\$HOME/.local/bin:\$PATH; export CLAUDE_CODE_OAUTH_TOKEN=\$(cat $TOKEN); cd $REPO; clear" Enter
+$TM send-keys -t cclive "export PATH=/opt/homebrew/bin:\$HOME/.local/bin:\$PATH; export CLAUDE_CODE_OAUTH_TOKEN=\$(cat $TOKEN); export PROMPT='\$ '; cd $REPO; clear" Enter
 sleep 1
 if [ -n "$STANDIN_DIR" ] || [ -n "$LAUNCH_FIRST" ]; then
   # ep17 clean-launch (also LAUNCH_FIRST=1 non-standin episodes): claude's startup prints a transient account toast with the logged-in
@@ -69,8 +73,7 @@ else
   for a in $ARTIFACTS; do $TM send-keys -t cclive "cat $a" Enter; sleep 3.5; done
   # launch claude
   [ -n "$PRECMD" ] && { $TM send-keys -t cclive "$PRECMD" Enter; sleep 9; }
-  $TM send-keys -t cclive "$CLAUDE" Enter
-  sleep 22
+  if [ "$MODE" != "bash" ]; then $TM send-keys -t cclive "$CLAUDE" Enter; sleep 22; fi
 fi
 if [ "$MODE" = "slash" ]; then
   rest="${TEXT#/}"
@@ -91,6 +94,8 @@ case "$COMPLETE" in
  init) for i in $(seq 1 50); do sleep 3; p=$($TM capture-pane -pt cclive 2>/dev/null); echo "$p"|grep -qE "Do you want to|❯ 1\. Yes" && $TM send-keys -t cclive "1"; if [ -f "$REPO/CLAUDE.md" ] && ! echo "$p"|grep -qiE "esc to interrupt"; then echo "init done $i (CLAUDE.md written)"; break; fi; done; sleep 4 ;;
  shellmode) sleep 6; $TM send-keys -t cclive "$FOLLOWUP"; sleep 1; $TM send-keys -t cclive Enter; prev="";st=0; for i in $(seq 1 30); do sleep 3; p=$($TM capture-pane -pt cclive 2>/dev/null); h=$(echo "$p"|md5); [ "$h" = "$prev" ]&&st=$((st+1))||st=0; prev=$h; [ $i -ge 4 ]&&[ $st -ge 3 ]&&{ echo "shellmode stable $i"; break; }; done; sleep 1 ;;
  sandbox) sleep 2; $TM send-keys -t cclive "1"; sleep 3; $TM send-keys -t cclive Escape; sleep 2; $TM send-keys -t cclive "$SBCMD"; sleep 1; $TM send-keys -t cclive Enter; prev="";st=0; for i in $(seq 1 30); do sleep 3; p=$($TM capture-pane -pt cclive 2>/dev/null); h=$(echo "$p"|md5); [ "$h" = "$prev" ]&&st=$((st+1))||st=0; prev=$h; [ $i -ge 4 ]&&[ $st -ge 3 ]&&{ echo "sandbox stable $i"; break; }; done; sleep 1 ;;
+ memwrite) for i in $(seq 1 40); do sleep 3; p=$($TM capture-pane -pt cclive 2>/dev/null); echo "$p"|grep -qiE "Do you want to|1\. Yes|allow Claude to edit" && $TM send-keys -t cclive "1"; grep -qi "pytest" "$REPO/CLAUDE.md" 2>/dev/null && { echo "memwrite $i"; break; }; done; sleep 3 ;;
+ plugininstall) for i in $(seq 1 40); do sleep 3; p=$($TM capture-pane -pt cclive 2>/dev/null); echo "$p"|grep -qiE "Successfully installed plugin|already installed" && { echo "plugininstall $i"; break; }; done; sleep 3 ;;
  *) prev="";st=0; for i in $(seq 1 50); do sleep 3; p=$($TM capture-pane -pt cclive 2>/dev/null); h=$(echo "$p"|md5); [ "$h" = "$prev" ]&&st=$((st+1))||st=0; prev=$h; [ $i -ge 6 ]&&[ $st -ge 3 ]&&{ echo "stable $i"; break; }; done; sleep 1 ;;
 esac
 sleep 4; $TM kill-session -t ccrec2 2>/dev/null; sleep 1; $TM kill-session -t cclive 2>/dev/null   # recorder stops at result, then close claude
