@@ -38,6 +38,7 @@ case "$N" in
   6) RESET=5411d3b ;;
   11) RESET=9e97a74 ;;
   fable5) RESET=0a11b0a ;;
+  29) RESET=5411d3b ;;
   *) RESET="" ;;
 esac
 if [ -n "$RESET" ]; then

@@ -27,6 +27,6 @@
    "Follow for a fresh Clawd Code tip every day."
   ]
  ],
- "command": "claude --effort high -p \"ultrathink: fix the unicode edge case in slugify\"",
+ "command": "claude --effort high -p \"ultrathink: fix the failing test\"",
  "artifact": ""
 }
