@@ -1,0 +1,15 @@
+{
+ "title": "EP 37 — STEER ONE RUN",
+ "sub": "--append-system-prompt: one-off behavior, nothing saved",
+ "lines": [
+  ["CLAUDE.md is forever. Output styles persist.", "Clawd dot M D is forever. Output styles persist."],
+  ["What if you only want to steer one run?", "But what if you only want to steer one single run?"],
+  ["claude -p --append-system-prompt \"...\"", "Add dash dash append dash system dash prompt to a headless run."],
+  ["\"Answer in TypeScript, ELI5 note per function\"", "Here: always answer in TypeScript, with a plain English note above each function."],
+  ["The answer obeys — nothing written to your repo.", "The answer obeys the rule, and nothing was written to your project."],
+  ["Run it again with no flag? Back to default.", "Run it again without the flag, and it's right back to default."],
+  ["Follow for a daily Claude Code tip", "Follow for a fresh Clawd Code tip every day."]
+ ],
+ "command": "claude -p \"Write a function that slugifies a string.\" --append-system-prompt \"Always answer in TypeScript and add an ELI5 comment above every function.\"",
+ "artifact": ""
+}
