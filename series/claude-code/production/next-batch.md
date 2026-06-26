@@ -28,9 +28,9 @@ ep19 /goal · ep21 /sandbox · ep23 /statusline · ep24 ! shell · fable5 model 
 | 30 | Append to CLAUDE.md mid-chat | `/en/memory` | EP 30 — TELL IT TO REMEMBER |
 | 31 | Background tasks | `/en/interactive-mode` | EP 31 — BACKGROUND TASKS |
 
-**Deferred / gated (NOT headless — need a focused session):** ep18 auto-mode (Shift+Tab + first-run
-opt-in) · ep20 /voice (real mic) · ep22 worktrees (two terminals) · ep27 /agents (multi-screen TUI
-wizard). ep25 /fast skipped (pipeline-unfit, prior decision).
+**Produced 2026-06-26 (were "deferred"):** **ep22 worktrees** (`--worktree`; MODE=bash, recorded headless — the "two terminals" rationale was wrong, a first-class flag exists; `ss8e8MjPISw`, scheduled 07-09) · **ep27 a subagent in one command** (recorded as the headless `--agents` twin of the `/agents` wizard; MODE=prompt interactive so the `● slugify-explainer` delegation renders + a one-sentence answer — headless `-p` made COMPLETE=stable false-fire before the long subagent answered; `xOL1dVTQp_c`, scheduled 07-10).
+
+**Still deferred / gated (NOT headless — need a focused session):** ep18 auto-mode (Shift+Tab status-bar cycle — needs a recd.sh MODE=modecycle keystroke+verify handler) · ep20 /voice (real mic — hardware-blocked, off-pipeline only) · ep36 Stop-hook (net-new assets + a two-turn handler). ep25 /fast (skipped: account-gated on usage credits; reassess with a manual `/fast` check).
 
 ## Post-06-28 slot plan (one/day, 13/16/19 UTC rotation continues)
 
