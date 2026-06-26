@@ -36,12 +36,13 @@ case "$EP" in
  34) RESET=5411d3b; ARTIFACTS=""; MODE=bash; CLAUDE=':'; TEXT='claude --strict-mcp-config --allowedTools Read "Bash(python3 *)" --disallowedTools WebFetch WebSearch --effort low -p "In one sentence, what does this repo do and what is the bug in slugify.py?" --output-format json | jq -r ".result"'; COMPLETE=stable ;;
  32) RESET=5411d3b; ARTIFACTS=""; MODE=bash; CLAUDE=':'; PRESTEP='mkdir -p "$DEMO/shared-lib" && printf "%s\n" "# SHARED_LIB_SHOUT" "def shout(s):" "    return s.upper()" > "$DEMO/shared-lib/strings.py"'; TEXT='claude --strict-mcp-config --add-dir ../shared-lib --permission-mode plan --disallowedTools WebFetch WebSearch -p "Read ../shared-lib/strings.py and tell me in one line what shout returns for the input hi."'; COMPLETE=stable ;;
  35) RESET=5411d3b; LAUNCH_FIRST=1; ARTIFACTS=""; CLAUDE='claude --strict-mcp-config --allowedTools Read --disallowedTools WebFetch WebSearch --effort low'; MODE=prompt; TEXT="In one sentence, what does slugify.py do?"; FOLLOWUP="/export saved-chat.txt"; COMPLETE=shellmode ;;
- 36) RESET=5411d3b; LAUNCH_FIRST=1; ARTIFACTS=""; PRESTEP='mkdir -p "$REPO/.claude" && cp "$DEMO/ep36-done.sh" "$REPO/.claude/done.sh" && chmod +x "$REPO/.claude/done.sh" && cp "$DEMO/ep36-settings.json" "$REPO/.claude/settings.json" && rm -f "$REPO/.claude/stop.log"'; CLAUDE='claude --strict-mcp-config --allowedTools Read --disallowedTools WebFetch WebSearch --effort low'; MODE=prompt; TEXT="What language is slugify.py written in? Answer in one word."; FOLLOWUP="Read .claude/stop.log and show me what the Stop hook appended when my last turn finished."; COMPLETE=shellmode ;;
+ 36) RESET=5411d3b; ARTIFACTS=""; MODE=bash; CLAUDE=':'; PRESTEP='mkdir -p "$REPO/.claude" && cp "$DEMO/ep36-done.sh" "$REPO/.claude/done.sh" && chmod +x "$REPO/.claude/done.sh" && cp "$DEMO/ep36-settings.json" "$REPO/.claude/settings.json" && rm -f "$REPO/.claude/stop.log"'; TEXT='claude --strict-mcp-config --allowedTools Read --disallowedTools WebFetch WebSearch --effort low -p "What language is slugify.py written in? Answer in one word." && printf "\n— Stop hook fired; stop.log now has: —\n" && cat .claude/stop.log'; COMPLETE=stable ;;
  33) RESET=6a8d07c; LAUNCH_FIRST=1; ARTIFACTS="CLAUDE.md"; PRESTEP='mkdir -p "$REPO/docs" && printf "# Git workflow\n- Branch per issue, squash-merge to main.\n" > "$REPO/docs/git-instructions.md" && printf "\n# Modules\n- Git workflow: @docs/git-instructions.md\n" >> "$REPO/CLAUDE.md"'; CLAUDE='claude --strict-mcp-config --allowedTools Read --disallowedTools WebFetch WebSearch --effort low'; MODE=prompt; TEXT="What is our git workflow? Answer in one line."; COMPLETE=stable ;;
  31) RESET=5411d3b; LAUNCH_FIRST=1; ARTIFACTS=""; CLAUDE='claude --strict-mcp-config --allowedTools Bash Read --disallowedTools WebFetch WebSearch --effort low'; MODE=prompt; TEXT="Run the test suite (python3 test_slugify.py) in the background so you do not block, tell me the background task ID, then read the output and report pass or fail."; COMPLETE=stable ;;
  37) RESET=5411d3b; ARTIFACTS=""; MODE=bash; CLAUDE=':'; TEXT='claude --strict-mcp-config --append-system-prompt "Always answer in TypeScript and put a one-line ELI5 comment above every function." --allowedTools Read Grep Glob --disallowedTools WebFetch WebSearch --effort low -p "Write a function that slugifies a string."'; COMPLETE=stable ;;
  22) RESET=5411d3b; ARTIFACTS=""; MODE=bash; CLAUDE=':'; PRESTEP='git -C "$REPO" worktree remove --force .claude/worktrees/wt 2>/dev/null; git -C "$REPO" branch -D worktree-wt 2>/dev/null; git -C "$REPO" worktree prune; mkdir -p "$REPO/.claude" && cp "$DEMO/ep22-settings.json" "$REPO/.claude/settings.local.json" && printf "%s\n" ".claude/worktrees/" >> "$REPO/.gitignore"'; TEXT='claude -p --strict-mcp-config --worktree wt --allowedTools Read --disallowedTools WebFetch WebSearch --effort low "In one line, what does slugify.py do?" && git worktree list'; COMPLETE=stable ;;
  27) RESET=5411d3b; LAUNCH_FIRST=1; ARTIFACTS=""; CLAUDE='claude --strict-mcp-config --agents '"'"'{"slugify-explainer":{"description":"Read-only agent that explains code","prompt":"In one sentence only, say what the file does. No lists, no bug analysis, no offers to fix. Read-only; never edit files.","tools":["Read","Grep","Glob"],"model":"sonnet"}}'"'"' --allowedTools Task Read Grep Glob --disallowedTools WebFetch WebSearch --effort low'; MODE=prompt; TEXT="Use the slugify-explainer agent: in one sentence, what does slugify.py do?"; COMPLETE=stable ;;
+ 18) RESET=5411d3b; LAUNCH_FIRST=1; ARTIFACTS=""; CLAUDE='claude --strict-mcp-config --allowedTools Read Edit Write --disallowedTools WebFetch WebSearch --effort low'; MODE=modecycle; TEXT=""; COMPLETE=modecycle ;;
 esac
 # reset the demo repo to this episode's correct starting state (so file cards + claude see the right files)
 if [ -n "$STANDIN_DIR" ]; then
@@ -61,6 +62,7 @@ $TM new-session -d -s cclive -x $W -y $H; $TM set-option -t cclive status off
 $TM set-option -g focus-events on 2>/dev/null; $TM set-option -g mouse on 2>/dev/null   # suppress claude's tmux hint chrome
 $TM send-keys -t cclive "export PATH=/opt/homebrew/bin:\$HOME/.local/bin:\$PATH; export CLAUDE_CODE_OAUTH_TOKEN=\$(cat $TOKEN); export PROMPT='\$ '; cd $REPO; clear" Enter
 sleep 1
+IDLE=1.0; [ "$MODE" = "modecycle" ] && IDLE=6.0
 if [ -n "$STANDIN_DIR" ] || [ -n "$LAUNCH_FIRST" ]; then
   # ep17 clean-launch (also LAUNCH_FIRST=1 non-standin episodes): claude's startup prints a transient account toast with the logged-in
   # email/org (e.g. "<acct>'s Organization /release-notes"). It auto-dismisses in ~14s. Launch
@@ -70,12 +72,12 @@ if [ -n "$STANDIN_DIR" ] || [ -n "$LAUNCH_FIRST" ]; then
   $TM send-keys -t cclive "$CLAUDE" Enter
   sleep 16
   $TM new-session -d -s ccrec2 -x $W -y $H; $TM set-option -t ccrec2 status off
-  $TM send-keys -t ccrec2 "export PATH=/opt/homebrew/bin:\$HOME/.local/bin:\$PATH; asciinema rec $REC/claude-ep${EP}.cast --overwrite --idle-time-limit 1.0 --command 'tmux attach -t cclive -r'" Enter
+  $TM send-keys -t ccrec2 "export PATH=/opt/homebrew/bin:\$HOME/.local/bin:\$PATH; asciinema rec $REC/claude-ep${EP}.cast --overwrite --idle-time-limit $IDLE --command 'tmux attach -t cclive -r'" Enter
   sleep 3
 else
   # recorder FIRST so it captures the shell + the artifact + claude launch
   $TM new-session -d -s ccrec2 -x $W -y $H; $TM set-option -t ccrec2 status off
-  $TM send-keys -t ccrec2 "export PATH=/opt/homebrew/bin:\$HOME/.local/bin:\$PATH; asciinema rec $REC/claude-ep${EP}.cast --overwrite --idle-time-limit 1.0 --command 'tmux attach -t cclive -r'" Enter
+  $TM send-keys -t ccrec2 "export PATH=/opt/homebrew/bin:\$HOME/.local/bin:\$PATH; asciinema rec $REC/claude-ep${EP}.cast --overwrite --idle-time-limit $IDLE --command 'tmux attach -t cclive -r'" Enter
   sleep 3
   # show the artifact(s) — the "more detail"
   for a in $ARTIFACTS; do $TM send-keys -t cclive "cat $a" Enter; sleep 3.5; done
@@ -87,6 +89,8 @@ if [ "$MODE" = "slash" ]; then
   rest="${TEXT#/}"
   $TM send-keys -t cclive "/"; sleep 3                                   # reveal the slash-command menu on screen
   $TM send-keys -t cclive "$rest"; sleep 1; $TM send-keys -t cclive Enter
+elif [ "$MODE" = "modecycle" ]; then
+  :
 else
   $TM send-keys -t cclive "$TEXT"; sleep 1; $TM send-keys -t cclive Enter
 fi
@@ -104,6 +108,7 @@ case "$COMPLETE" in
  sandbox) sleep 2; $TM send-keys -t cclive "1"; sleep 3; $TM send-keys -t cclive Escape; sleep 2; $TM send-keys -t cclive "$SBCMD"; sleep 1; $TM send-keys -t cclive Enter; prev="";st=0; for i in $(seq 1 30); do sleep 3; p=$($TM capture-pane -pt cclive 2>/dev/null); h=$(echo "$p"|md5); [ "$h" = "$prev" ]&&st=$((st+1))||st=0; prev=$h; [ $i -ge 4 ]&&[ $st -ge 3 ]&&{ echo "sandbox stable $i"; break; }; done; sleep 1 ;;
  memwrite) for i in $(seq 1 40); do sleep 3; p=$($TM capture-pane -pt cclive 2>/dev/null); echo "$p"|grep -qiE "Do you want to|1\. Yes|allow Claude to edit" && $TM send-keys -t cclive "1"; grep -qi "pytest" "$REPO/CLAUDE.md" 2>/dev/null && { echo "memwrite $i"; break; }; done; sleep 3 ;;
  plugininstall) for i in $(seq 1 40); do sleep 3; p=$($TM capture-pane -pt cclive 2>/dev/null); echo "$p"|grep -qiE "Successfully installed plugin|already installed" && { echo "plugininstall $i"; break; }; done; sleep 3 ;;
+ modecycle) sleep 3; $TM send-keys -t cclive BTab; sleep 5; p=$($TM capture-pane -pt cclive 2>/dev/null); echo "$p"|grep -qi "accept edits on" && echo "modecycle acceptEdits ok"; $TM send-keys -t cclive BTab; sleep 7; p=$($TM capture-pane -pt cclive 2>/dev/null); echo "$p"|grep -qi "plan mode on" && echo "modecycle plan ok"; sleep 3 ;;
  *) prev="";st=0; for i in $(seq 1 50); do sleep 3; p=$($TM capture-pane -pt cclive 2>/dev/null); h=$(echo "$p"|md5); [ "$h" = "$prev" ]&&st=$((st+1))||st=0; prev=$h; [ $i -ge 6 ]&&[ $st -ge 3 ]&&{ echo "stable $i"; break; }; done; sleep 1 ;;
 esac
 sleep 4; $TM kill-session -t ccrec2 2>/dev/null; sleep 1; $TM kill-session -t cclive 2>/dev/null   # recorder stops at result, then close claude

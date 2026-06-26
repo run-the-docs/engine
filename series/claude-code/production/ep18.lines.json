@@ -1,33 +1,15 @@
 {
- "published": false,
- "title": "EP 18 — STOP APPROVING EVERY COMMAND",
- "sub": "Shift+Tab to auto mode — a classifier guards each action",
+ "title": "EP 18 — STOP APPROVING EVERY EDIT",
+ "sub": "Shift+Tab cycles permission modes: ask → accept edits → plan",
  "lines": [
-  [
-   "Stop clicking 'yes' on every command.",
-   "Stop clicking yes on every command."
-  ],
-  [
-   "Give Claude a multi-step task.",
-   "Give Clawd a multi step task."
-  ],
-  [
-   "Press Shift+Tab — it switches to auto mode.",
-   "Press shift tab. It switches to auto mode."
-  ],
-  [
-   "It edits, runs shell, hits the network — no prompts.",
-   "It edits, runs shell, hits the network. No prompts."
-  ],
-  [
-   "A safety classifier checks each action and blocks anything risky.",
-   "A safety classifier checks each action, and blocks anything risky."
-  ],
-  [
-   "Follow for a fresh Claude Code tip every day.",
-   "Follow for a fresh Clawd Code tip, every day."
-  ]
+  ["Tired of approving every edit?", "Tired of approving every single edit?"],
+  ["Press Shift+Tab to cycle permission modes.", "Press shift tab, to cycle Clawd's permission modes."],
+  ["Accept edits: Claude writes files, no prompts.", "First, accept edits. Clawd writes files in your folder, with no prompts."],
+  ["Your current mode always shows in the status bar.", "And your current mode always shows, right there in the status bar."],
+  ["Plan mode: research and propose, never edit.", "Then plan mode. Clawd researches and proposes, but never edits your files."],
+  ["Three modes, one keystroke: ask, accept, plan.", "Three modes, one keystroke. Ask, accept edits, or plan."],
+  ["Follow for a fresh Claude Code tip every day.", "Follow for a fresh Clawd Code tip, every day."]
  ],
- "command": "Shift+Tab",
+ "command": "Shift+Tab in the Claude TUI cycles: default → accept edits → plan",
  "artifact": ""
 }

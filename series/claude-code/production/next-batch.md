@@ -30,7 +30,9 @@ ep19 /goal · ep21 /sandbox · ep23 /statusline · ep24 ! shell · fable5 model 
 
 **Produced 2026-06-26 (were "deferred"):** **ep22 worktrees** (`--worktree`; MODE=bash, recorded headless — the "two terminals" rationale was wrong, a first-class flag exists; `ss8e8MjPISw`, scheduled 07-09) · **ep27 a subagent in one command** (recorded as the headless `--agents` twin of the `/agents` wizard; MODE=prompt interactive so the `● slugify-explainer` delegation renders + a one-sentence answer — headless `-p` made COMPLETE=stable false-fire before the long subagent answered; `xOL1dVTQp_c`, scheduled 07-10).
 
-**Still deferred / gated (NOT headless — need a focused session):** ep18 auto-mode (Shift+Tab status-bar cycle — needs a recd.sh MODE=modecycle keystroke+verify handler) · ep20 /voice (real mic — hardware-blocked, off-pipeline only) · ep36 Stop-hook (net-new assets + a two-turn handler). ep25 /fast (skipped: account-gated on usage credits; reassess with a manual `/fast` check).
+**Produced 2026-06-26 (round 2, were "deferred"):** **ep18 permission modes** (Shift+Tab cycle default→acceptEdits→plan; NEW recd.sh `MODE=modecycle` + `COMPLETE=modecycle` BTab-keystroke handler [tmux drops `S-Tab`, use `BTab`] + per-episode `IDLE=6.0`; hero retargeted to the base cycle — auto/bypass are account-gated and narration-only; captions made state-agnostic since fix_term collapses the dwells so frame-perfect caption↔mode sync isn't achievable; `lBKOiEV3oGc`, scheduled 07-12) · **ep36 Stop hook** (redesigned to `MODE=bash`: `claude -p "…" && cat .claude/stop.log` — the hook fires on `-p` exit then cat shows it, killing the old in-session FOLLOWUP race; the nested settings shape is CORRECT — the workflow verifier's "flat" claim was wrong, empirically verified; `S3iaX_ur3YM`, scheduled 07-10).
+
+**Still deferred / gated (NOT headless):** ep20 /voice (real mic — hardware-blocked, off-pipeline only). ep25 /fast (skipped: account-gated on usage credits; reassess with a manual `/fast` check).
 
 ## Post-06-28 slot plan (one/day, 13/16/19 UTC rotation continues)
 
