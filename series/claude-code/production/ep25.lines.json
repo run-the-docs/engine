@@ -1,33 +1,15 @@
 {
- "published": false,
- "title": "EP 25 — TURN ON FAST MODE",
- "sub": "/fast — same Opus, faster output (uses usage credits)",
+ "title": "EP 25 — FAST MODE",
+ "sub": "/fast: up to 2.5x faster output on Opus",
  "lines": [
-  [
-   "Claude feels slow? Flip one switch.",
-   "Clawd feels slow? Flip one switch."
-  ],
-  [
-   "Type /fast to turn on fast mode.",
-   "Type slash fast, to turn on fast mode."
-  ],
-  [
-   "Same Opus — up to 2.5x the speed.",
-   "Same Opus. Up to two and a half times the speed."
-  ],
-  [
-   "Perfect for live, back-and-forth work.",
-   "Perfect for live, back and forth work."
-  ],
-  [
-   "It draws on usage credits — toggle off after.",
-   "It draws on usage credits. Toggle off, after."
-  ],
-  [
-   "Follow for a fresh Claude Code tip every day.",
-   "Follow for a fresh Clawd Code tip, every day."
-  ]
+  ["Claude Code can run up to 2.5x faster.", "Did you know Clawd Code can run up to two and a half times faster?"],
+  ["Turn it on with /fast on.", "You turn it on with the command, slash fast on."],
+  ["Fast mode ON — a bolt marks your status bar.", "Fast mode is now on, and a little lightning bolt marks your status bar."],
+  ["Same Opus model, just quicker tokens.", "It is the very same Opus model, just running with much quicker tokens."],
+  ["The trade: about double the per-token cost.", "The trade off is about double the cost, per token, while it is on."],
+  ["/fast off to slow back down.", "And it is, slash fast off, whenever you want to slow back down again."],
+  ["Follow for a fresh Claude Code tip every day.", "Follow Run the Docs for a fresh Clawd Code tip, every single weekday."]
  ],
- "command": "/fast",
+ "command": "/fast on   (toggle fast mode; /fast off to disable)",
  "artifact": ""
 }
