@@ -1,0 +1,15 @@
+{
+ "title": "EP 27 — A SUBAGENT IN ONE COMMAND",
+ "sub": "/agents is the wizard; --agents is the headless twin",
+ "lines": [
+  ["A subagent is a helper with its own context, tools, and prompt.", "A subagent is a helper Clawd spawns, with its own context, its own tools, and its own prompt."],
+  ["The easy way to build one: run /agents — a guided wizard.", "The easy way to build one is to run, slash agents. It opens a guided wizard."],
+  ["Library tab, Generate with Claude, pick tools, model, save.", "In the Library tab you hit Generate with Clawd, pick its tools and model, and save."],
+  ["Want it scriptable? --agents takes the same fields as JSON.", "Want it scriptable instead? The dash dash agents flag takes the very same fields, as JSON."],
+  ["name, description, tools, model, and the system prompt.", "A name, a description, the tools it may use, a model, and its system prompt."],
+  ["Then just ask — and Claude delegates to the subagent.", "Then you just ask. And Clawd delegates the task, straight to it."],
+  ["Follow for a fresh Claude Code tip every day.", "Follow for a fresh Clawd Code tip, every day."]
+ ],
+ "command": "claude --agents '{\"slugify-explainer\":{\"description\":\"Read-only agent that explains code\",\"prompt\":\"In one sentence only, say what the file does. No lists, no bug analysis, no offers to fix. Read-only; never edit files.\",\"tools\":[\"Read\",\"Grep\",\"Glob\"],\"model\":\"sonnet\"}}' -p \"Use the slugify-explainer agent: in one sentence, what does slugify.py do?\"",
+ "artifact": ""
+}

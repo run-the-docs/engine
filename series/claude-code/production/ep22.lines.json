@@ -1,0 +1,15 @@
+{
+ "title": "EP 22 — PARALLEL WORKTREES",
+ "sub": "claude --worktree: isolate parallel sessions, no collisions",
+ "lines": [
+  ["Two Claude sessions, one repo — edits collide.", "Run two Claude sessions on one repo and their edits can collide."],
+  ["claude --worktree wt", "The fix: claude, dash dash worktree, then a name."],
+  ["Isolated checkout under .claude/worktrees/", "It spins up an isolated checkout under dot claude slash worktrees."],
+  ["…on a fresh branch: worktree-wt", "On a fresh branch named worktree, dash, w t."],
+  ["git worktree list shows both, side by side.", "Git worktree list shows your main checkout and the new one, side by side."],
+  ["Different name in another terminal = parallel.", "Run it with a different name in another terminal, for a second isolated session."],
+  ["Follow for a daily Claude Code tip", "Follow for a fresh Clawd Code tip every day."]
+ ],
+ "command": "claude -p --worktree wt \"In one line, what does slugify.py do?\" && git worktree list",
+ "artifact": ""
+}
