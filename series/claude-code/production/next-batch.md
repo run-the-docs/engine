@@ -135,20 +135,20 @@ memwrite) for i in $(seq 1 40); do sleep 3; p=$($TM capture-pane -pt cclive 2>/d
 
 ## Post-07-07 — ep37 (drafted + verified 2026-06-25)
 
-### ep37 — Steer one run (`--append-system-prompt`)  ⚠ PRINT pattern (like ep13), NOT send-keys
+### ep37 — Steer one run (`--append-system-prompt`)  ⚠ bash-PRINT pattern (like ep34's `-p`), NOT send-keys
 Docs: `code.claude.com/docs/en/cli-reference` (System prompt flags). The flag **applies only to the
 current invocation** — the docs explicitly contrast it with CLAUDE.md (`/en/memory`, persistent) and
 output styles (`/en/output-styles`, persistent), which is the episode's hook. Distinct from ep34
 (`-p | jq` plumbing); this shows `-p` *behavior steering*.
 
-Record the headless **PRINT** form: the prompt is the **positional in `CLAUDE`**, `TEXT=""` — do NOT
-type the prompt via send-keys (`claude -p` with no positional blocks on stdin). `COMPLETE=stable`
-(the default stability handler) catches the printed answer; no bespoke clause needed.
+Record the headless **PRINT** form in **`MODE=bash`** (like ep34's `-p`): `CLAUDE=':'` skips the TUI
+launch and the full `claude … -p "…"` command is typed into a plain `$ ` shell, so the printed answer
+renders in the terminal. `COMPLETE=stable` (the default stability handler) catches it; no bespoke clause
+needed. (The earlier `MODE=prompt; TEXT=""` draft was superseded by this bash-print form during
+recording — this block matches the shipped `recd.sh` case.)
 
 ```
-37) RESET=5411d3b; ARTIFACTS=""; MODE=prompt; TEXT=""; \
-    CLAUDE='claude -p "Write a function that slugifies a string." --append-system-prompt "Always answer in TypeScript and put a one-line ELI5 comment above every function." --allowedTools Read Grep Glob --disallowedTools WebFetch WebSearch --effort low'; \
-    COMPLETE=stable ;;
+37) RESET=5411d3b; ARTIFACTS=""; MODE=bash; CLAUDE=':'; TEXT='claude --strict-mcp-config --append-system-prompt "Always answer in TypeScript and put a one-line ELI5 comment above every function." --allowedTools Read Grep Glob --disallowedTools WebFetch WebSearch --effort low -p "Write a function that slugifies a string."'; COMPLETE=stable ;;
 ```
 
 Notes (from the verify pass):
@@ -159,4 +159,6 @@ Notes (from the verify pass):
   RESET-state dependency beyond the standard slugify-present sha `5411d3b` (same as ep1/6/14).
 - **Visible payoff:** the printed answer is TypeScript with an ELI5 comment above the function — a rule
   in neither CLAUDE.md nor an output style; a re-run without the flag answers normally.
-- **Proposed slot:** 2026-07-08 13:00 UTC (continues the daily 13/16/19 rotation after ep33 on 07-07).
+- **Slot (shipped):** 2026-07-08 17:00 UTC — next open slot after ep33 (07-07 19:00). Recorded + built
+  2026-06-26 (engine#81), YouTube `e9hzul46hHU`; scheduled after a pull-back from an accidental immediate
+  public publish (cockpit card website#47).
