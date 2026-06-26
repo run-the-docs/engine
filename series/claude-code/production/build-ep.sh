@@ -41,6 +41,7 @@ case "$N" in
   27) RESET=5411d3b ;;
   18) RESET=5411d3b ;;
   25) RESET=5411d3b ;;
+  38) RESET=5411d3b ;;
 esac
 if [ -n "$RESET" ]; then
   git -C "$REPO" reset --hard "$RESET" >/dev/null 2>&1 && git -C "$REPO" clean -fdq >/dev/null 2>&1 \

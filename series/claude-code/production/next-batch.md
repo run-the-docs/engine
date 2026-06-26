@@ -34,6 +34,8 @@ ep19 /goal · ep21 /sandbox · ep23 /statusline · ep24 ! shell · fable5 model 
 
 **ep25 PRODUCED 2026-06-26 (round 3):** **ep25 fast mode** (`/fast on` → `↯ Fast mode ON · $10/$50 per Mtok`; MODE=slash toggle-only, COMPLETE=stable — the account's fast-mode usage credits got exhausted by a test query, and a query burns credits while the toggle does NOT, so the demo shows the toggle + the ↯ status-bar indicator only; `N4eCKNsGWQk`, scheduled 07-13 tail). GOTCHA: `/fast` is account-gated on **usage credits** — probe with a manual `/fast on` (clean = `↯ Fast mode ON`; gated = `Fast mode disabled · usage credits exhausted`), and DON'T add a follow-up query to the recipe (it drains credits mid-take).
 
+**ep38 PRODUCED 2026-06-26 (NEW, beyond the original six — extends the drip):** **ep38 pick the right model** (`claude --model haiku -p "…"` runs a simple task on a cheaper/faster model; MODE=bash; the command visibly shows `--model haiku` + Haiku's answer — distinct from fable5's model showcase; `1h-48GITJuU`, scheduled 07-14). PICKED because it's leak-free: `/usage` & `/cost` render a panel that EXPOSES the operator's global setup (`/load-memory` skill + `discord` MCP server) → NOT recordable on the neutral channel; flag-based `claude -p` episodes stay clean.
+
 **Still deferred (NOT headless):** ep20 /voice — real mic, hardware-blocked, off-pipeline only. **This is the LAST of the original "missing six" still unproduced** (ep18/22/25/27/36 all shipped; ep20 needs an operator mic recording).
 
 ## Post-06-28 slot plan (one/day, 13/16/19 UTC rotation continues)

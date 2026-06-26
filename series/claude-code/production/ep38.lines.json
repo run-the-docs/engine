@@ -1,0 +1,15 @@
+{
+ "title": "EP 38 — PICK THE RIGHT MODEL",
+ "sub": "--model: a cheaper, faster model for simple work",
+ "lines": [
+  ["Not every task needs the biggest model.", "Not every task needs the biggest, most expensive model."],
+  ["Add --model haiku for quick, cheap work.", "Add, dash dash model haiku, for quick and cheap work."],
+  ["Haiku answers simple questions in a snap.", "Haiku answers the simple questions in a snap."],
+  ["Same prompt, a fraction of the cost.", "The same prompt, at a fraction of the cost."],
+  ["Save Opus for the hard, multi-step problems.", "Save Opus for the hard, multi-step problems."],
+  ["Set it per run, or make it your default.", "Set it per run with the flag, or make it your default."],
+  ["Follow for a fresh Claude Code tip every day.", "Follow for a fresh Clawd Code tip, every day."]
+ ],
+ "command": "claude --model haiku -p \"In one sentence, what does slugify.py do?\"",
+ "artifact": ""
+}
