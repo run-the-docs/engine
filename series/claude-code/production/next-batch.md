@@ -32,7 +32,9 @@ ep19 /goal · ep21 /sandbox · ep23 /statusline · ep24 ! shell · fable5 model 
 
 **Produced 2026-06-26 (round 2, were "deferred"):** **ep18 permission modes** (Shift+Tab cycle default→acceptEdits→plan; NEW recd.sh `MODE=modecycle` + `COMPLETE=modecycle` BTab-keystroke handler [tmux drops `S-Tab`, use `BTab`] + per-episode `IDLE=6.0`; hero retargeted to the base cycle — auto/bypass are account-gated and narration-only; captions made state-agnostic since fix_term collapses the dwells so frame-perfect caption↔mode sync isn't achievable; `lBKOiEV3oGc`, scheduled 07-12) · **ep36 Stop hook** (redesigned to `MODE=bash`: `claude -p "…" && cat .claude/stop.log` — the hook fires on `-p` exit then cat shows it, killing the old in-session FOLLOWUP race; the nested settings shape is CORRECT — the workflow verifier's "flat" claim was wrong, empirically verified; `S3iaX_ur3YM`, scheduled 07-10).
 
-**Still deferred / gated (NOT headless):** ep20 /voice (real mic — hardware-blocked, off-pipeline only). ep25 /fast (skipped: account-gated on usage credits; reassess with a manual `/fast` check).
+**ep25 PRODUCED 2026-06-26 (round 3):** **ep25 fast mode** (`/fast on` → `↯ Fast mode ON · $10/$50 per Mtok`; MODE=slash toggle-only, COMPLETE=stable — the account's fast-mode usage credits got exhausted by a test query, and a query burns credits while the toggle does NOT, so the demo shows the toggle + the ↯ status-bar indicator only; `N4eCKNsGWQk`, scheduled 07-13 tail). GOTCHA: `/fast` is account-gated on **usage credits** — probe with a manual `/fast on` (clean = `↯ Fast mode ON`; gated = `Fast mode disabled · usage credits exhausted`), and DON'T add a follow-up query to the recipe (it drains credits mid-take).
+
+**Still deferred (NOT headless):** ep20 /voice — real mic, hardware-blocked, off-pipeline only. **This is the LAST of the original "missing six" still unproduced** (ep18/22/25/27/36 all shipped; ep20 needs an operator mic recording).
 
 ## Post-06-28 slot plan (one/day, 13/16/19 UTC rotation continues)
 
