@@ -50,7 +50,8 @@ overwrite an older one; the site renders `MAX(as_of)` per video, and history sta
 python3 videos/build-stats.py <export.json> > videos/stats.json   # in run-the-docs/website
 ```
 Open a website PR with the regenerated `videos/stats.json`; Cloudflare Pages redeploys `/videos`.
-Until run-the-docs review is wired (infra#365), admin-merge as the dispatch-miss fallback.
+run-the-docs/website `main` is unprotected, so squash-merge it directly
+(`gh pr merge <n> --repo run-the-docs/website --squash --delete-branch`) — no `--admin` needed.
 
 ## Cadence
 Best-effort weekly (the YT token is the gate; there is no always-on server-side stats job

@@ -34,8 +34,11 @@ Run on a schedule (daily is plenty for a daily drip — see cadence below):
    UPDATE videos SET youtube_privacy='public' WHERE id='<video_id>' AND youtube_privacy='private';
    ```
 4. **Regenerate + PR** — re-run the `videos/build-posted.py` flow in run-the-docs/website
-   (MCP query → build-posted.py → `videos/posted.json`) and open a website PR. Until
-   infra#365 wires Review-E for run-the-docs, admin-merge it (dispatch-miss fallback).
+   (MCP query → build-posted.py → `videos/posted.json`) and open a website PR.
+   run-the-docs/website `main` is unprotected, so squash-merge it directly
+   (`gh pr merge <n> --repo run-the-docs/website --squash --delete-branch`) — no `--admin`.
+   (An admin/review step would only apply if branch protection is ever added before
+   infra#365 wires Review-E for run-the-docs.)
 5. **Alert** — post a one-line summary to Discord `#run-the-docs` (transitions applied, or
    "no changes"). A weekly green heartbeat doubles as a dead-man's-switch.
 
