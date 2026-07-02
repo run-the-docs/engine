@@ -7,7 +7,7 @@ name: Reconcile publish status
 # squash-merged PR (website main is unprotected -> the merge fires the existing Pages deploy).
 #
 # INERT until the RTD_SOCIAL_D1_TOKEN secret is provisioned (Cloudflare Account.D1.Edit,
-# via OpenTofu in dashecorp/infra). The orchestrator MCP routine in
+# via a direct `gh secret set` on run-the-docs/engine (NOT OpenTofu; engine#57). The orchestrator MCP routine in
 # tools/reconcile-publish-status.md remains the manual fallback.
 
 on:
@@ -37,7 +37,7 @@ jobs:
           if [ "$TOKEN_SET" = "true" ]; then
             echo "skip=0" >> "$GITHUB_OUTPUT"
           else
-            echo "::notice::RTD_SOCIAL_D1_TOKEN not set — reconciler is inert until provisioned via OpenTofu (dashecorp/infra). Skipping cleanly."
+            echo "::notice::RTD_SOCIAL_D1_TOKEN not set — reconciler is inert until provisioned via gh secret set on this repo (engine#57). Skipping cleanly."
             echo "skip=1" >> "$GITHUB_OUTPUT"
           fi
 
